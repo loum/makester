@@ -37,14 +37,14 @@ PIP := $(PYVERSION)env/bin/pip
 PYTHON := $(PYVERSION)env/bin/python
 
 VENV_DIR_EXISTS := $(shell [ -e "${PYVERSION}env" ] && echo 1 || echo 0)
-clear_env:
+clear-env:
 ifeq ($(VENV_DIR_EXISTS), 1)
 	@echo \#\#\# Deleting existing environment ${PYVERSION}env ...
 	$(shell which rm) -fr ${PYVERSION}env
 	@echo \#\#\# ${PYVERSION}env delete done.
 endif
 
-init_env:
+init-env:
 	@echo \#\#\# Creating virtual environment ${PYVERSION}env ...
 	@echo \#\#\# Using wheel house $(WHEEL) ...
 ifneq ($(VENV_TOOL),)
@@ -67,12 +67,20 @@ else
 	@echo \#\#\# Virtual environment not created.
 endif
 
-init: clear_env init_env
+init: clear-env init-env
 
-py_versions:
+py-versions:
 	@echo python3 version: ${PY3_VERSION}
 	@echo python3 minor: ${PY3_VERSION_MINOR}
 	@echo path to python3 executable: ${PY3}
 	@echo python3 virtual env command: ${PY_VENV}
 	@echo python2 virtual env command: ${PY2_VENV}
 	@echo virtual env tooling: ${VENV_TOOL}
+
+python-venv-help:
+	@echo "(makefiles/python-venv.mk)\n\
+  py-versions          Display your environment Python setup\n\
+  clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
+  init-env             Create virtual environment \"$(PYVERSION)env\"\n\
+  init                 Remove virtual environment \"$(PYVERSION)env\" and re-create\n\
+	";
