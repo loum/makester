@@ -11,7 +11,7 @@ run:
 stop:
 	@$(DOCKER) stop $(MAKESTER__CONTAINER_NAME) || true
 
-RUNNING_CONTAINER = $(shell $(DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME))
+RUNNING_CONTAINER := $(shell docker ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 status:
 ifneq ($(RUNNING_CONTAINER),)
 	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container is running.  Run \"make stop\" to terminate
