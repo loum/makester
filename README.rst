@@ -50,12 +50,19 @@ Include the required makefile targets into your `Makefile`.  For example::
 
     include makester/makefiles/base.mk
 
+.. note::
+
+    Remember to regularly get the latest `Makester` code base::
+
+        $ git submodule update --remote --merge
+
 Still not sure?  See the sample Docker "Hello World" below.
 
 `Makefiles` to come and are currently a WIP include:
 
 - docker-compose
 - AWS
+- git
 
 *******************************************
 Run the Sample Docker "Hello World" Project
