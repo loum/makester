@@ -100,3 +100,18 @@ Python Virtual Environments
 To build a Python virtual environment, your dependencies to `requirements.txt` in the top level of you project directory::
 
   $ make -f sample/Makefile init
+
+*****************
+Command Reference
+*****************
+
+`makefile/docker.mk`
+====================
+
+Tag image built under version control with the `latest` tag::
+
+    $ make tag
+
+Remove dangling images::
+
+    $ make rm-dangling-images
