@@ -21,9 +21,6 @@ else
 endif
 
 IMAGE_TAG := $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
-$(warning IMAGE_TAG: $(IMAGE_TAG))
-$(warning MAKESTER__SERVICE_NAME: $(MAKESTER__SERVICE_NAME))
-$(warning MAKESTER__IMAGE_TAG: $(MAKESTER__IMAGE_TAG))
 tag:
 	@$(DOCKER) tag $(IMAGE_TAG) $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TAG)
 
