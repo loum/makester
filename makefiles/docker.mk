@@ -12,6 +12,12 @@ run:
 stop:
 	@$(DOCKER) stop $(MAKESTER__CONTAINER_NAME) || true
 
+login-priv:
+	@$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) sh
+
+logs:
+	@$(DOCKER) logs --follow $(MAKESTER__CONTAINER_NAME)
+
 RUNNING_CONTAINER := $(shell docker ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 status:
 ifneq ($(RUNNING_CONTAINER),)
@@ -29,9 +35,11 @@ rm-dangling-images:
 
 docker-help:
 	@echo "(makefiles/docker.mk)\n\
-  run:                 Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
-  stop:                Stop container $(MAKESTER__CONTAINER_NAME)\n\
   status:              Check container $(MAKESTER__CONTAINER_NAME) status\n\
+  run:                 Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
+  login-priv:          Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
+  logs:                Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
+  stop:                Stop container $(MAKESTER__CONTAINER_NAME)\n\
   tag:                 Tag image $(MAKESTER__SERVICE_NAME):latest (default)\n\
   rm-dangling-images:  Remove all dangling images\n\
 	";
