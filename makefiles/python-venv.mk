@@ -59,15 +59,19 @@ ifneq ($(VENV_TOOL),)
 	@echo \#\#\# wheel env done.
 
 	@echo \#\#\# Installing package dependencies ...
-	$(PIP) wheel --wheel-dir $(WHEEL) --find-links=$(WHEEL) --requirement requirements.txt
-	$(PIP) install --find-links=$(WHEEL) --requirement requirements.txt
+	$(PIP) wheel --wheel-dir $(WHEEL) --find-links=$(WHEEL) $(PIP_INSTALL)
+	$(PIP) install --find-links=$(WHEEL) $(PIP_INSTALL)
 	@echo \#\#\# Package install done.
 else
 	@echo \#\#\# Hmmm, cannot find virtual env tool.
 	@echo \#\#\# Virtual environment not created.
 endif
 
-init: clear-env init-env
+pip-requirements: PIP_INSTALL = --requirement requirements.txt
+pip-requirements: clear-env init-env
+
+pip-editable: PIP_INSTALL = .
+pip-editable: -e .
 
 py-versions:
 	@echo python3 version: ${PY3_VERSION}
@@ -80,7 +84,8 @@ py-versions:
 python-venv-help:
 	@echo "(makefiles/python-venv.mk)\n\
   py-versions          Display your environment Python setup\n\
+  pip-requirements     \"clear-env\"|\"init-env\" and build virtual environment deps from \"requirements.txt\"\n\
+  pip-editable         \"clear-env\"|\"init-env\" and build virtual environment deps from \"setup.py\"\n\
   clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
-  init-env             Create virtual environment \"$(PYVERSION)env\"\n\
-  init                 Remove virtual environment \"$(PYVERSION)env\" and re-create\n\
+  init-env             Build virtual environment \"$(PYVERSION)env\"\n\
 	";
