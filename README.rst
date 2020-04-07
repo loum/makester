@@ -6,7 +6,7 @@ Centralised repository for common tasks that you use everyday in your coding pro
 
 Created in response to a proliferation of disjointed Makefiles over the years.  Now, projects can follow a consistent infrastructure management pattern that is version controlled and easy to use.
 
-If you use Docker, ``docker-compose`` or Python virtual environments regularly then read on.
+If you're into `3 musketeers <https://3musketeers.io/>`_ and use Docker, ``docker-compose`` or Python virtual environments and ``make`` regularly then read on.
 
 *************
 Prerequisites
@@ -93,9 +93,42 @@ Delete the Image
 
   $ make -f sample/Makefile rmi
 
+******************************
+Using Makester in your Project
+******************************
+
+Add a ``Makefile`` to the top level of your project.  Not sure what that means?  Then just copy over `the sample Makefile <https://github.com/loum/makester/blob/master/sample/Makefile>`_ and tweak the targets to suit.
+
+.. note::
+
+    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your Makefile (until I can figure out a better way to do this).
+
+The sample Docker image build target takes the simplest form::
+
+    build-image:
+        @$(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+
+Some important parameters to note:
+
+- ``DOCKER`` - path to your local Docker executable
+- ``MAKESTER__SERVICE_NAME`` - an image identifier built from the Docker repository name (defaults to ``makester``) and a customisable project name (defaults to the project's parent directory).  For example, ``makester/sample``
+- ``HASH`` - as per ``git rev-parse --help``
+
+.. note::
+
+    ``MAKESTER__SERVICE_NAME`` is used extensively throughout Makester so you should use it within your ``Makefile`` targets.  Not happy with the defaults?  Then override them at the top of your Makefile as follows::
+
+        # Include overrides (must occur before include statements).
+        MAKESTER__REPO_NAME := supa-cool-repo
+        PROJECT_NAME := my-project
+
 ***************************
 Python Virtual Environments
 ***************************
+
+.. note::
+
+    Add ``include makester/makefiles/python-venv.mk`` to your ``Makefile``
 
 To build a Python virtual environment, add your dependencies to ``requirements.txt`` or ``setup.py`` in the top level of you project directory.
 
@@ -104,14 +137,50 @@ To build a Python virtual environment, add your dependencies to ``requirements.t
    Both ``requirements.txt`` and ``setup.py`` for ``pip install`` are supported here.  Depending on your preference, create a target in your ``Makefile`` and chain either ``pip-requirements`` or ``pip-editable``.  For example, if your environment features a ``setup.py`` then create a new target called ``init`` (can be any meaningful target name you chose) as follows::
 
     init: pip-editable
-
-Likewise, if you have a ``requirements.txt``::
+    
+   Likewise, if you have a ``requirements.txt``::
 
     init: pip-requirements
 
 Then, execute the ``init`` target::
 
   $ make -f sample/Makefile init
+
+************************************
+Makester Default Virtual Environment
+************************************
+
+Makester provides a default virtual environment that can be invoked by placing the following target in your Makefile::
+
+    makester-init: makester-requirements
+
+``makester-requirements`` install the following libraries:
+
+docker-compose
+==============
+
+`docker-compose <https://docs.docker.com/compose/>`_ is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform.  Let ``pip`` manage the install and have one less thing to worry about ...
+
+Combine ``makester-requirements`` with your Project's ``requirements.txt``
+==========================================================================
+
+::
+
+    init: makester-requirements
+        make pip-requirements
+
+****************************
+Makester Imoprtant Variables
+****************************
+
+Can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements)
+
+- ``MAKESTER__REPO_NAME``
+- ``MAKESTER__PROJECT_NAME``
+- ``MAKESTER__SERVICE_NAME``
+- ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
+- ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
+- ``MAKESTER__RUN_COMMAND`` - override the Docker container ``run`` command initiated by ``make run``
 
 *****************
 Command Reference
@@ -123,9 +192,12 @@ Command Reference
 Display your environment Python setup::
 
    $ make py-versions
-
-  pip-requirements     "clear-env"|"init-env" and build virtual environment deps from "requirements.txt"
-  pip-editable         "clear-env"|"init-env" and build virtual environment deps from "setup.py"
+   python3 version: Python 3.6.10
+   python3 minor: 6
+   path to python3 executable: /home/lupco/.pyenv/shims/python3
+   python3 virtual env command: /home/lupco/.pyenv/shims/python3 -m venv
+   python2 virtual env command:
+   virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
 
 Remove existing virtual environment::
 
@@ -137,6 +209,16 @@ Build virtual environment::
 
 ``makefile/docker.mk``
 ======================
+
+Provided you build your container with Makester, you can also run as a container::
+
+    $ make run
+
+The ``run`` target can be controlled in your ``Makefile`` by overriding the ``MAKESTER__RUN_COMMAND`` parameter.  For example::
+
+    MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
+    --name $(MAKESTER__CONTAINER_NAME)\
+    $(MAKESTER__SERVICE_NAME):$(HASH)
 
 Tag image built under version control with the ``latest`` tag::
 
