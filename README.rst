@@ -30,7 +30,7 @@ Get the code and change into the top level ``git`` project directory::
 Project Overview
 ****************
 
-The ``Makester`` project layout features a grouping of ``Makefiles`` under the ``makefiles`` directory::
+The **Makester** project layout features a grouping of makefiles under the ``makefiles`` directory::
 
   $ tree makefiles/
   makefiles/
@@ -40,7 +40,7 @@ The ``Makester`` project layout features a grouping of ``Makefiles`` under the `
 
 Each ``Makefile`` is a group of concerns for a particular project build/infrastructure component.  For example, ``makefiles/python-venv.mk`` has targets that allow you to create and manage Python virtual environments.
 
-To use, add ``Makester`` as a submodule in your ``git`` project repository::
+To use, add **Makester** as a submodule in your ``git`` project repository::
 
   $ git submodule add https://github.com/loum/makester.git
 
@@ -101,7 +101,7 @@ Add a ``Makefile`` to the top level of your project.  Not sure what that means? 
 
 .. note::
 
-    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your Makefile (until I can figure out a better way to do this).
+    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your ``Makefile`` (until I can figure out a better way to do this).
 
 The sample Docker image build target takes the simplest form::
 
@@ -116,11 +116,11 @@ Some important parameters to note:
 
 .. note::
 
-    ``MAKESTER__SERVICE_NAME`` is used extensively throughout Makester so you should use it within your ``Makefile`` targets.  Not happy with the defaults?  Then override them at the top of your Makefile as follows::
+    ``MAKESTER__SERVICE_NAME`` is used extensively throughout Makester so you should use it within your ``Makefile`` targets.  Not happy with the defaults?  Then override them at the top of your ``Makefile`` as follows::
 
         # Include overrides (must occur before include statements).
         MAKESTER__REPO_NAME := supa-cool-repo
-        PROJECT_NAME := my-project
+        MAKESTER__PROJECT_NAME := my-project
 
 ***************************
 Python Virtual Environments
@@ -134,7 +134,7 @@ To build a Python virtual environment, add your dependencies to ``requirements.t
 
 .. note::
 
-   Both ``requirements.txt`` and ``setup.py`` for ``pip install`` are supported here.  Depending on your preference, create a target in your ``Makefile`` and chain either ``pip-requirements`` or ``pip-editable``.  For example, if your environment features a ``setup.py`` then create a new target called ``init`` (can be any meaningful target name you chose) as follows::
+   Both ``requirements.txt`` and ``setup.py`` for ``pip install`` are supported here.  Depending on your preference, create a target in your ``Makefile`` and chain either ``pip-requirements`` or ``pip-editable``.  For example, if your environment features a ``setup.py`` then create a new target called ``init`` (can be any meaningful target name you choose) as follows::
 
     init: pip-editable
     
@@ -150,7 +150,7 @@ Then, execute the ``init`` target::
 Makester Default Virtual Environment
 ************************************
 
-Makester provides a default virtual environment that can be invoked by placing the following target in your Makefile::
+**Makester** provides a default virtual environment that can be invoked by placing the following target in your ``Makefile``::
 
     makester-init: makester-requirements
 
@@ -170,10 +170,10 @@ Combine ``makester-requirements`` with your Project's ``requirements.txt``
         make pip-requirements
 
 ****************************
-Makester Imoprtant Variables
+Makester Important Variables
 ****************************
 
-Can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements)
+These can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements)
 
 - ``MAKESTER__REPO_NAME``
 - ``MAKESTER__PROJECT_NAME``
@@ -223,6 +223,10 @@ The ``run`` target can be controlled in your ``Makefile`` by overriding the ``MA
 Tag image built under version control with the ``latest`` tag::
 
     $ make tag
+
+Alternatively, to align with your preferred tagging convention, override the ``MAKESTER__IMAGE_TAG`` parameter::
+
+    $ make tag MAKESTER__IMAGE_TAG=supa-tag-01
 
 Remove dangling images::
 
