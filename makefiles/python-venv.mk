@@ -67,8 +67,13 @@ else
 	@echo \#\#\# Virtual environment not created.
 endif
 
-pip-requirements: PIP_INSTALL = --requirement requirements.txt
-pip-requirements: clear-env init-env
+PIP_REQUIREMENTS := $(shell [ -f ./requirements.txt ] && echo --requirement requirements.txt)
+pip-requirements: PIP_INSTALL = $(PIP_REQUIREMENTS)
+pip-requirements: init-env
+
+MAKESTER_REQUIREMENTS = --requirement makester/requirements.txt
+makester-requirements: PIP_INSTALL = $(MAKESTER_REQUIREMENTS)
+makester-requirements: init-env
 
 pip-editable: PIP_INSTALL = .
 pip-editable: -e .

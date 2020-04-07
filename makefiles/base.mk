@@ -1,9 +1,9 @@
 # Get the name of the project
-PROJECT_NAME := $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
+MAKESTER__PROJECT_NAME ?= $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
 
 # Set Docker image variables.
-MAKESTER__REPO_NAME ?= loum
-MAKESTER__SERVICE_NAME = $(MAKESTER__REPO_NAME)/$(PROJECT_NAME)
+MAKESTER__REPO_NAME ?= makester
+MAKESTER__SERVICE_NAME = $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
 
 print-%:
 	@echo '$*=$($*)'

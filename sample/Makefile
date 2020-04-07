@@ -1,6 +1,12 @@
+# Include overrides (must occur before include statements).
+MAKESTER__REPO_NAME := supa-cool-repo
+MAKESTER__PROJECT_NAME := my-project
+
 include makefiles/base.mk
 include makefiles/docker.mk
 include makefiles/python-venv.mk
+
+init: pip-requirements
 
 bi: build-image
 
