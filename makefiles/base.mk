@@ -14,15 +14,14 @@ clean:
 # Repo-wide globals (stuff you need to make everything work)
 GIT := $(shell which git 2>/dev/null)
 HASH := $(shell $(GIT) rev-parse --short HEAD)
-DOCKER_COMPOSE := $(shell which docker-compose 2>/dev/null || echo "3env/bin/docker-compose")
 
 base-help:
-	@echo "Targets\n\
-------------------------------------------------------------------------\n\
-	";
+	@echo "\n\
+--------------------------------------------------------------------------------------------\n\
+Targets\n\
+--------------------------------------------------------------------------------------------\n"
 	@echo "(makefiles/base.mk)\n\
   print-<var>:         Display the Makefile global variable '<var>' value\n\
-  clean:               Remove all files not tracked by Git\n\
-	";
+  clean:               Remove all files not tracked by Git\n"
 
 .PHONY: base-help

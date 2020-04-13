@@ -92,5 +92,4 @@ python-venv-help:
   pip-requirements     \"clear-env\"|\"init-env\" and build virtual environment deps from \"requirements.txt\"\n\
   pip-editable         \"clear-env\"|\"init-env\" and build virtual environment deps from \"setup.py\"\n\
   clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
-  init-env             Build virtual environment \"$(PYVERSION)env\"\n\
-	";
+  init-env             Build virtual environment \"$(PYVERSION)env\"\n"

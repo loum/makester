@@ -41,7 +41,6 @@ docker-help:
   logs:                Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   stop:                Stop container $(MAKESTER__CONTAINER_NAME)\n\
   tag:                 Tag image $(MAKESTER__SERVICE_NAME):latest (default)\n\
-  rm-dangling-images:  Remove all dangling images\n\
-	";
+  rm-dangling-images:  Remove all dangling images\n"
 
 .PHONY: docker-help

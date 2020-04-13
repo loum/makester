@@ -60,7 +60,6 @@ Still not sure?  See the sample Docker "Hello World" below.
 
 ``Makefiles`` to come and are currently a WIP include:
 
-- docker-compose
 - AWS
 - git
 
@@ -156,8 +155,8 @@ Makester Default Virtual Environment
 
 ``makester-requirements`` install the following libraries:
 
-docker-compose
-==============
+Makester docker-compose
+=======================
 
 `docker-compose <https://docs.docker.com/compose/>`_ is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform.  Let ``pip`` manage the install and have one less thing to worry about ...
 
@@ -181,6 +180,8 @@ These can be overridden with values placed at the top of your ``Makefile`` (befo
 - ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
 - ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
 - ``MAKESTER__RUN_COMMAND`` - override the Docker container ``run`` command initiated by ``make run``
+- ``MAKESTER__COMPOSE_FILES`` - override the ``docker-compose`` ``-file`` switch (defaults to ``-f docker-compose.yml``
+- ``MAKESTER__COMPOSE_RUN_CMD`` - override the ``docker-compose`` run command
 
 *****************
 Command Reference
@@ -231,3 +232,61 @@ Alternatively, to align with your preferred tagging convention, override the ``M
 Remove dangling images::
 
     $ make rm-dangling-images
+
+``makefile/compose.mk``
+=======================
+
+Follow instructions under the `Makester docker-compose`_ heading to see how Makester can make ``docker-compose`` available in your project.
+
+Build your infrastructure stack with `docker-compose <https://docs.docker.com/compose/>`_.
+
+.. note::
+
+    Makester ``makefile/compose.mk`` assumes a ``docker-compose.yml`` file exists in the top level directory of the project repository by default.  However, this can overriden by setting the ``MAKESTER__COMPOSE_FILES`` parameter.
+    MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
+
+To build your `docker-compose`` stack::
+
+    $ make compose-up
+
+To destroy your stack::
+
+    $ make compose-down
+
+To dump your stack's ``docker-compose`` configuration::
+
+    $ make compose-config
+
+If you need more control over ``docker-compose``, the ``docker-compose`` command can be controlled in your ``Makefile`` by overriding the ``MAKESTER__COMPOSE_RUN_CMD`` parameter.  For example, to specify the verbose output option::
+
+    MAKESTER__COMPOSE_RUN_CMD ?= SERVICE_NAME=$(MAKESTER__PROJECT_NAME) HASH=$(HASH)\
+      $(DOCKER_COMPOSE)\
+     --verbose\
+     $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
+
+Integrate ``backoff`` with ``makefile/compose.mk`` in your Makefile
+-------------------------------------------------------------------
+
+The following recipe defines a ``backoff`` strategy with ``docker-compose`` in addition to adding an action to run the initialisation script, ``init-script.sh``::
+
+    backoff:
+        @$(PYTHON) makester/scripts/backoff -d "HiveServer2" -p 10000 localhost
+        @$(PYTHON) makester/scripts/backoff -d "Web UI for HiveServer2" -p 10002 localhost
+    
+    local-build-up: compose-up backoff
+        @./init-sript.sh
+
+Provide Multiple ``docker-compose`` ``up``/``down`` Targets
+-----------------------------------------------------------
+
+The following recipe overrides the ``MAKESTER__COMPOSE_FILES`` Makester parameter and allows you to customise multiple build/destroy environments::
+
+    test-compose-up: MAKESTER__COMPOSE_FILES = -f docker-compose.yml -f docker-compose-test.yml
+    test-compose-up: compose-up
+    
+    dev-compose-up: MAKESTER__COMPOSE_FILES = -f docker-compose.yml -f docker-compose-dev.yml
+    dev-compose-up: compose-up
+
+.. note::
+
+    Remember to provide the complimentary ``docker-compose`` ``down`` targets in your ``Makefile``.
