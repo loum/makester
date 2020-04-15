@@ -36,6 +36,7 @@ The **Makester** project layout features a grouping of makefiles under the ``mak
   $ tree makefiles/
   makefiles/
   ├── base.mk
+  ├── compose.mk
   ├── docker.mk
   └── python-venv.mk
 
