@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := help
+
 # Get the name of the project
 MAKESTER__PROJECT_NAME ?= $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
 
@@ -14,6 +16,8 @@ clean:
 # Repo-wide globals (stuff you need to make everything work)
 GIT := $(shell which git 2>/dev/null)
 HASH := $(shell $(GIT) rev-parse --short HEAD)
+
+help: base-help
 
 base-help:
 	@echo "\n\
