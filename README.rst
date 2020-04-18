@@ -266,22 +266,71 @@ If you need more control over ``docker-compose``, the ``docker-compose`` command
      --verbose\
      $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
 
-Integrate ``backoff`` with ``makefile/compose.mk`` in your Makefile
--------------------------------------------------------------------
+******************
+Makester Utilities
+******************
 
-The following recipe defines a ``backoff`` strategy with ``docker-compose`` in addition to adding an action to run the initialisation script, ``init-script.sh``::
+``utils/waitster.py``
+=====================
+
+Wait until dependent service is ready::
+
+    $ 3env/bin/python utils/waitster.py
+    usage: waitster.py [-h] -p PORT [-d DETAIL] host
+    
+    Backoff until all ports ready
+    
+    positional arguments:
+      host                  Connection host
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -p PORT, --port PORT  Backoff port number until ready
+      -d DETAIL, --detail DETAIL
+                            Meaningful description for backoff port
+
+``utils/templatester.py``
+=========================
+
+Template against environment variables or optional JSON values (``--mapping`` switch)::
+
+    $ 3env/bin/python utils/templatester.py --help
+    usage: templatester.py [-h] [-f FILTER] [-m MAPPING] [-w] [-q] template
+    
+    Set Interpreter values dynamically
+    
+    positional arguments:
+      template              Path to Jinja2 template (absolute, or relative to user home)
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f FILTER, --filter FILTER
+                            Environment variable filter (ignored when mapping is taken from JSON file)
+      -m MAPPING, --mapping MAPPING
+                            Optional path to JSON mappings (absolute, or relative to user home).
+      -w, --write           Write out templated file alongside Jinja2 template
+      -q, --quiet           Disable logs to screen (to log level "ERROR")
+
+****************
+Makester Recipes
+****************
+
+Integrate ``utils/backoff.py`` with ``makefile/compose.mk`` in your Makefile
+============================================================================
+
+The following recipe defines a *backoff* strategy with ``docker-compose`` in addition to adding an action to run the initialisation script, ``init-script.sh``::
 
     backoff:
-        @$(PYTHON) makester/scripts/backoff -d "HiveServer2" -p 10000 localhost
-        @$(PYTHON) makester/scripts/backoff -d "Web UI for HiveServer2" -p 10002 localhost
+        @$(PYTHON) makester/utils/waitster.py -d "HiveServer2" -p 10000 localhost
+        @$(PYTHON) makester/utils/waitster.py -d "Web UI for HiveServer2" -p 10002 localhost
     
     local-build-up: compose-up backoff
         @./init-sript.sh
 
 Provide Multiple ``docker-compose`` ``up``/``down`` Targets
------------------------------------------------------------
+===========================================================
 
-The following recipe overrides the ``MAKESTER__COMPOSE_FILES`` Makester parameter and allows you to customise multiple build/destroy environments::
+Override ``MAKESTER__COMPOSE_FILES`` Makester parameter to customise multiple build/destroy environments::
 
     test-compose-up: MAKESTER__COMPOSE_FILES = -f docker-compose.yml -f docker-compose-test.yml
     test-compose-up: compose-up

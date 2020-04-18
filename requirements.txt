@@ -1,2 +1,11 @@
-backoff
+# Infrastructure stack management.
 docker-compose
+
+# Service management.
+backoff
+
+# Editing style.
+pylint
+
+# Templating
+Jinja2
