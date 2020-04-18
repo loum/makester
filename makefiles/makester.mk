@@ -18,7 +18,7 @@ clean:
 	$(GIT) clean -xdf -e .vagrant -e *.swp -e 2env -e 3env
 
 submodule-update:
-	$(GIT) submodule update --init --recursive
+	$(GIT) submodule update --remote --merge
 
 help base-help: makester-help
 

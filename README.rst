@@ -8,6 +8,8 @@ Created in response to a proliferation of disjointed Makefiles over the years.  
 
 If you're into `3 musketeers <https://3musketeers.io/>`_ and use Docker, ``docker-compose`` or Python virtual environments and ``make`` regularly then read on.
 
+Still not sure?  Try to `Run the Sample Docker "Hello World" Project`_.
+
 *************
 Prerequisites
 *************
@@ -37,28 +39,39 @@ The **Makester** project layout features a grouping of makefiles under the ``mak
   makefiles/
   ├── compose.mk
   ├── docker.mk
-  ├── makster.mk
+  ├── makester.mk
   └── python-venv.mk
 
 Each ``Makefile`` is a group of concerns for a particular project build/infrastructure component.  For example, ``makefiles/python-venv.mk`` has targets that allow you to create and manage Python virtual environments.
 
-To use, add **Makester** as a submodule in your ``git`` project repository::
+Adding **Makester** to your Git Repository
+==========================================
 
-  $ git submodule add https://github.com/loum/makester.git
+#. Add **Makester** as a submodule in your ``git`` project repository::
 
-Create a ``Makefile`` at the top-level of your ``git`` project repository.
+   $ git submodule add https://github.com/loum/makester.git
 
-Include the required makefile targets into your ``Makefile``.  As a minimum you will need ``makester.mk``::
+   .. note::
 
-    include makester/makefiles/makester.mk
+      ``git submodule add`` will only ``fetch`` the submodule folder without any content.  For first time initialisation (``pull`` the submodule)::
+           
+         $ git submodule update --init --recursive
+
+#. Create a ``Makefile`` at the top-level of your ``git`` project repository.
+
+#. Include the required makefile targets into your ``Makefile``.  For example::
+
+      include makester/makefiles/base.mk
 
 .. note::
 
     Remember to regularly get the latest ``Makester`` code base::
 
-        $ make submodule-update
+        $ git submodule update --remote --merge
+    
+    or, as a convenience::
 
-Still not sure?  `Run the Sample Docker "Hello World" Project`_ below.
+        $ make submodule-update
 
 *******************************************
 Run the Sample Docker "Hello World" Project
@@ -95,20 +108,11 @@ Using Makester in your Project
 
 Add a ``Makefile`` to the top level of your project.  Not sure what that means?  Then just copy over `the sample Makefile <https://github.com/loum/makester/blob/master/sample/Makefile>`_ and tweak the targets to suit.
 
-.. note::
-
-    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your ``Makefile`` (until I can figure out a better way to do this).
-
-The sample Docker image build target takes the simplest form::
-
-    build-image:
-        @$(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
-
 Some important parameters to note:
 
 - ``DOCKER`` - path to your local Docker executable
 - ``MAKESTER__SERVICE_NAME`` - an image identifier built from the Docker repository name (defaults to ``makester``) and a customisable project name (defaults to the project's parent directory).  For example, ``makester/sample``
-- ``HASH`` - as per ``git rev-parse --help``
+- ``HASH`` - as per ``git rev-parse --help``.  The ``HASH`` value of your ``git`` branch allows you to uniquely identify each build revision within your project.  Once you merge your code changes back into the ``master`` branch, you can ``make tag`` to ``latest``.
 
 .. note::
 
@@ -205,8 +209,28 @@ Build virtual environment::
 
    $ make init-env
 
+``makefile/makester``
+=====================
+
+.. note::
+
+    This Makefile should be included in all of your projects as a minimum.
+
+Update your existing Git submodules::
+
+    $ make submodule-update
+
 ``makefile/docker.mk``
 ======================
+
+.. note::
+
+    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your ``Makefile`` (until I can figure out a better way to do this).
+
+Add the following snippet to your ``Makefile`` to allow you to build your Docker image::
+
+    build-image:
+        @$(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 
 Provided you build your container with Makester, you can also run as a container::
 
