@@ -35,9 +35,9 @@ The **Makester** project layout features a grouping of makefiles under the ``mak
 
   $ tree makefiles/
   makefiles/
-  ├── base.mk
   ├── compose.mk
   ├── docker.mk
+  ├── makster.mk
   └── python-venv.mk
 
 Each ``Makefile`` is a group of concerns for a particular project build/infrastructure component.  For example, ``makefiles/python-venv.mk`` has targets that allow you to create and manage Python virtual environments.
@@ -48,22 +48,17 @@ To use, add **Makester** as a submodule in your ``git`` project repository::
 
 Create a ``Makefile`` at the top-level of your ``git`` project repository.
 
-Include the required makefile targets into your ``Makefile``.  For example::
+Include the required makefile targets into your ``Makefile``.  As a minimum you will need ``makester.mk``::
 
-    include makester/makefiles/base.mk
+    include makester/makefiles/makester.mk
 
 .. note::
 
     Remember to regularly get the latest ``Makester`` code base::
 
-        $ git submodule update --remote --merge
+        $ make submodule-update
 
-Still not sure?  See the sample Docker "Hello World" below.
-
-``Makefiles`` to come and are currently a WIP include:
-
-- AWS
-- git
+Still not sure?  `Run the Sample Docker "Hello World" Project`_ below.
 
 *******************************************
 Run the Sample Docker "Hello World" Project
