@@ -121,6 +121,13 @@ Some important parameters to note:
         # Include overrides (must occur before include statements).
         MAKESTER__REPO_NAME := supa-cool-repo
         MAKESTER__PROJECT_NAME := my-project
+        MAKESTER__CONTAINER_NAME := mega-container
+
+.. note::
+
+    ``MAKESTER__REPO_NAME`` is optional.
+
+``MAKESTER__CONTAINER_NAME`` allows you to control the name of the running container launched against your Docker image.
 
 ***************************
 Python Virtual Environments
@@ -175,7 +182,8 @@ Makester Important Variables
 
 These can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements)
 
-- ``MAKESTER__REPO_NAME``
+- ``HASH`` - unique `git` branch identifier that allows you to identify each build revision within your project
+- ``MAKESTER__REPO_NAME`` - optional Docker Hub repository name (defaults empty)
 - ``MAKESTER__PROJECT_NAME``
 - ``MAKESTER__SERVICE_NAME``
 - ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
@@ -191,7 +199,10 @@ Command Reference
 ``makefile/python-venv.mk``
 ===========================
 
-Display your environment Python setup::
+Display your Local Environment's Python Setup
+---------------------------------------------
+
+::
 
    $ make py-versions
    python3 version: Python 3.6.10
@@ -201,48 +212,60 @@ Display your environment Python setup::
    python2 virtual env command:
    virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
 
-Remove existing virtual environment::
+Remove Existing Virtual Environment
+-----------------------------------
+
+::
 
    $ make clear-env
 
-Build virtual environment::
+Build Virtual Environment
+-------------------------
+
+::
 
    $ make init-env
 
-``makefile/makester``
-=====================
+``makefile/makester.mk``
+========================
 
 .. note::
 
     This Makefile should be included in all of your projects as a minimum.
 
-Update your existing Git submodules::
+Update your existing Git Submodules
+-----------------------------------
+
+::
 
     $ make submodule-update
 
 ``makefile/docker.mk``
 ======================
 
-.. note::
+Build your Docker Image
+-----------------------
 
-    Docker images builds vary between projects so the ``build-image`` target should be set explicitly in your ``Makefile`` (until I can figure out a better way to do this).
+::
 
-Add the following snippet to your ``Makefile`` to allow you to build your Docker image::
+    $ make build-image
 
-    build-image:
-        @$(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+The ``build-image`` target can be controlled by overrding the ``MAKESTER__BUILD_COMMAND`` parameter in your ``Makefile``.  For example::
 
-Provided you build your container with Makester, you can also run as a container::
+    MAKESTER__BUILD_COMMAND := $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+
+Run your Docker Images as a Container
+-------------------------------------
+
+::
 
     $ make run
 
 The ``run`` target can be controlled in your ``Makefile`` by overriding the ``MAKESTER__RUN_COMMAND`` parameter.  For example::
 
-    MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d\
-    --name $(MAKESTER__CONTAINER_NAME)\
-    $(MAKESTER__SERVICE_NAME):$(HASH)
+    MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
-Tag image built under version control with the ``latest`` tag::
+Tag Docker Image built under version control with the ``latest`` Tag::
 
     $ make tag
 
@@ -250,7 +273,17 @@ Alternatively, to align with your preferred tagging convention, override the ``M
 
     $ make tag MAKESTER__IMAGE_TAG=supa-tag-01
 
-Remove dangling images::
+Remove your Docker Image
+------------------------
+
+::
+
+    $ make rm-image
+
+Remove Dangling Docker Images
+-----------------------------
+
+::
 
     $ make rm-dangling-images
 
@@ -263,18 +296,28 @@ Build your infrastructure stack with `docker-compose <https://docs.docker.com/co
 
 .. note::
 
-    Makester ``makefile/compose.mk`` assumes a ``docker-compose.yml`` file exists in the top level directory of the project repository by default.  However, this can overriden by setting the ``MAKESTER__COMPOSE_FILES`` parameter.
-    MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
+    Makester ``makefile/compose.mk`` assumes a ``docker-compose.yml`` file exists in the top level directory of the project repository by default.  However, this can overriden by setting the ``MAKESTER__COMPOSE_FILES`` parameter::
 
-To build your `docker-compose`` stack::
+        MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
+
+Build your Compose Stack
+------------------------
+
+::
 
     $ make compose-up
 
-To destroy your stack::
+Destroy your Compose Stack
+--------------------------
+
+::
 
     $ make compose-down
 
-To dump your stack's ``docker-compose`` configuration::
+Dump your Compose Stack's Configuration
+---------------------------------------
+
+::
 
     $ make compose-config
 

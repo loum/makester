@@ -4,12 +4,11 @@
 GIT = $(shell which git 2>/dev/null)
 HASH := $(shell $(GIT) rev-parse --short HEAD)
 
-# Get the name of the project
+# Set Docker variables to be used throughout the project.
 MAKESTER__PROJECT_NAME ?= $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
+MAKESTER__CONTAINER_NAME ?= my-container
 
-# Set Docker image variables.
-MAKESTER__REPO_NAME ?= makester
-MAKESTER__SERVICE_NAME = $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
+MAKESTER__IMAGE_TAG ?= latest
 
 print-%:
 	@echo '$*=$($*)'
@@ -30,6 +29,6 @@ Targets\n\
 	@echo "(makefiles/makester.mk)\n\
   print-<var>:         Display the Makefile global variable '<var>' value\n\
   clean:               Remove all files not tracked by Git\n\
-  submodule-update:    update your existing Git submodules\n"
+  submodule-update:    Update your existing Git submodules\n"
 
 .PHONY: base-help
