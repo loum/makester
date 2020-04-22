@@ -18,6 +18,10 @@ MAKESTER__RUN_COMMAND = $(DOCKER) run --rm\
 # Can be overriden in user Makefile.
 MAKESTER__BUILD_COMMAND ?= $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 
+si: search-image
+search-image:
+	-$(DOCKER) images "$(MAKESTER__SERVICE_NAME)*"
+
 bi: build-image
 
 build-image:
@@ -62,6 +66,7 @@ docker-help:
 	@echo "(makefiles/docker.mk)\n\
   build-image:         Build docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias bi)\n\
   rm-image:            Delete docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias rmi)\n\
+  search-image:        List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
   status:              Check container $(MAKESTER__CONTAINER_NAME) run status\n\
   run:                 Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
   login-priv:          Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
