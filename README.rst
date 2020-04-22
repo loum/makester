@@ -233,12 +233,33 @@ Display your Local Environment's Python Setup
    python2 virtual env command:
    virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
 
+Build Virtual Environment with Dependencies from ``requirements.txt``
+---------------------------------------------------------------------
+
+::
+
+    $ make pip-requirements
+
+Build Virtual Environment with Dependencies from  ``setup.py``
+--------------------------------------------------------------
+
+::
+
+    $ make pip-editable
+
 Remove Existing Virtual Environment
 -----------------------------------
 
 ::
 
    $ make clear-env
+
+Build Python Package from ``setup.py``
+--------------------------------------
+
+Write wheel package to -``-wheel-dir`` (defaults to ``~/wheelhouse``)::
+
+    $ make package
 
 Build Virtual Environment
 -------------------------

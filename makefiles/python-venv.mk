@@ -78,6 +78,11 @@ makester-requirements: init-env
 pip-editable: PIP_INSTALL = .
 pip-editable: -e .
 
+package:
+	@echo \#\#\# Building package ...
+	$(PYVERSION)env/bin/python setup.py bdist_wheel -d $(WHEEL)
+	@echo \#\#\# Build done.
+
 py-versions:
 	@echo python3 version: ${PY3_VERSION}
 	@echo python3 minor: ${PY3_VERSION_MINOR}
@@ -86,10 +91,14 @@ py-versions:
 	@echo python2 virtual env command: ${PY2_VENV}
 	@echo virtual env tooling: ${VENV_TOOL}
 
+help: python-venv-help
 python-venv-help:
 	@echo "(makefiles/python-venv.mk)\n\
   py-versions          Display your environment Python setup\n\
   pip-requirements     \"clear-env\"|\"init-env\" and build virtual environment deps from \"requirements.txt\"\n\
   pip-editable         \"clear-env\"|\"init-env\" and build virtual environment deps from \"setup.py\"\n\
+  package              Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse)\n\
   clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
   init-env             Build virtual environment \"$(PYVERSION)env\"\n"
+
+.PHONY: package
