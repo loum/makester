@@ -396,6 +396,8 @@ Stop Minikube Local Cluster
 Delete Minikube Local Cluster
 -----------------------------
 
+::
+
     $ make mk-del
 
 Get Service Access Details
@@ -403,10 +405,10 @@ Get Service Access Details
 
 .. note::
 
-	Only applicable if "LoadBalancer" type is specified in your Kubernetes Manifest.  Add this to your ``docker-compose.yml`` before converting::
+    Only applicable if "LoadBalancer" type is specified in your Kubernetes Manifest.  Add this to your ``docker-compose.yml`` before converting::
 
       labels:
-            kompose.service.type: LoadBalancer
+          kompose.service.type: LoadBalancer
 
     $ make mk-service
 
