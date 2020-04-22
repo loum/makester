@@ -196,7 +196,7 @@ These can be overridden with values placed at the top of your ``Makefile`` (befo
 - ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
 - ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
 - ``MAKESTER__VERSION`` - Control versioning (defaults to ``0.0.0``)
-- ``MAKESTER__IMAGE_TAG`` - Control release numbering when versioning is unchanged (defaults to ``1``)
+- ``MAKESTER__RELEASE_NUMBER`` - Control release number when versioning is unchanged (defaults to ``1``)
 - ``MAKESTER__RUN_COMMAND`` - override the Docker container ``run`` command initiated by ``make run``
 - ``MAKESTER__COMPOSE_FILES`` - override the ``docker-compose`` ``-file`` switch (defaults to ``-f docker-compose.yml``
 - ``MAKESTER__COMPOSE_RUN_CMD`` - override the ``docker-compose`` run command
