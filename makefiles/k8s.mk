@@ -26,13 +26,14 @@ kube-get: KCTL_CMD = get pod,svc
 kube-apply kube-del kube-get: kubectl-cmd
 
 kompose-cmd:
-	-$(KOMPOSE) $(KCTL_CMD) || true
+	$(KOMPOSE) $(KOMPOSE_CMD) || true
 
 mkdir-k8s:
 	-@$(shell which mkdir) ./k8s 2>/dev/null || true
 
-konvert: KOMPOSE_CMD = convert --out ./k8s
 konvert: mkdir-k8s
+konvert: KOMPOSE_CMD = convert --out ./k8s
+konvert: kompose-cmd
 
 k8s-help:
 	@echo "(makefiles/k8s.mk)\n\
@@ -47,4 +48,4 @@ k8s-help:
   kube-del             Delete a pod using the type and name specified in \"./k8s\" directory\n\
   kube-get             View the Pods and Services\n"
 
-.PHONY: k8s-help
+.PHONY: k8s-help konvert
