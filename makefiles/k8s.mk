@@ -7,20 +7,18 @@ minikube-cmd:
 
 mk-status: MK_CMD = status
 mk-start: MK_CMD = start --driver docker
-mk-dashboard: mk-start
 mk-dashboard: MK_CMD = dashboard
 mk-stop: MK_CMD = stop
-mk-del: mk-stop
 mk-del: MK_CMD = delete
+mk-del: kube-del
 mk-service: MK_CMD = service $(MAKESTER__PROJECT_NAME) --url
 mk-status mk-start mk-dashboard mk-stop mk-del mk-service: minikube-cmd
 
 kubectl-cmd:
 	-$(KUBECTL) $(KCTL_CMD) || true
 
-kube-apply: mk-start
 kube-apply: KCTL_CMD = apply -f ./k8s
-kube-del:
+kube-apply: mk-start
 kube-del: KCTL_CMD = delete -f ./k8s
 kube-get: KCTL_CMD = get pod,svc
 kube-apply kube-del kube-get: kubectl-cmd
