@@ -17,6 +17,12 @@ Prerequisites
 - `Docker <https://docs.docker.com/install/>`_
 - `GNU make <https://www.gnu.org/software/make/manual/make.html>`_
 
+If using `Kubernetes Minikube <https://kubernetes.io/docs/setup/learning-environment/minikube/>`_:
+
+- `Minikube <https://kubernetes.io/docs/tasks/tools/install-minikube/>`_
+- `kubectll <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_
+- `kompose <https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/#install-kompose>`_ if you would like to convert `docker-compose.yml` files to Kubernetes manifests
+
 ***************
 Getting Started
 ***************
@@ -39,6 +45,7 @@ The **Makester** project layout features a grouping of makefiles under the ``mak
   makefiles/
   ├── compose.mk
   ├── docker.mk
+  ├── k8s.mk
   ├── makester.mk
   └── python-venv.mk
 
@@ -196,6 +203,20 @@ These can be overridden with values placed at the top of your ``Makefile`` (befo
 Command Reference
 *****************
 
+``makefile/makester.mk``
+========================
+
+.. note::
+
+    This Makefile should be included in all of your projects as a minimum.
+
+Update your existing Git Submodules
+-----------------------------------
+
+::
+
+    $ make submodule-update
+
 ``makefile/python-venv.mk``
 ===========================
 
@@ -225,20 +246,6 @@ Build Virtual Environment
 ::
 
    $ make init-env
-
-``makefile/makester.mk``
-========================
-
-.. note::
-
-    This Makefile should be included in all of your projects as a minimum.
-
-Update your existing Git Submodules
------------------------------------
-
-::
-
-    $ make submodule-update
 
 ``makefile/docker.mk``
 ======================
@@ -327,6 +334,88 @@ If you need more control over ``docker-compose``, the ``docker-compose`` command
       $(DOCKER_COMPOSE)\
      --verbose\
      $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
+
+``makefile/k8s.mk``
+===================
+
+Shakeout or debug your Docker image containers prior to deploying to Kubernetes.
+
+.. note::
+
+    All Kubernetes manifests are expected to be in the ``k8s`` directory.
+
+Check Minikube Local Cluster Status
+-----------------------------------
+
+::
+
+    $ make mk-status
+
+Start Minikube Locally and Create a Cluster ("docker" driver)
+-------------------------------------------------------------
+
+::
+
+    $ make mk-start
+
+Access the Kubernetes Dashboard (Ctrl-C to stop)
+------------------------------------------------
+
+::
+
+    $ make mk-dashboard
+
+Stop Minikube Local Cluster
+---------------------------
+
+::
+
+    $ make mk-stop
+
+Delete Minikube Local Cluster
+-----------------------------
+
+    $ make mk-del
+
+Get Service Access Details
+--------------------------
+
+.. note::
+
+	Only applicable if "LoadBalancer" type is specified in your Kubernetes Manifest.  Add this to your ``docker-compose.yml`` before converting::
+
+      labels:
+            kompose.service.type: LoadBalancer
+
+    $ make mk-service
+
+Convert config files from ``docker-compose.yml``
+------------------------------------------------
+
+::
+
+    $ make konvert
+
+Create Resource(s) in all Manifest Files in ``./k8s`` Directory
+---------------------------------------------------------------
+
+::
+
+    $ make kube-apply
+
+Delete a Pod using the type and name Specified in ``./k8s`` Directory
+---------------------------------------------------------------------
+
+::
+
+    $ make kube-del
+
+View the Pods and Services
+--------------------------
+
+::
+
+    $ make kube-get
 
 ******************
 Makester Utilities
