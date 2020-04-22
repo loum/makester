@@ -59,6 +59,9 @@ tag: IMAGE_TAG = $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE
 tag: build-image
 	-$(DOCKER) tag $(IMAGE_TAG) $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TAG)
 
+tag-version: MAKESTER__IMAGE_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
+tag-version: tag
+
 rm-dangling-images:
 	$(shell $(DOCKER) rmi $($(DOCKER) images -q -f dangling=true`))
 

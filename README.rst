@@ -195,6 +195,8 @@ These can be overridden with values placed at the top of your ``Makefile`` (befo
 - ``MAKESTER__SERVICE_NAME``
 - ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
 - ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
+- ``MAKESTER__VERSION`` - Control versioning (defaults to ``0.0.0``)
+- ``MAKESTER__IMAGE_TAG`` - Control release numbering when versioning is unchanged (defaults to ``1``)
 - ``MAKESTER__RUN_COMMAND`` - override the Docker container ``run`` command initiated by ``make run``
 - ``MAKESTER__COMPOSE_FILES`` - override the ``docker-compose`` ``-file`` switch (defaults to ``-f docker-compose.yml``
 - ``MAKESTER__COMPOSE_RUN_CMD`` - override the ``docker-compose`` run command
@@ -293,9 +295,17 @@ The ``run`` target can be controlled in your ``Makefile`` by overriding the ``MA
 
     MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
-Tag Docker Image built under version control with the ``latest`` Tag::
+Tag Docker image built under version control with the ``latest`` Tag::
 
     $ make tag
+
+Tag Docker image with a custom versioning policy::
+
+    $ make tag-version
+
+.. note::
+
+    ``make tag-version`` defaults to ``0,0,0-1`` but this can be overriden by setting ``MAKESTER__VERSION`` and ``MAKESTER__RELEASE_NUMBER`` in your ``Makefile``
 
 Alternatively, to align with your preferred tagging convention, override the ``MAKESTER__IMAGE_TAG`` parameter::
 

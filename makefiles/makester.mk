@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := help
 
+# Default versioning.
+MAKESTER__VERSION = $(if $(MAKESTER__VERSION),$(MAKESTER__VERSION),0.0.0)
+MAKESTER__RELEASE_NUMBER = $(if $(MAKESTER__RELEASE_NUMBER),$(MAKESTER__RELEASE_NUMBER),1)
+
 # Repo-wide globals (stuff you need to make everything work)
 GIT = $(shell which git 2>/dev/null)
 HASH := $(shell $(GIT) rev-parse --short HEAD)
