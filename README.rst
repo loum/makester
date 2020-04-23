@@ -61,7 +61,7 @@ Adding **Makester** to your Git Repository
    .. note::
 
       ``git submodule add`` will only ``fetch`` the submodule folder without any content.  For first time initialisation (``pull`` the submodule)::
-           
+
          $ git submodule update --init --recursive
 
 #. Create a ``Makefile`` at the top-level of your ``git`` project repository.
@@ -151,7 +151,7 @@ To build a Python virtual environment, add your dependencies to ``requirements.t
    Both ``requirements.txt`` and ``setup.py`` for ``pip install`` are supported here.  Depending on your preference, create a target in your ``Makefile`` and chain either ``pip-requirements`` or ``pip-editable``.  For example, if your environment features a ``setup.py`` then create a new target called ``init`` (can be any meaningful target name you choose) as follows::
 
     init: pip-editable
-    
+
    Likewise, if you have a ``requirements.txt``::
 
     init: pip-requirements
@@ -373,78 +373,131 @@ Shakeout or debug your Docker image containers prior to deploying to Kubernetes.
 
 .. note::
 
-    All Kubernetes manifests are expected to be in the ``k8s`` directory.
+    All Kubernetes manifests are expected to be in the ``MAKESTER__K8_MANIFESTS`` directory (defaults to ``k8s/manifests``).
+
+Kubernetes Minikube ``make mk-<minikube-target>``
+-------------------------------------------------
+
+Requires `Minikube <https://kubernetes.io/docs/tasks/tools/install-minikube/>`_.
+
 
 Check Minikube Local Cluster Status
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
     $ make mk-status
 
-Start Minikube Locally and Create a Cluster ("docker" driver)
--------------------------------------------------------------
+Start Minikube Locally and Create a Cluster (``docker`` driver)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
     $ make mk-start
 
 Access the Kubernetes Dashboard (Ctrl-C to stop)
-------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
     $ make mk-dashboard
 
 Stop Minikube Local Cluster
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
     $ make mk-stop
 
 Delete Minikube Local Cluster
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
     $ make mk-del
 
 Get Service Access Details
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
 
-    Only applicable if "LoadBalancer" type is specified in your Kubernetes Manifest.  Add this to your ``docker-compose.yml`` before converting::
+    Only applicable if ``LoadBalancer`` type is specified in your Kubernetes manifest.  Add this to your ``docker-compose.yml`` before converting::
 
       labels:
           kompose.service.type: LoadBalancer
 
+::
+
     $ make mk-service
 
+Kompose
+-------
+
+Requires `kompose <https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/#install-kompose>`_.
+
 Convert config files from ``docker-compose.yml``
-------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Write out new manifests to ``MAKESTER__K8_MANIFESTS`` (defaults to ``./k8s/manifests``).
 
 ::
 
     $ make konvert
 
-Create Resource(s) in all Manifest Files in ``./k8s`` Directory
----------------------------------------------------------------
+Kubernetes ``kubectl`` ``make kube-<kubectl-target>``
+-----------------------------------------------------
+
+Requires `kubectll <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_.
+
+.. warning::
+
+    Care must be taken when managing mulitple Kubernetes contexts.  ``kubectl`` will operate against the active context.
+
+Check Current ``kubectl`` Context
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
+
+    $ make kube-context
+
+.. note::
+
+    Current context name is delimited with the ``*``::
+
+      CURRENT   NAME                CLUSTER             AUTHINFO                                                                NAMESPACE
+                SupaAKSCluster      SupaAKSCluster      clusterUser_RESOURCE_GROUP_SupaAKSCluster
+      *         minikube            minikube            minikube
+
+Change ``kubectl`` Context
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    $ make kube-context-set MAKESTER__KUBECTL_CONTEXT=<context-name>
+
+Change ``kubectl`` to the ``minikube`` Context
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    $ make kube-context-set
+
+Create Kubernetes Resource(s)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Builds all manifestf files in ``MAKESTER__K8_MANIFESTS`` directory::
 
     $ make kube-apply
 
-Delete a Pod using the type and name Specified in ``./k8s`` Directory
----------------------------------------------------------------------
+Delete Kubernetes Resource(s)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+Deletes all manifestf files in ``MAKESTER__K8_MANIFESTS`` directory::
 
     $ make kube-del
 
 View the Pods and Services
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 

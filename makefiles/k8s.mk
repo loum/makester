@@ -15,22 +15,27 @@ mk-service: MK_CMD = service $(MAKESTER__PROJECT_NAME) --url
 mk-status mk-start mk-dashboard mk-stop mk-del mk-service: minikube-cmd
 
 kubectl-cmd:
-	-$(KUBECTL) $(KCTL_CMD) || true
+	-@$(KUBECTL) $(KCTL_CMD) || true
 
-kube-apply: KCTL_CMD = apply -f ./k8s
+MAKESTER__K8_MANIFESTS := $(if $(MAKESTER__K8_MANIFESTS),$(MAKESTER__K8_MANIFESTS),./k8s/manifests)
+MAKESTER__KUBECTL_CONTEXT := $(if $(MAKESTER__KUBECTL_CONTEXT),$(MAKESTER__KUBECTL_CONTEXT),minikube)
+
+kube-context: KCTL_CMD = config get-contexts
+kube-context-use: KCTL_CMD = config use-context $(MAKESTER__KUBECTL_CONTEXT)
+kube-apply: KCTL_CMD = apply -f $(MAKESTER__K8_MANIFESTS)
 kube-apply: mk-start
-kube-del: KCTL_CMD = delete -f ./k8s
+kube-del: KCTL_CMD = delete -f $(MAKESTER__K8_MANIFESTS)
 kube-get: KCTL_CMD = get pod,svc
-kube-apply kube-del kube-get: kubectl-cmd
+kube-context kube-context-use kube-apply kube-del kube-get: kubectl-cmd
 
 kompose-cmd:
 	$(KOMPOSE) $(KOMPOSE_CMD) || true
 
 mkdir-k8s:
-	-@$(shell which mkdir) ./k8s 2>/dev/null || true
+	-@$(shell which mkdir) $(MAKESTER__K8_MANIFESTS) 2>/dev/null || true
 
 konvert: mkdir-k8s
-konvert: KOMPOSE_CMD = convert --out ./k8s
+konvert: KOMPOSE_CMD = convert --out $(MAKESTER__K8_MANIFESTS)
 konvert: kompose-cmd
 
 k8s-help:
