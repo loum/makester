@@ -548,6 +548,39 @@ Template against environment variables or optional JSON values (``--mapping`` sw
       -w, --write           Write out templated file alongside Jinja2 template
       -q, --quiet           Disable logs to screen (to log level "ERROR")
 
+``utils/templatester.py`` takes file path to ``template`` and renders the template against target variables.  The variables can be specified as a JSON document defined by ``--mapping``.
+
+The ``template`` path needs to end with a ``.j2`` extension.  If the ``--write`` switch is provided then generated content will be output to the ``template`` less the ``.j2``.
+
+A special custom filter ``env_override`` is available to bypass ``MAPPING`` values and source the environment for variable substitution.  Use the custom filter ``env_override`` in your template as follows::
+
+    "test" : {{ "default" | env_override('CUSTOM') }}
+
+Provided an environment variable as been set::
+
+    export CUSTOM=some_value
+
+The template will render::
+
+    some_value
+
+Otherwise::
+
+    default
+
+``utils/templatester.py`` example::
+
+    # Create the Jinja2 template.
+    cat << EOF > my_template.j2
+    This is my CUSTOM variable value: {{ CUSTOM }}
+    EOF
+    # Template!
+    CUSTOM=bananas 3env/bin/python utils/templatester.py --quiet my_template.j2
+
+Outputs::
+
+    This is my CUSTOM variable value: bananas
+
 ****************
 Makester Recipes
 ****************

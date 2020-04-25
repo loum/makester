@@ -47,6 +47,8 @@ k8s-help:
   mk-del               Delete Minikube local cluster\n\
   mk-service           Get Service access details (if \"LoadBalancer\" type specified)\n\
   konvert              Convert config files from \"docker-compose.yml\"\n\
+  kube-context         Get all Kubernetes cluster contexts\n\
+  kube-context-set     Change Kubernetes cluster context by setting \"MAKESTER__KUBECTL_CONTEXT\" defaults \"minikube\"\n\
   kube-apply           Create resource(s) in all manifest files in \"./k8s\" directory\n\
   kube-del             Delete a pod using the type and name specified in \"./k8s\" directory\n\
   kube-get             View the Pods and Services\n"

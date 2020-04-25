@@ -63,21 +63,42 @@ def _get_json_values(path_to_json) -> dict:
 
 def _build_from_template(env_map, template_file_path, write_output=False):
     """
-    Take *template_file_path* and template against environment variables
+    Take *template_file_path* and template against variables
     defined by *env_map*.
 
     *template_file_path* needs to end with a ``.j2`` extension as the generated
     content will be output to the *template_file_path* less the ``.j2``.
 
-    Returns the name of the output content's file path.
+    A special custom filter ``env_override`` is available to bypass *env_map* and
+    source the environment for variable substitution.  Use the custom filter
+    ``env_override`` in your template as follows::
+
+        "test" : {{ "default" | env_override('CUSTOM') }}
+
+    Provided an environment variable as been set::
+
+        export CUSTOM=some_value
+
+    The template will render::
+
+        ``some_value``
+
+    Otherwise::
+
+        ``default``
 
     """
+    def env_override(value, key):
+        return os.getenv(key, value)
+
     target_template_file_path = os.path.splitext(template_file_path)
     LOG.info('Generating templated file for "%s"', template_file_path)
 
     if len(target_template_file_path) > 1 and target_template_file_path[1] == '.j2':
         file_loader = jinja2.FileSystemLoader(os.path.dirname(template_file_path))
-        j2_env = jinja2.Environment(loader=file_loader)
+        j2_env = jinja2.Environment(autoescape=True, loader=file_loader)
+
+        j2_env.filters['env_override'] = env_override
         template = j2_env.get_template(os.path.basename(template_file_path))
 
         output = template.render(**env_map)
