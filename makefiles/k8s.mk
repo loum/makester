@@ -5,12 +5,20 @@ KOMPOSE := $(shell which kompose)
 minikube-cmd:
 	-@$(MINIKUBE) $(MK_CMD) || true
 
+mk-docker-env.mk: Makefile
+	-@$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
+
+-include mk-docker-env.mk
+MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' mk-docker-env.mk)
+
+mk-docker-env-export:
+	$(foreach v,$(MK_DOCKER_ENV_VARS),$(eval $(shell echo export $(v)="$($(v))")))
+
 mk-status: MK_CMD = status
 mk-start: MK_CMD = start --driver docker
 mk-dashboard: MK_CMD = dashboard
 mk-stop: MK_CMD = stop
 mk-del: MK_CMD = delete
-mk-del: kube-del
 mk-service: MK_CMD = service $(MAKESTER__PROJECT_NAME) --url
 mk-status mk-start mk-dashboard mk-stop mk-del mk-service: minikube-cmd
 
@@ -23,7 +31,6 @@ MAKESTER__KUBECTL_CONTEXT := $(if $(MAKESTER__KUBECTL_CONTEXT),$(MAKESTER__KUBEC
 kube-context: KCTL_CMD = config get-contexts
 kube-context-use: KCTL_CMD = config use-context $(MAKESTER__KUBECTL_CONTEXT)
 kube-apply: KCTL_CMD = apply -f $(MAKESTER__K8_MANIFESTS)
-kube-apply: mk-start
 kube-del: KCTL_CMD = delete -f $(MAKESTER__K8_MANIFESTS)
 kube-get: KCTL_CMD = get pod,svc
 kube-context kube-context-use kube-apply kube-del kube-get: kubectl-cmd
@@ -32,7 +39,7 @@ kompose-cmd:
 	$(KOMPOSE) $(KOMPOSE_CMD) || true
 
 mkdir-k8s:
-	-@$(shell which mkdir) $(MAKESTER__K8_MANIFESTS) 2>/dev/null || true
+	-@$(shell which mkdir) -pv $(MAKESTER__K8_MANIFESTS) 2>/dev/null || true
 
 konvert: mkdir-k8s
 konvert: KOMPOSE_CMD = convert --out $(MAKESTER__K8_MANIFESTS)
@@ -53,4 +60,4 @@ k8s-help:
   kube-del             Delete a pod using the type and name specified in \"./k8s\" directory\n\
   kube-get             View the Pods and Services\n"
 
-.PHONY: k8s-help konvert
+.PHONY: k8s-help konvert mk-docker-env.mk
