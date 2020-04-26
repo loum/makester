@@ -41,8 +41,9 @@ kompose-cmd:
 mkdir-k8s:
 	-@$(shell which mkdir) -pv $(MAKESTER__K8_MANIFESTS) 2>/dev/null || true
 
+MAKESTER__COMPOSE_K8S_EPHEMERAL = docker-compose.yml
 konvert: mkdir-k8s
-konvert: KOMPOSE_CMD = convert --out $(MAKESTER__K8_MANIFESTS)
+konvert: KOMPOSE_CMD = convert --file ${MAKESTER__COMPOSE_K8S_EPHEMERAL} --out $(MAKESTER__K8_MANIFESTS)
 konvert: kompose-cmd
 
 k8s-help:
