@@ -55,12 +55,16 @@ else
 	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container not running. Run \"make run\" to start
 endif
 
-tag: IMAGE_TAG = $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
+IMAGE_TAG = $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
+MAKESTER__IMAGE_TAG_ALIAS = $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TAG)
 tag: build-image
-	-$(DOCKER) tag $(IMAGE_TAG) $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TAG)
+	-$(DOCKER) tag $(IMAGE_TAG) $(MAKESTER__IMAGE_TAG_ALIAS)
 
 tag-version: MAKESTER__IMAGE_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 tag-version: tag
+
+image-push:
+	-$(DOCKER) push $(MAKESTER__IMAGE_TAG_ALIAS)
 
 rm-dangling-images:
 	$(shell $(DOCKER) rmi $($(DOCKER) images -q -f dangling=true`))
@@ -75,7 +79,9 @@ docker-help:
   login-priv           Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
   logs                 Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   stop                 Stop container $(MAKESTER__CONTAINER_NAME)\n\
-  tag                  Build and tag image $(MAKESTER__SERVICE_NAME):latest (default)\n\
-  rm-dangling-images   Remove all dangling images\n"
+  tag                  Build and tag image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
+  tag-version          Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
+  rm-dangling-images   Remove all dangling images\n\
+  image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n"
 
 .PHONY: docker-help
