@@ -67,15 +67,15 @@ rm-dangling-images:
 
 docker-help:
 	@echo "(makefiles/docker.mk)\n\
-  build-image:         Build docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias bi)\n\
-  rm-image:            Delete docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias rmi)\n\
-  search-image:        List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
-  status:              Check container $(MAKESTER__CONTAINER_NAME) run status\n\
-  run:                 Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
-  login-priv:          Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
-  logs:                Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
-  stop:                Stop container $(MAKESTER__CONTAINER_NAME)\n\
-  tag:                 Build and tag image $(MAKESTER__SERVICE_NAME):latest (default)\n\
-  rm-dangling-images:  Remove all dangling images\n"
+  build-image          Build docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias bi)\n\
+  rm-image             Delete docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias rmi)\n\
+  search-image         List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
+  status               Check container $(MAKESTER__CONTAINER_NAME) run status\n\
+  run                  Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
+  login-priv           Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
+  logs                 Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
+  stop                 Stop container $(MAKESTER__CONTAINER_NAME)\n\
+  tag                  Build and tag image $(MAKESTER__SERVICE_NAME):latest (default)\n\
+  rm-dangling-images   Remove all dangling images\n"
 
 .PHONY: docker-help

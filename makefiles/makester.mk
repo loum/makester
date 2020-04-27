@@ -31,8 +31,8 @@ makester-help:
 Targets\n\
 --------------------------------------------------------------------------------------------\n"
 	@echo "(makefiles/makester.mk)\n\
-  print-<var>:         Display the Makefile global variable '<var>' value\n\
-  clean:               Remove all files not tracked by Git\n\
-  submodule-update:    Update your existing Git submodules\n"
+  print-<var>          Display the Makefile global variable '<var>' value\n\
+  clean                Remove all files not tracked by Git\n\
+  submodule-update     Update your existing Git submodules\n"
 
 .PHONY: base-help

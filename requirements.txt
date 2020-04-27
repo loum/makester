@@ -9,3 +9,6 @@ pylint
 
 # Templating
 Jinja2
+
+# Azure CLI
+azure-cli>=2.4.0
