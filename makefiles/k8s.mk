@@ -57,8 +57,8 @@ k8s-help:
   konvert              Convert config files from \"docker-compose.yml\"\n\
   kube-context         Get all Kubernetes cluster contexts\n\
   kube-context-set     Change Kubernetes cluster context by setting \"MAKESTER__KUBECTL_CONTEXT\" defaults \"minikube\"\n\
-  kube-apply           Create resource(s) in all manifest files in \"./k8s\" directory\n\
-  kube-del             Delete a pod using the type and name specified in \"./k8s\" directory\n\
+  kube-apply           Create resource(s) in all manifest files in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
+  kube-del             Delete a pod using the type and name specified in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
   kube-get             View the Pods and Services\n"
 
 .PHONY: k8s-help konvert mk-docker-env.mk
