@@ -3,10 +3,10 @@ KUBECTL := $(shell which kubectl)
 KOMPOSE := $(shell which kompose)
 
 minikube-cmd:
-	-@$(MINIKUBE) $(MK_CMD) || true
+	$(MINIKUBE) $(MK_CMD) || true
 
 mk-docker-env.mk: Makefile
-	-@$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
+	$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
 
 -include mk-docker-env.mk
 MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' mk-docker-env.mk)
@@ -16,6 +16,9 @@ mk-docker-env-export:
 
 mk-status: MK_CMD = status
 mk-start: MK_CMD = start --driver docker
+mk-start:
+	$(shell sleep 5)
+	$(MAKE) mk-docker-env-export
 mk-dashboard: MK_CMD = dashboard
 mk-stop: MK_CMD = stop
 mk-del: MK_CMD = delete
