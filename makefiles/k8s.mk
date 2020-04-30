@@ -5,11 +5,12 @@ KOMPOSE := $(shell which kompose)
 minikube-cmd:
 	$(MINIKUBE) $(MK_CMD) || true
 
-mk-docker-env.mk: Makefile
+.makester/mk-docker-env.mk: Makefile
+	-$(shell which mkdir) -pv .makester
 	$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
 
--include mk-docker-env.mk
-MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' mk-docker-env.mk)
+-include .makester/mk-docker-env.mk
+MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' makester/.makester/mk-docker-env.mk)
 
 mk-docker-env-export:
 	$(foreach v,$(MK_DOCKER_ENV_VARS),$(eval $(shell echo export $(v)="$($(v))")))
@@ -64,4 +65,4 @@ k8s-help:
   kube-del             Delete a pod using the type and name specified in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
   kube-get             View the Pods and Services\n"
 
-.PHONY: k8s-help konvert mk-docker-env.mk
+.PHONY: k8s-help konvert .makester/mk-docker-env.mk
