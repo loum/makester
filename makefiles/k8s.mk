@@ -6,8 +6,8 @@ minikube-cmd:
 	$(MINIKUBE) $(MK_CMD) || true
 
 .makester/mk-docker-env.mk: Makefile
-	-$(shell which mkdir) -pv .makester
-	$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
+	-@$(shell which mkdir) -p .makester
+	@$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
 
 -include .makester/mk-docker-env.mk
 MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' makester/.makester/mk-docker-env.mk)
