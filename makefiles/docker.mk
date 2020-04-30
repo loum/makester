@@ -1,9 +1,10 @@
 DOCKER := $(shell which docker 2>/dev/null)
 
 MAKESTER__CONTAINER_NAME = my-container
-MAKESTER__IMAGE_TAG = latest
+MAKESTER__IMAGE_TARGET_TAG = latest
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
+MAKESTER__REPO_NAME = $(if $(MAKESTER__REPO_NAME),$(MAKESTER__REPO_NAME),)
 ifdef MAKESTER__REPO_NAME
 MAKESTER__SERVICE_NAME = $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
 else
@@ -29,10 +30,10 @@ build-image:
 
 rmi rm-image: rm-image-cmd
 
-IMAGE_TAG_EXISTS = $(shell $(DOCKER) images -q $(MAKESTER__SERVICE_NAME):$(HASH))
+IMAGE_TAG_EXISTS = $(shell $(DOCKER) images -q $(MAKESTER__IMAGE_TAG_ALIAS))
 rm-image-cmd:
 ifneq ($(strip $(IMAGE_TAG_EXISTS)),)
-	$(DOCKER) rmi $(MAKESTER__SERVICE_NAME):$(HASH)
+	$(DOCKER) rmi $(MAKESTER__IMAGE_TAG_ALIAS)
 endif
 
 run:
@@ -55,12 +56,12 @@ else
 	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container not running. Run \"make run\" to start
 endif
 
-IMAGE_TAG = $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
-MAKESTER__IMAGE_TAG_ALIAS = $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TAG)
-tag: build-image
-	-$(DOCKER) tag $(IMAGE_TAG) $(MAKESTER__IMAGE_TAG_ALIAS)
+IMAGE_TAG_ID = $(shell $(DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
+MAKESTER__IMAGE_TAG_ALIAS = $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)
+tag:
+	-$(DOCKER) tag $(IMAGE_TAG_ID) $(MAKESTER__IMAGE_TAG_ALIAS)
 
-tag-version: MAKESTER__IMAGE_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
+tag-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 tag-version: tag
 
 image-push:
@@ -71,8 +72,8 @@ rm-dangling-images:
 
 docker-help:
 	@echo "(makefiles/docker.mk)\n\
-  build-image          Build docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias bi)\n\
-  rm-image             Delete docker image $(MAKESTER__SERVICE_NAME):$(HASH) (alias rmi)\n\
+  build-image          Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) (alias bi)\n\
+  rm-image             Delete docker image \"$(MAKESTER__IMAGE_TAG_ALIAS)\" (alias rmi)\n\
   search-image         List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
   status               Check container $(MAKESTER__CONTAINER_NAME) run status\n\
   run                  Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
