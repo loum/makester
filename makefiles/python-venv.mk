@@ -92,6 +92,7 @@ py-versions:
 	@echo virtual env tooling: ${VENV_TOOL}
 
 help: python-venv-help
+
 python-venv-help:
 	@echo "(makefiles/python-venv.mk)\n\
   py-versions          Display your environment Python setup\n\
@@ -101,4 +102,4 @@ python-venv-help:
   clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
   init-env             Build virtual environment \"$(PYVERSION)env\"\n"
 
-.PHONY: package
+.PHONY: help package

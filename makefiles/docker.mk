@@ -1,18 +1,10 @@
 DOCKER := $(shell which docker 2>/dev/null)
 
 MAKESTER__CONTAINER_NAME = my-container
-MAKESTER__IMAGE_TARGET_TAG = latest
-
-# MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
-MAKESTER__REPO_NAME = $(if $(MAKESTER__REPO_NAME),$(MAKESTER__REPO_NAME),)
-ifdef MAKESTER__REPO_NAME
-MAKESTER__SERVICE_NAME = $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
-else
-MAKESTER__SERVICE_NAME = $(MAKESTER__PROJECT_NAME)
-endif
+MAKESTER__IMAGE_TARGET_TAG = $(HASH)
 
 # Can be overriden in user Makefile.
-MAKESTER__RUN_COMMAND = $(DOCKER) run --rm\
+MAKESTER__RUN_COMMAND ?= $(DOCKER) run --rm\
  --name $(MAKESTER__CONTAINER_NAME)\
  $(MAKESTER__SERVICE_NAME):$(HASH)
 
@@ -61,6 +53,9 @@ MAKESTER__IMAGE_TAG_ALIAS = $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_T
 tag:
 	-$(DOCKER) tag $(IMAGE_TAG_ID) $(MAKESTER__IMAGE_TAG_ALIAS)
 
+tag-latest: MAKESTER__IMAGE_TARGET_TAG = latest
+tag-latest: tag
+
 tag-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 tag-version: tag
 
@@ -69,6 +64,8 @@ image-push:
 
 rm-dangling-images:
 	$(shell $(DOCKER) rmi $($(DOCKER) images -q -f dangling=true`))
+
+help: docker-help
 
 docker-help:
 	@echo "(makefiles/docker.mk)\n\
@@ -80,9 +77,10 @@ docker-help:
   login-priv           Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
   logs                 Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   stop                 Stop container $(MAKESTER__CONTAINER_NAME)\n\
-  tag                  Build and tag image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
+  tag                  Tag image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
+  tag-latest           Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
   tag-version          Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
   rm-dangling-images   Remove all dangling images\n\
   image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n"
 
-.PHONY: docker-help
+.PHONY: help

@@ -117,24 +117,15 @@ Add a ``Makefile`` to the top level of your project.  Not sure what that means? 
 
 Some important parameters to note:
 
-- ``DOCKER`` - path to your local Docker executable
-- ``MAKESTER__SERVICE_NAME`` - an image identifier built from the Docker repository name (defaults to ``makester``) and a customisable project name (defaults to the project's parent directory).  For example, ``makester/sample``
-- ``HASH`` - as per ``git rev-parse --help``.  The ``HASH`` value of your ``git`` branch allows you to uniquely identify each build revision within your project.  Once you merge your code changes back into the ``master`` branch, you can ``make tag`` to ``latest``.
+- ``MAKESTER__SERVICE_NAME`` - a service identifier that defaults to ``MAKESTER__PROJECT_NAME``.  If ``MAKESTER__REPO_NAME`` is defined in your ``Makefile`` then ``MAKESTER__SERVICE_NAME`` becomes ``MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME``
+- ``HASH`` - as per ``git rev-parse --help``.  The ``HASH`` value of your ``git`` branch allows you to uniquely identify each build revision within your project.  Once you merge your code changes back into the ``master`` branch, you can ``make tag-latest`` to tag the image with ``latest``.
 
 .. note::
 
-    ``MAKESTER__SERVICE_NAME`` is used extensively throughout Makester so you should use it within your ``Makefile`` targets.  Not happy with the defaults?  Then override them at the top of your ``Makefile`` as follows::
+    ``MAKESTER__SERVICE_NAME`` is used extensively throughout Makester so you should use it within your ``Makefile`` targets.  Not happy with the defaults?  Then override ``MAKESTER__SERVICE_NAME`` at the top of your ``Makefile`` as follows::
 
         # Include overrides (must occur before include statements).
-        MAKESTER__REPO_NAME := supa-cool-repo
-        MAKESTER__PROJECT_NAME := my-project
-        MAKESTER__CONTAINER_NAME := mega-container
-
-.. note::
-
-    ``MAKESTER__REPO_NAME`` is optional.
-
-``MAKESTER__CONTAINER_NAME`` allows you to control the name of the running container launched against your Docker image.
+        MAKESTER__SERVICE_NAME := supa-cool-sdervice-name
 
 ***************************
 Python Virtual Environments
@@ -183,20 +174,33 @@ Combine ``makester-requirements`` with your Project's ``requirements.txt``
     init: makester-requirements
         make pip-requirements
 
-****************************
-Makester Important Variables
-****************************
+******************
+Makester Variables
+******************
 
-These can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements)
+.. note::
+
+    Makester global variables can be view any time with the ``vars`` target::
+
+       $ make vars
 
 - ``HASH`` - unique `git` branch identifier that allows you to identify each build revision within your project
+
+The following Makester variables can be overridden with values placed at the top of your ``Makefile`` (before the ``include`` statements).
+
 - ``MAKESTER__REPO_NAME`` - optional Docker Hub repository name (defaults empty)
 - ``MAKESTER__PROJECT_NAME``
 - ``MAKESTER__SERVICE_NAME``
-- ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
-- ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
+
 - ``MAKESTER__VERSION`` - Control versioning (defaults to ``0.0.0``)
 - ``MAKESTER__RELEASE_NUMBER`` - Control release number when versioning is unchanged (defaults to ``1``)
+
+
+``makefile/docker.mk`` Variables
+================================
+
+- ``MAKESTER__CONTAINER_NAME`` - Control the name of your image container (defaults to ``my-container``)
+- ``MAKESTER__IMAGE_TAG`` - (defaults to ``latest``)
 - ``MAKESTER__RUN_COMMAND`` - override the Docker container ``run`` command initiated by ``make run``
 - ``MAKESTER__COMPOSE_FILES`` - override the ``docker-compose`` ``-file`` switch (defaults to ``-f docker-compose.yml``
 - ``MAKESTER__COMPOSE_RUN_CMD`` - override the ``docker-compose`` run command

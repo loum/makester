@@ -15,10 +15,12 @@ compose-down: COMPOSE_CMD = down -v
 
 compose-config compose-up compose-down: compose-cmd
 
+help: compose-help
+
 compose-help:
 	@echo "(makefiles/compose.mk)\n\
   compose-config       Compose stack \"$(MAKESTER__PROJECT_NAME)\" config ($(MAKESTER__COMPOSE_FILES))\n\
   compose-up           Compose stack \"$(MAKESTER__PROJECT_NAME)\" create ($(MAKESTER__COMPOSE_FILES))\n\
   compose-down         Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes)\n"
 
-.PHONY: compose-help
+.PHONY: help

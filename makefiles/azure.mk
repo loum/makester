@@ -28,6 +28,8 @@ azure-rm-del:
  --resource-group ${MAKESTER__AZURE_RESOURCE_GROUP}\
  --name ${MAKESTER__AZURE_RESOURCE_NAME}
 
+help: azure-help
+
 azure-help:
 	@echo "(makefiles/azure.mk)\n\
   azure-login         Log into Azure via CLI\n\
@@ -35,4 +37,4 @@ azure-help:
   azure-rm            Deploy an Azure resource using Resource Manager\n\
   azure-rm-del        Delete an Azure resource\n"
 
-.PHONY: azure-help
+.PHONY: help
