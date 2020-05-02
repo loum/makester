@@ -29,7 +29,9 @@ submodule-update:
 	$(GIT) submodule update --remote --merge
 
 vars:
-	@echo "\nOverride non run time variables at the top of your Makefile before the includes:\n\n\
+	@echo "\n\
+  HASH                               $(HASH)\n\
+  \nOverride variables at the top of your Makefile before the includes:\n\n\
   MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\
   MAKESTER__RELEASE_NUMBER:          $(MAKESTER__RELEASE_NUMBER)\n\
   MAKESTER__REPO_NAME:               $(MAKESTER__REPO_NAME)\n\

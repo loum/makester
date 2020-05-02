@@ -3,12 +3,10 @@ DOCKER := $(shell which docker 2>/dev/null)
 MAKESTER__CONTAINER_NAME = my-container
 MAKESTER__IMAGE_TARGET_TAG = $(HASH)
 
-# Can be overriden in user Makefile.
 MAKESTER__RUN_COMMAND ?= $(DOCKER) run --rm\
  --name $(MAKESTER__CONTAINER_NAME)\
  $(MAKESTER__SERVICE_NAME):$(HASH)
 
-# Can be overriden in user Makefile.
 MAKESTER__BUILD_COMMAND ?= $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 
 si: search-image
@@ -22,11 +20,8 @@ build-image:
 
 rmi rm-image: rm-image-cmd
 
-IMAGE_TAG_EXISTS = $(shell $(DOCKER) images -q $(MAKESTER__IMAGE_TAG_ALIAS))
 rm-image-cmd:
-ifneq ($(strip $(IMAGE_TAG_EXISTS)),)
 	$(DOCKER) rmi $(MAKESTER__IMAGE_TAG_ALIAS)
-endif
 
 run:
 	-$(MAKESTER__RUN_COMMAND)
@@ -56,8 +51,14 @@ tag:
 tag-latest: MAKESTER__IMAGE_TARGET_TAG = latest
 tag-latest: tag
 
+tag-rm-latest: MAKESTER__IMAGE_TARGET_TAG = latest
+tag-rm-latest: rmi
+
 tag-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 tag-version: tag
+
+tag-rm-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
+tag-rm-version: rmi
 
 image-push:
 	-$(DOCKER) push $(MAKESTER__IMAGE_TAG_ALIAS)
