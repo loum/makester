@@ -10,10 +10,10 @@ minikube-cmd:
 	@$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
 
 -include .makester/mk-docker-env.mk
-MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' makester/.makester/mk-docker-env.mk)
+MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' .makester/mk-docker-env.mk)
 
 mk-docker-env-export:
-	$(foreach v,$(MK_DOCKER_ENV_VARS),$(eval $(shell echo export $(v)="$($(v))")))
+	@$(foreach v,$(MK_DOCKER_ENV_VARS),$(eval $(shell echo export $(v)="$($(v))")))
 
 mk-status: MK_CMD = status
 mk-start: MK_CMD = start --driver docker
