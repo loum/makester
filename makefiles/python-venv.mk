@@ -75,8 +75,8 @@ MAKESTER_REQUIREMENTS = --requirement makester/requirements.txt
 makester-requirements: PIP_INSTALL = $(MAKESTER_REQUIREMENTS)
 makester-requirements: init-env
 
-pip-editable: PIP_INSTALL = .
-pip-editable: -e .
+pip-editable: PIP_INSTALL = -e .
+pip-editable: init-env
 
 package:
 	@echo \#\#\# Building package ...
