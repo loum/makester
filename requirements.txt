@@ -11,4 +11,6 @@ pylint
 Jinja2
 
 # Azure CLI
+# ERROR: azure-cli 2.5.1 has requirement websocket-client~=0.56.0, but you'll have websocket-client 0.57.0 which is incompatible.
+websocket-client<0.57.0
 azure-cli>=2.4.0
