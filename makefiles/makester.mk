@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-MAKESTER__PROJECT_NAME := $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
+MAKESTER__PROJECT_NAME ?= $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)

@@ -78,8 +78,7 @@ docker-help:
   login-priv           Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
   logs                 Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   stop                 Stop container $(MAKESTER__CONTAINER_NAME)\n\
-  tag                  Tag image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
-  tag-latest           Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
+  tag-latest           Tag image $(MAKESTER__SERVICE_NAME) \"latest\"\n\
   tag-version          Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
   rm-dangling-images   Remove all dangling images\n\
   image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n"
