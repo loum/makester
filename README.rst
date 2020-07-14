@@ -159,10 +159,8 @@ Makester Default Virtual Environment
 
     makester-init: makester-requirements
 
-``makester-requirements`` install the following libraries:
-
-Makester docker-compose
-=======================
+Makester ``docker-compose``
+===========================
 
 `docker-compose <https://docs.docker.com/compose/>`_ is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform.  Let ``pip`` manage the install and have one less thing to worry about ...
 
@@ -172,7 +170,16 @@ Combine ``makester-requirements`` with your Project's ``requirements.txt``
 ::
 
     init: makester-requirements
-        make pip-requirements
+        $(MAKE) pip-requirements
+
+*************************************************
+Makester Azure CLI Support in Virtual Environment
+*************************************************
+
+**Makester** can install the `Azure CLI <https://pypi.org/project/azure-cli/>`_ in your virtual environment by placing the following target in your ``Makefile``::
+
+    azure-init: azure-requirements
+
 
 ******************
 Makester Variables
