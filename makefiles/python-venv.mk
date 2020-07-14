@@ -71,12 +71,10 @@ PIP_REQUIREMENTS := $(shell [ -f ./requirements.txt ] && echo --requirement requ
 pip-requirements: PIP_INSTALL = $(PIP_REQUIREMENTS)
 pip-requirements: init-env
 
-MAKESTER_REQUIREMENTS = --requirement makester/requirements.txt
-makester-requirements: PIP_INSTALL = $(MAKESTER_REQUIREMENTS)
+makester-requirements: PIP_INSTALL = --requirement makester/requirements.txt
 makester-requirements: init-env
 
-MAKESTER_REQUIREMENTS = --requirement makester/azure-requirements.txt
-azure-requirements: PIP_INSTALL = $(MAKESTER_REQUIREMENTS)
+azure-requirements: PIP_INSTALL = --requirement makester/azure-requirements.txt
 azure-requirements: init-env
 
 pip-editable: PIP_INSTALL = -e .
