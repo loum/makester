@@ -16,7 +16,7 @@ search-image:
 bi: build-image
 
 build-image:
-	-$(MAKESTER__BUILD_COMMAND)
+	$(MAKESTER__BUILD_COMMAND)
 
 rmi rm-image: rm-image-cmd
 
