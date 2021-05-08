@@ -1,6 +1,9 @@
-.DEFAULT_GOAL := help
+ifndef .DEFAULT_GOAL
+.DEFAULT_GOAL := makester-help
+endif
 
-MAKESTER__PROJECT_NAME ?= $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
+# Defaults to the current directory (converted to lower case).
+MAKESTER__PROJECT_NAME = $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
@@ -52,10 +55,6 @@ vars:
   MAKESTER__SERVICE_NAME:            $(MAKESTER__SERVICE_NAME)\n\
   MAKESTER__VERSION:                 $(MAKESTER__VERSION)\n"
 
-help base-help: makester-help
-
-help: makester-help
-
 makester-help:
 	@echo "\n\
 --------------------------------------------------------------------------------------------\n\
@@ -67,4 +66,4 @@ Targets\n\
   clean                Remove all files not tracked by Git\n\
   submodule-update     Update your existing Git submodules\n"
 
-.PHONY: vars help
+.PHONY: vars makester-help

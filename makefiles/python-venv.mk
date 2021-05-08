@@ -1,3 +1,9 @@
+ifndef .DEFAULT_GOAL
+.DEFAULT_GOAL := python-venv-help
+endif
+
+MAKESTER__PROJECT_DIR = $(PWD)/$(shell echo $(PROJECT_NAME) | tr A-Z a-z | tr - _)
+
 # Check if we have python3 available.
 PY3_VERSION := $(shell python3 --version 2>/dev/null)
 PY3_VERSION_FULL := $(wordlist 2, 4, $(subst ., , ${PY3_VERSION}))
@@ -31,10 +37,10 @@ else
 endif
 
 # OK, set some globals.
-WHEEL=~/wheelhouse
-PYTHONPATH=.
-PIP := $(PYVERSION)env/bin/pip
-PYTHON := $(PYVERSION)env/bin/python
+WHEEL = ~/wheelhouse
+PYTHONPATH = .
+PIP := $(PWD)/$(PYVERSION)env/bin/pip
+PYTHON := $(PWD)/$(PYVERSION)env/bin/python
 
 VENV_DIR_EXISTS := $(shell [ -e "${PYVERSION}env" ] && echo 1 || echo 0)
 clear-env:
@@ -45,27 +51,29 @@ ifeq ($(VENV_DIR_EXISTS), 1)
 endif
 
 init-env:
-	@echo \#\#\# Creating virtual environment ${PYVERSION}env ...
-	@echo \#\#\# Using wheel house $(WHEEL) ...
+	$(info ### Creating virtual environment ${PYVERSION}env ...)
 ifneq ($(VENV_TOOL),)
 	$(VENV_TOOL) ${PYVERSION}env
-	@echo \#\#\# ${PYVERSION}env build done.
 
-	@echo \#\#\# Preparing wheel environment and directory ...
-	$(shell which mkdir) -pv $(WHEEL) 2>/dev/null
+	$(info ### Preparing pip and setuptools ...)
 	$(PIP) install --upgrade pip
 	$(PIP) install --upgrade setuptools
-	$(PIP) install wheel
-	@echo \#\#\# wheel env done.
 
-	@echo \#\#\# Installing package dependencies ...
-	$(PIP) wheel --wheel-dir $(WHEEL) --find-links=$(WHEEL) $(PIP_INSTALL)
+	$(info ### Installing ...)
 	$(PIP) install --find-links=$(WHEEL) $(PIP_INSTALL)
-	@echo \#\#\# Package install done.
 else
-	@echo \#\#\# Hmmm, cannot find virtual env tool.
-	@echo \#\#\# Virtual environment not created.
+	$(warn ### Hmmm, cannot find virtual env tool)
+	$(warn ### Virtual environment not created)
 endif
+
+wheel-dir:
+	$(info ### Creating Wheel directory "$(WHEEL)"...)
+	$(shell which mkdir) -pv $(WHEEL)
+
+wheel: wheel-dir
+	$(info ### Build Wheel archives for your requirements and dependencies ...)
+	$(PIP) install wheel
+	$(PIP) wheel --wheel-dir $(WHEEL) --find-links=$(WHEEL) $(PIP_INSTALL)
 
 PIP_REQUIREMENTS := $(shell [ -f ./requirements.txt ] && echo --requirement requirements.txt)
 pip-requirements: PIP_INSTALL = $(PIP_REQUIREMENTS)
@@ -80,20 +88,22 @@ azure-requirements: init-env
 pip-editable: PIP_INSTALL = -e .
 pip-editable: init-env
 
-package:
-	@echo \#\#\# Building package ...
-	$(PYVERSION)env/bin/python setup.py bdist_wheel -d $(WHEEL)
-	@echo \#\#\# Build done.
+SETUP_PY := $(PWD)/setup.py
+package-clean:
+	$(info ### Cleaning PyPI package temporary directories ...)
+	$(PYTHON) $(SETUP_PY) clean
+
+package: package-clean
+	$(info ### Building package ...)
+	$(PYTHON) $(SETUP_PY) bdist_wheel --dist-dir $(WHEEL) --verbose
 
 py-versions:
-	@echo python3 version: ${PY3_VERSION}
-	@echo python3 minor: ${PY3_VERSION_MINOR}
-	@echo path to python3 executable: ${PY3}
-	@echo python3 virtual env command: ${PY_VENV}
-	@echo python2 virtual env command: ${PY2_VENV}
-	@echo virtual env tooling: ${VENV_TOOL}
-
-help: python-venv-help
+	$(info python3 version: ${PY3_VERSION})
+	$(info python3 minor: ${PY3_VERSION_MINOR})
+	$(info path to python3 executable: ${PY3})
+	$(info python3 virtual env command: ${PY_VENV})
+	$(info python2 virtual env command: ${PY2_VENV})
+	$(info virtual env tooling: ${VENV_TOOL})
 
 python-venv-help:
 	@echo "(makefiles/python-venv.mk)\n\
@@ -104,4 +114,4 @@ python-venv-help:
   clear-env            Remove virtual environment \"$(PYVERSION)env\"\n\
   init-env             Build virtual environment \"$(PYVERSION)env\"\n"
 
-.PHONY: help package
+.PHONY: python-venv-help package

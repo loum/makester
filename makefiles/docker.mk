@@ -1,3 +1,7 @@
+ifndef .DEFAULT_GOAL
+.DEFAULT_GOAL := docker-help
+endif
+
 DOCKER := $(shell which docker 2>/dev/null)
 
 MAKESTER__CONTAINER_NAME = my-container
@@ -66,8 +70,6 @@ image-push:
 rm-dangling-images:
 	$(shell $(DOCKER) rmi $($(DOCKER) images -q -f dangling=true`))
 
-help: docker-help
-
 docker-help:
 	@echo "(makefiles/docker.mk)\n\
   build-image          Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) (alias bi)\n\
@@ -83,4 +85,4 @@ docker-help:
   rm-dangling-images   Remove all dangling images\n\
   image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n"
 
-.PHONY: help
+.PHONY: docker-help

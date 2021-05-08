@@ -1,3 +1,7 @@
+ifndef .DEFAULT_GOAL
+.DEFAULT_GOAL := k8s-help
+endif
+
 MINIKUBE := $(shell which minikube)
 KUBECTL := $(shell which kubectl)
 KOMPOSE := $(shell which kompose)
@@ -50,8 +54,6 @@ konvert: mkdir-k8s
 konvert: KOMPOSE_CMD = convert --file ${MAKESTER__COMPOSE_K8S_EPHEMERAL} --out $(MAKESTER__K8_MANIFESTS)
 konvert: kompose-cmd
 
-help: k8s-help
-
 k8s-help:
 	@echo "(makefiles/k8s.mk)\n\
   mk-status            Check Minikube local cluster status\n\
@@ -67,4 +69,4 @@ k8s-help:
   kube-del             Delete a pod using the type and name specified in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
   kube-get             View the Pods and Services\n"
 
-.PHONY: help konvert .makester/mk-docker-env.mk
+.PHONY: k8s-help konvert .makester/mk-docker-env.mk
