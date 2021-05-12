@@ -3,7 +3,9 @@ ifndef .DEFAULT_GOAL
 endif
 
 # Defaults to the current directory (converted to lower case).
+ifndef MAKESTER__PROJECT_NAME
 MAKESTER__PROJECT_NAME = $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
+endif
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
