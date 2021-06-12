@@ -4,8 +4,8 @@ endif
 
 DOCKER := $(shell which docker 2>/dev/null)
 
-MAKESTER__CONTAINER_NAME = my-container
-MAKESTER__IMAGE_TARGET_TAG = $(HASH)
+MAKESTER__CONTAINER_NAME ?= my-container
+MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
 
 MAKESTER__RUN_COMMAND ?= $(DOCKER) run --rm\
  --name $(MAKESTER__CONTAINER_NAME)\
