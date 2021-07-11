@@ -33,8 +33,14 @@ run:
 stop:
 	-$(DOCKER) stop $(MAKESTER__CONTAINER_NAME)
 
-login-priv:
-	-$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) sh
+root:
+	-$(DOCKER) exec -ti -u 0 $(MAKESTER__CONTAINER_NAME) sh || true
+
+sh:
+	-$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) sh || true
+
+bash:
+	-$(DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash || true
 
 logs:
 	-$(DOCKER) logs --follow $(MAKESTER__CONTAINER_NAME)
@@ -77,7 +83,9 @@ docker-help:
   search-image         List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
   status               Check container $(MAKESTER__CONTAINER_NAME) run status\n\
   run                  Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
-  login-priv           Login to container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
+  root                 Shell on container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
+  sh                   Shell on container $(MAKESTER__CONTAINER_NAME) as \"USER\"\n\
+  bash                 Bash on container $(MAKESTER__CONTAINER_NAME) as \"USER\"\n\
   logs                 Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   stop                 Stop container $(MAKESTER__CONTAINER_NAME)\n\
   tag-latest           Tag image $(MAKESTER__SERVICE_NAME) \"latest\"\n\

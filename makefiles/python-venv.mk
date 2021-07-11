@@ -102,6 +102,9 @@ py-versions:
 	$(info ### python2 virtual env command: $(PY2_VENV))
 	$(info ### virtual env tooling: $(VENV_TOOL))
 
+py:
+	-@$(PYTHON)
+
 python-venv-help:
 	@echo "(makefiles/python-venv.mk)\n\
   py-versions          Display your environment Python setup\n\
@@ -109,6 +112,7 @@ python-venv-help:
   pip-editable         \"clear-env\"|\"init-env\" and build virtual environment deps from \"setup.py\"\n\
   package              Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse)\n\
   clear-env            Remove virtual environment \"$(PWD)/$(PYVERSION)env\"\n\
-  init-env             Build virtual environment \"$(PWD)/$(PYVERSION)env\"\n"
+  init-env             Build virtual environment \"$(PWD)/$(PYVERSION)env\"\n\
+  py                   Start the vitual environment Python REPL\n"
 
 .PHONY: python-venv-help package
