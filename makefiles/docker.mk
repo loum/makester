@@ -71,7 +71,7 @@ tag-rm-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RE
 tag-rm-version: rmi
 
 image-push:
-	-$(DOCKER) push $(MAKESTER__IMAGE_TAG_ALIAS)
+	$(DOCKER) push $(MAKESTER__IMAGE_TAG_ALIAS)
 
 rm-dangling-images:
 	$(shell $(DOCKER) rmi $($(DOCKER) images -q -f dangling=true`))
