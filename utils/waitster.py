@@ -7,7 +7,7 @@ import argparse
 import logging
 import backoff
 
-LOG = logging.getLogger('waitster')
+LOG = logging.getLogger(__name__)
 if not LOG.handlers:
     LOG.propagate = 0
     CONSOLE = logging.StreamHandler()
@@ -44,7 +44,7 @@ def main():
 
 
 @backoff.on_exception(backoff.constant,
-                      (EOFError, ConnectionRefusedError),
+                      (OSError, EOFError, ConnectionRefusedError),
                       max_time=300,
                       interval=5)
 def _backoff(host, port, description=None):
@@ -55,12 +55,12 @@ def _backoff(host, port, description=None):
     if description:
         msg += f' {description}'
 
-    logging.info('%s ...')
+    LOG.info('%s ...', msg)
 
     with telnetlib.Telnet(host, int(port)) as _tn:
         _tn.set_debuglevel(5)
         _tn.read_until(b' ', 1)
-        logging.info('Port %s ready', port)
+        LOG.info('Port %s ready', port)
 
 
 if __name__ == "__main__":
