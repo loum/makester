@@ -18,9 +18,9 @@
 ## Overview
 Centralised repository for common tasks that you use everyday in your coding projects.
 
-Created in response to a proliferation of disjointed Makefiles over the years.  Now, projects can follow a consistent infrastructure management pattern that is version controlled and easy to use.
+Created in response to a proliferation of disjointed Makefiles over the years. Now, projects can follow a consistent infrastructure management pattern that is version controlled and easy to use.
 
-If you're into [3 musketeers](https://3musketeers.io/) and use Docker, `docker-compose` or Python virtual environments and `make` regularly then read on.
+If you're into [3 musketeers](https://3musketeers.io/), work with multi-container applications or Python virtual environments and `make` regularly then read on.
 
 The `Makester` project layout features a grouping of makefiles under the `makefiles` directory:
 ```
@@ -35,12 +35,12 @@ makefiles/
 ├── makester.mk
 └── python-venv.mk
 ```
-Each `Makefile` is a group of concerns for a particular project build/infrastructure component.  For example, `makefiles/python-venv.mk` has targets that allow you to create and manage Python virtual environments.
+Each `Makefile` is a group of concerns for a particular project build/infrastructure component. For example, `makefiles/python-venv.mk` has targets that allow you to create and manage Python virtual environments.
 
-Still not sure?  Try to [Run the Sample Docker "Hello World" Project](#Run-the-Sample-Docker-"Hello-World"-Project).
+Still not sure? Try to [Run the Sample Docker "Hello World" Project](#Run-the-Sample-Docker-"Hello-World"-Project).
 
 ## Prerequisites
-- [Docker](https://docs.docker.com/install/)
+- [Docker](https://docs.docker.com/install/) or [Podman](https://podman.io/)
 - [GNU make](https://www.gnu.org/software/make/manual/make.html)
 
 If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/):
@@ -86,12 +86,12 @@ make -f sample/Makefile rmi
 ```
 git submodule add https://github.com/loum/makester.git
 ```
-> **_NOTE:_** `git submodule add` will only `fetch` the submodule folder without any content.  For first time initialisation (`pull` the submodule):
+> **_NOTE:_** `git submodule add` will only `fetch` the submodule folder without any content. For first time initialisation (`pull` the submodule):
 ```
 git submodule update --init --recursive
 ```
- 2. Create a `Makefile` at the top-level of your `git` project repository.  Not sure what that means?  Then just copy over the [sample Makefile](https://github.com/loum/makester/blob/master/sample/Makefile>) and tweak the targets to suit.
- 3. Include the required makefile targets into your `Makefile`.  For example:
+ 2. Create a `Makefile` at the top-level of your `git` project repository. Not sure what that means? Then just copy over the [sample Makefile](https://github.com/loum/makester/blob/master/sample/Makefile>) and tweak the targets to suit.
+ 3. Include the required makefile targets into your `Makefile`. For example:
 ```
 include makester/makefiles/makester.mk
 ```
@@ -103,18 +103,18 @@ or, as a convenience:
 ```
 make submodule-update
 ```
-> **_NOTE:_** `MAKESTER__SERVICE_NAME` is used extensively throughout `Makester` so you should use it within your `Makefile` targets.  Not happy with the defaults?  Then override `MAKESTER__SERVICE_NAME` at the top of your `Makefile` as follows:
+> **_NOTE:_** `MAKESTER__SERVICE_NAME` is used extensively throughout `Makester` so you should use it within your `Makefile` targets. Not happy with the defaults? Then override `MAKESTER__SERVICE_NAME` at the top of your `Makefile` as follows:
 > ```
 > # Include overrides (must occur before include statements).
 > MAKESTER__SERVICE_NAME := supa-cool-service-name
 > ```
 ### Makester Variables
-> **_NOTE:_** Makester global variables can be overridden with values placed at the top of your `Makefile` (before the `include` statements).  Variable values can be view any time with the `vars` target:
+> **_NOTE:_** Makester global variables can be overridden with values placed at the top of your `Makefile` (before the `include` statements). Variable values can be view any time with the `vars` target:
 > ```
 > make vars
 > ```
 ### Makester Default Virtual Environment
-`Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done.  For example, `docker-compose`.  First, you need to place the following target in your `Makefile`. :
+`Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
 ```
 makester-init: makester-requirements
 ```
@@ -128,13 +128,13 @@ make makester-init
 
 To use add `include makester/makefiles/makester.mk` to your `Makefile`.
 #### Variables
-- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`.  This can be used to target your container repository and identify your image
-	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`.  For example `supa-cool-repo/my-project` is achieved with the following:
+- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
+	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
 ```
 MAKESTER__REPO_NAME := supa-cool-repo
 MAKESTER__PROJECT_NAME := my-project
 ```
-- `HASH`: as per `git rev-parse --help`.  The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project.  Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
+- `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
 - `MAKESTER__VERSION` - Control versioning (defaults to `0.0.0`)
 - `MAKESTER__RELEASE_NUMBER` - Control release number when versioning is unchanged (defaults to `1`)
 
@@ -148,7 +148,7 @@ To use add `include makester/makefiles/python-venv.mk` to your `Makefile`.
 
 To build a project-purposed Python virtual environment, add your dependencies to `requirements.txt` or `setup.py` in the top level of you project directory.
 
-> **_NOTE:_** Both `requirements.txt` and `setup.py` for `pip install` are supported here.  Depending on your preference, create a target in your `Makefile` and chain either `pip-requirements` or `pip-editable`.  For example, if your environment features a `setup.py` then create a new target called `init` (can be any meaningful target name you choose) as follows:
+> **_NOTE:_** Both `requirements.txt` and `setup.py` for `pip install` are supported here. Depending on your preference, create a target in your `Makefile` and chain either `pip-requirements` or `pip-editable`. For example, if your environment features a `setup.py` then create a new target called `init` (can be any meaningful target name you choose) as follows:
 ```
 init: pip-editable
 ```
@@ -183,7 +183,7 @@ virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
 ```
 make pip-requirements
 ```
-##### Build Virtual Environment with Dependencies from  `setup.py`
+##### Build Virtual Environment with Dependencies from `setup.py`
 ```
 make pip-editable
 ```
@@ -207,16 +207,14 @@ make py
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
-[docker-compose](https://docs.docker.com/compose/) is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform.  Let `pip` manage the install and have one less thing to worry about ...
-
-Here's more information on building your infrastructure stack with [docker-compose](https://docs.docker.com/compose/).
+[docker-compose](https://docs.docker.com/compose/) is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform. Let `pip` manage the install and have one less thing to worry about ...
 
 #### Variables
-> **_NOTE_**: Makester `makefile/compose.mk` assumes a `docker-compose.yml` file exists in the top level directory of the project repository by default.  However, this can overriden by setting the `MAKESTER__COMPOSE_FILES` parameter:
+> **_NOTE_**: Makester `makefile/compose.mk` assumes a `docker-compose.yml` file exists in the top level directory of the project repository by default. However, this can overriden by setting the `MAKESTER__COMPOSE_FILES` parameter:
 ```
 MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
 ```
-If you need more control over `docker-compose`, then override the `MAKESTER__COMPOSE_RUN_CMD` parameter in your `Makefile`.  For example, to specify the verbose output option:
+If you need more control over `docker-compose`, then override the `MAKESTER__COMPOSE_RUN_CMD` parameter in your `Makefile`. For example, to specify the verbose output option:
 ```
 MAKESTER__COMPOSE_RUN_CMD ?= SERVICE_NAME=$(MAKESTER__PROJECT_NAME) HASH=$(HASH)\
  $(DOCKER_COMPOSE)\
@@ -258,7 +256,7 @@ azure-init: azure-requirements
 ```
 make build-image
 ```
-The `build-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`.  For example:
+The `build-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`. For example:
 ```
 MAKESTER__BUILD_COMMAND := $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 ```
@@ -266,7 +264,7 @@ MAKESTER__BUILD_COMMAND := $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) 
 ```
 make run
 ```
-The `run` target can be controlled in your `Makefile` by overriding the `MAKESTER__RUN_COMMAND` parameter.  For example:
+The `run` target can be controlled in your `Makefile` by overriding the `MAKESTER__RUN_COMMAND` parameter. For example:
 ```
 MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 ```
@@ -278,7 +276,7 @@ make tag
 ```
 make tag-version
 ```
-Version defaults to `0.0.0-1` but this can be overriden by setting `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` in your `Makefile`.  Alternatively, to align with your preferred tagging convention, override the `MAKESTER__IMAGE_TAG` parameter.  For example:
+Version defaults to `0.0.0-1` but this can be overriden by setting `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` in your `Makefile`. Alternatively, to align with your preferred tagging convention, override the `MAKESTER__IMAGE_TAG` parameter. For example:
 ```
 make tag MAKESTER__IMAGE_TAG=supa-tag-01
 ```
@@ -296,7 +294,7 @@ To use add `include makester/makefiles/k8s.mk` to your `Makefile`.
 Shakeout or debug your Docker image containers prior to deploying to Kubernetes.
 > **_NOTE_**: All Kubernetes manifests are expected to be in the `MAKESTER__K8_MANIFESTS` directory (defaults to `k8s/manifests`).
 
-> **_WARNING:_** Care must be taken when managing mulitple Kubernetes contexts.  `kubectl` will operate against the active context.
+> **_WARNING:_** Care must be taken when managing mulitple Kubernetes contexts. `kubectl` will operate against the active context.
 
 #### Variables
 #### Command Reference
@@ -321,7 +319,7 @@ make mk-stop
 make mk-del
 ```
 ##### Get Service Access Details
-> **_NOTE:_** Only applicable if `LoadBalancer` type is specified in your Kubernetes manifest.  Add this to your `docker-compose.yml` before converting:
+> **_NOTE:_** Only applicable if `LoadBalancer` type is specified in your Kubernetes manifest. Add this to your `docker-compose.yml` before converting:
 > ```
 > labels:
 >  kompose.service.type: LoadBalancer
@@ -410,11 +408,11 @@ optional arguments:
   -w, --write           Write out templated file alongside Jinja2 template
   -q, --quiet           Disable logs to screen (to log level "ERROR")
 ```
-`utils/templatester.py` takes file path to `template` and renders the template against target variables.  The variables can be specified as a JSON document defined by `--mapping`.
+`utils/templatester.py` takes file path to `template` and renders the template against target variables. The variables can be specified as a JSON document defined by `--mapping`.
 
-The `template` path needs to end with a `.j2` extension.  If the `--write` switch is provided then generated content will be output to the `template` less the `.j2`.
+The `template` path needs to end with a `.j2` extension. If the `--write` switch is provided then generated content will be output to the `template` less the `.j2`.
 
-A special custom filter `env_override` is available to bypass `MAPPING` values and source the environment for variable substitution.  Use the custom filter `env_override` in your template as follows:
+A special custom filter `env_override` is available to bypass `MAPPING` values and source the environment for variable substitution. Use the custom filter `env_override` in your template as follows:
 ```
 "test" : {{ "default" | env_override('CUSTOM') }}
 ```
