@@ -2,7 +2,12 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := docker-help
 endif
 
+# Look for podman. Falls through to docker.
+DOCKER := $(shell which podman 2>/dev/null)
+ifndef DOCKER
 DOCKER := $(shell which docker 2>/dev/null)
+endif
+$(call check_defined, DOCKER, can't find a container runtime: docker and podman supported)
 
 MAKESTER__CONTAINER_NAME ?= my-container
 MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
@@ -45,7 +50,7 @@ bash:
 logs:
 	-$(DOCKER) logs --follow $(MAKESTER__CONTAINER_NAME)
 
-RUNNING_CONTAINER := $(shell docker ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
+RUNNING_CONTAINER := $($(DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 status:
 ifneq ($(RUNNING_CONTAINER),)
 	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container is running.  Run \"make stop\" to terminate

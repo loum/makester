@@ -1,5 +1,6 @@
 # Infrastructure stack management.
 docker-compose
+podman-compose
 
 # Service management.
 backoff
