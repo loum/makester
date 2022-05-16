@@ -5,6 +5,7 @@ MAKESTER__CONTAINER_NAME := mega-container
 include makefiles/makester.mk
 include makefiles/docker.mk
 include makefiles/python-venv.mk
+include makefiles/versioning.mk
 
 MAKESTER__BUILD_COMMAND = $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) sample
 
