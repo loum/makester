@@ -1,4 +1,4 @@
-# Makester: Common Project Build/Management Components
+# Makester: Common Project Build and Management Tooling
 - [Overview](#Overview)
 - [Prerequisites](#Prerequisites)
 - [Getting Started](#Getting-Started)
@@ -9,18 +9,15 @@
   - [`makefile/makester.mk`](#`makefile/makester.mk`)
   - [`makefiles/python-venv.mk`](#`makefiles/python-venv.mk`)
   - [`makefiles/compose.mk`](#`makefiles/compose.mk`)
-  - [`makefiles/azure.mk`](#`makefiles/azure.mk`)
-  - [`makefile/docker.mk`](#`makefiles/azure.mk`)
+  - [`makefile/docker.mk`](#`makefiles/docker.mk`)
   - [`makefile/k8s.mk`](#`makefiles/k8s.mk`)
 - [Makester Utilities](#Makester-Utilities)
 - [Makester Recipes](#Makester-Recipes)
 
 ## Overview
-Centralised repository for common tasks that you use everyday in your coding projects.
+Makester is aimed to be a centralised, reusable tool kit for tasks that you use regularly in your projects. Makester was inspired by [Modern Make](https://makefile.site/) and created in response to a proliferation of disjointed Makefiles. Now, projects can follow a consistent infrastructure management pattern that is version controlled and easy to use.
 
-Created in response to a proliferation of disjointed Makefiles over the years. Now, projects can follow a consistent infrastructure management pattern that is version controlled and easy to use.
-
-If you're into [3 musketeers](https://3musketeers.io/), work with multi-container applications or Python virtual environments and `make` regularly then read on.
+If you use Python, Docker or Kubernetes daily then read on.
 
 The `Makester` project layout features a grouping of makefiles under the `makefiles` directory:
 ```
@@ -28,7 +25,6 @@ tree makefiles/
 ```
 ```
 makefiles/
-├── azure.mk
 ├── compose.mk
 ├── docker.mk
 ├── k8s.mk
@@ -40,13 +36,12 @@ Each `Makefile` is a group of concerns for a particular project build/infrastruc
 Still not sure? Try to [Run the Sample Docker "Hello World" Project](#Run-the-Sample-Docker-"Hello-World"-Project).
 
 ## Prerequisites
-- [Docker](https://docs.docker.com/install/) or [Podman](https://podman.io/)
+- [Docker](https://docs.docker.com/install/)
 - [GNU make](https://www.gnu.org/software/make/manual/make.html)
 
 If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/):
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- [kompose](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/#install-kompose) if you would like to convert `docker-compose.yml` files to Kubernetes manifests
 
 ## Getting Started
 Get the code and change into the top level `git` project directory:
@@ -236,13 +231,6 @@ make compose-down
 ```
 make compose-config
 ```
-### `makefiles/azure.mk`
-To use add `include makester/makefiles/azure.mk` to your `Makefile`.
-
-`Makester` can install the [Azure CLI](https://pypi.org/project/azure-cli/) in your virtual environment by placing the following target in your `Makefile`:
-```
-azure-init: azure-requirements
-```
 #### Variables
 #### Command Reference
 
@@ -319,18 +307,9 @@ make mk-stop
 make mk-del
 ```
 ##### Get Service Access Details
-> **_NOTE:_** Only applicable if `LoadBalancer` type is specified in your Kubernetes manifest. Add this to your `docker-compose.yml` before converting:
-> ```
-> labels:
->  kompose.service.type: LoadBalancer
-> ```
+> **_NOTE:_** Only applicable if `LoadBalancer` type is specified in your Kubernetes manifest.
 ```
 make mk-service
-```
-##### Convert Config Files from `docker-compose.yml`
-Write out new manifests to `MAKESTER__K8_MANIFESTS` (defaults to `./k8s/manifests`).
-```
-make konvert
 ```
 
 ##### Check Current `kubectl` Context
@@ -465,4 +444,4 @@ dev-compose-up: compose-up
 > **_NOTE:_** Remember to provide the complimentary `docker-compose` `down` targets in your `Makefile`.
 
 ---
-[top](#Makester:-Common-Project-Build/Management-Components)
+[top](#Makester-Common-Project-Build-and-Management-Tooling)
