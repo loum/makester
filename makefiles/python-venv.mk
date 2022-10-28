@@ -79,9 +79,6 @@ pip-requirements: init-env
 makester-requirements: PIP_INSTALL = --requirement makester/requirements.txt
 makester-requirements: init-env
 
-azure-requirements: PIP_INSTALL = --requirement makester/azure-requirements.txt
-azure-requirements: init-env
-
 pip-editable: PIP_INSTALL = -e .
 pip-editable: init-env
 
