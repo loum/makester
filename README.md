@@ -1,3 +1,4 @@
+
 # Makester: Common Project Build and Management Tooling
 - [Overview](#Overview)
 - [Prerequisites](#Prerequisites)
@@ -98,16 +99,31 @@ or, as a convenience:
 ```
 make submodule-update
 ```
-> **_NOTE:_** `MAKESTER__SERVICE_NAME` is used extensively throughout `Makester` so you should use it within your `Makefile` targets. Not happy with the defaults? Then override `MAKESTER__SERVICE_NAME` at the top of your `Makefile` as follows:
-> ```
-> # Include overrides (must occur before include statements).
-> MAKESTER__SERVICE_NAME := supa-cool-service-name
-> ```
 ### Makester Variables
-> **_NOTE:_** Makester global variables can be overridden with values placed at the top of your `Makefile` (before the `include` statements). Variable values can be view any time with the `vars` target:
+The standard [GNU Makefile variable](https://www.gnu.org/software/make/manual/html_node/Using-Variables.html) convention is adhered to within the project. Makester introduces special purpose variables are denoted as `MAKESTER__`. Makester will attempt to provide sane defaults to get you started. However, it is recommended that you override these values in your own project's Makefile to provide more informative context.
+
+Makester special purpose variable values can be viewed any time with the `vars` target:
 > ```
 > make vars
 > ```
+
+A description of the Makester special purpose variables follows:
+- `MAKESTER__PROJECT_NAME`: the name of the project. Defaults to the current working directory's basename
+- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
+	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
+  ```
+  MAKESTER__REPO_NAME := supa-cool-repo
+  MAKESTER__PROJECT_NAME := my-project
+  ```
+  > **_NOTE:_** `MAKESTER__SERVICE_NAME` is used extensively throughout `Makester` so you should use it within your   `Makefile` targets. Not happy with the defaults? Then override `MAKESTER__SERVICE_NAME` at the top of your `Makefile`   as follows:
+  > ```
+    > # Include overrides (must occur before include statements).
+    > MAKESTER__SERVICE_NAME := supa-cool-service-name
+    > ```
+- `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
+- `MAKESTER__VERSION`: Control versioning (defaults to `0.0.0`)
+- `MAKESTER__RELEASE_NUMBER`: Control release number when versioning is unchanged (defaults to `1`)
+- `MAKESTER__LOCAL_IP`: Platform independent way to get the local host's IP address
 ### Makester Default Virtual Environment
 `Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
 ```
@@ -122,16 +138,6 @@ make makester-init
 > **_NOTE:_** This Makefile should be included in all of your projects as a minimum.
 
 To use add `include makester/makefiles/makester.mk` to your `Makefile`.
-#### Variables
-- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
-	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
-```
-MAKESTER__REPO_NAME := supa-cool-repo
-MAKESTER__PROJECT_NAME := my-project
-```
-- `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
-- `MAKESTER__VERSION` - Control versioning (defaults to `0.0.0`)
-- `MAKESTER__RELEASE_NUMBER` - Control release number when versioning is unchanged (defaults to `1`)
 
 #### Command Reference
 ##### Update your existing Git Submodules
@@ -202,7 +208,7 @@ make py
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
-[docker-compose](https://docs.docker.com/compose/) is a great tool for managing your Docker container stack but a real pain when it comes to installing on your preferred platform. Let `pip` manage the install and have one less thing to worry about ...
+As of [Moby 20.10.13](https://github.com/moby/moby/releases/tag/v20.10.13), [docker compose V2](https://docs.docker.com/compose/compose-v2/) is integrated into the Docker CLI. This means that we do not need to support the installation of the standalone [docker-compose](https://docs.docker.com/compose/install/other/).
 
 #### Variables
 > **_NOTE_**: Makester `makefile/compose.mk` assumes a `docker-compose.yml` file exists in the top level directory of the project repository by default. However, this can overriden by setting the `MAKESTER__COMPOSE_FILES` parameter:

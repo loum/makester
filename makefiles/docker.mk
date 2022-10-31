@@ -7,7 +7,7 @@ DOCKER := $(shell which podman 2>/dev/null)
 ifndef DOCKER
 DOCKER := $(shell which docker 2>/dev/null)
 endif
-$(call check_defined, DOCKER, can't find a container runtime: docker and podman supported)
+$(call check-defined, DOCKER, can't find a container runtime: docker and podman supported)
 
 MAKESTER__CONTAINER_NAME ?= my-container
 MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
