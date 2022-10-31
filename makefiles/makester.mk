@@ -2,6 +2,10 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := makester-help
 endif
 
+ifndef MAKESTER__VERBOSE
+MAKEFLAGS += --no-print-directory
+endif
+
 # Defaults to the current directory (converted to lower case).
 ifndef MAKESTER__PROJECT_NAME
 MAKESTER__PROJECT_NAME = $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
@@ -9,11 +13,11 @@ endif
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
-    ifeq ($(strip $(MAKESTER__REPO_NAME)),)
-        MAKESTER__SERVICE_NAME := $(MAKESTER__PROJECT_NAME)
-    else
-        MAKESTER__SERVICE_NAME := $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
-    endif
+  ifeq ($(strip $(MAKESTER__REPO_NAME)),)
+    MAKESTER__SERVICE_NAME := $(MAKESTER__PROJECT_NAME)
+  else
+    MAKESTER__SERVICE_NAME := $(MAKESTER__REPO_NAME)/$(MAKESTER__PROJECT_NAME)
+  endif
 endif
 
 # Default versioning.
@@ -40,17 +44,21 @@ submodule-update:
 # Params:
 #   1. Variable name(s) to test.
 #   2. (optional) Error message to print.
-check_defined = \
-    $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = \
-    $(if $(value $1),, \
-        $(error Undefined $1$(if $2, ($2))))
+check-defined = $(strip $(foreach 1,$1,$(call _check-defined,$1,$(strip $(value 2)))))
+_check-defined = $(if $(value $1),,$(error Undefined $1$(if $2, ($2))))
+
+UNAME ?= $(shell uname)
+ifeq ($(UNAME), Darwin)
+MAKESTER__LOCAL_IP ?= $(shell ipconfig getifaddr en0)
+else ifeq ($(UNAME), Linux)
+MAKESTER__LOCAL_IP ?= $(shell hostname -I | awk '{print $$1}')
+endif
 
 vars:
 	@echo "\n\
-  HASH                               $(HASH)\n\
-  \nOverride variables at the top of your Makefile before the includes:\n\n\
+  HASH:                              $(HASH)\n\
+  MAKESTER__LOCAL_IP:                $(MAKESTER__LOCAL_IP)\n\
+  \nOverride variables at the top of your Makefile before the includes:\n\
   MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\
   MAKESTER__RELEASE_NUMBER:          $(MAKESTER__RELEASE_NUMBER)\n\
   MAKESTER__REPO_NAME:               $(MAKESTER__REPO_NAME)\n\
