@@ -2,19 +2,13 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := docker-help
 endif
 
-# Look for podman. Falls through to docker.
-DOCKER := $(shell which podman 2>/dev/null)
-ifndef DOCKER
-DOCKER := $(shell which docker 2>/dev/null)
-endif
-$(call check-defined, DOCKER, can't find a container runtime: docker and podman supported)
+# Docker is needed.
+DOCKER ?= $(call check-exe,docker,https://docs.docker.com/get-docker/)
 
 MAKESTER__CONTAINER_NAME ?= my-container
 MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
 
-MAKESTER__RUN_COMMAND ?= $(DOCKER) run --rm\
- --name $(MAKESTER__CONTAINER_NAME)\
- $(MAKESTER__SERVICE_NAME):$(HASH)
+MAKESTER__RUN_COMMAND ?= $(DOCKER) run --rm --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
 MAKESTER__BUILD_COMMAND ?= $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 
