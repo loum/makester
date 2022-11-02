@@ -1,4 +1,3 @@
-
 # Makester: Common Project Build and Management Tooling
 - [Overview](#Overview)
 - [Prerequisites](#Prerequisites)
@@ -111,19 +110,23 @@ A description of the Makester special purpose variables follows:
 - `MAKESTER__PROJECT_NAME`: the name of the project. Defaults to the current working directory's basename
 - `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
 	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
-  ```
-  MAKESTER__REPO_NAME := supa-cool-repo
-  MAKESTER__PROJECT_NAME := my-project
-  ```
+    ```
+    MAKESTER__REPO_NAME := supa-cool-repo
+    MAKESTER__PROJECT_NAME := my-project
+    ```
   > **_NOTE:_** `MAKESTER__SERVICE_NAME` is used extensively throughout `Makester` so you should use it within your   `Makefile` targets. Not happy with the defaults? Then override `MAKESTER__SERVICE_NAME` at the top of your `Makefile`   as follows:
   > ```
-    > # Include overrides (must occur before include statements).
-    > MAKESTER__SERVICE_NAME := supa-cool-service-name
-    > ```
+  > # Include overrides (must occur before include statements).
+  > MAKESTER__SERVICE_NAME := supa-cool-service-name
+  > ```
+
 - `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
 - `MAKESTER__VERSION`: Control versioning (defaults to `0.0.0`)
 - `MAKESTER__RELEASE_NUMBER`: Control release number when versioning is unchanged (defaults to `1`)
 - `MAKESTER__LOCAL_IP`: Platform independent way to get the local host's IP address
+- `MAKESTER__WORK_DIR`: Working area that Makester uses to store information (defaults to `$PWD/.makester`).
+  > **_NOTE:_** Be sure to add the location of `MAKESTER__WORK_DIR` into your project's `.gitignore`.
+
 ### Makester Default Virtual Environment
 `Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
 ```
@@ -211,7 +214,7 @@ To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 As of [Moby 20.10.13](https://github.com/moby/moby/releases/tag/v20.10.13), [docker compose V2](https://docs.docker.com/compose/compose-v2/) is integrated into the Docker CLI. This means that we do not need to support the installation of the standalone [docker-compose](https://docs.docker.com/compose/install/other/).
 
 #### Variables
-> **_NOTE_**: Makester `makefile/compose.mk` assumes a `docker-compose.yml` file exists in the top level directory of the project repository by default. However, this can overriden by setting the `MAKESTER__COMPOSE_FILES` parameter:
+> **_NOTE_**: Makester `makefile/compose.mk` assumes a `docker-compose.yml` file exists in the top level directory of the project repository by default. However, this can overridden by setting the `MAKESTER__COMPOSE_FILES` parameter:
 ```
 MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
 ```
@@ -270,7 +273,7 @@ make tag
 ```
 make tag-version
 ```
-Version defaults to `0.0.0-1` but this can be overriden by setting `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` in your `Makefile`. Alternatively, to align with your preferred tagging convention, override the `MAKESTER__IMAGE_TAG` parameter. For example:
+Version defaults to `0.0.0-1` but this can be overridden by setting `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` in your `Makefile`. Alternatively, to align with your preferred tagging convention, override the `MAKESTER__IMAGE_TAG` parameter. For example:
 ```
 make tag MAKESTER__IMAGE_TAG=supa-tag-01
 ```
