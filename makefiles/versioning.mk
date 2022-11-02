@@ -10,10 +10,9 @@ MAKESTER__PACKAGE_NAME := $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
 CMD ?= /h
 # GitVersion help (default).
 gitversion:
-	-@$(shell which mkdir) -p .makester
 	@$(DOCKER) run --rm\
  -v "$(MAKESTER__PROJECT_DIR):/$(MAKESTER__PACKAGE_NAME)"\
- gittools/gitversion:$(GITVERSION_VERSION) $(CMD) > .makester/versioning
+ gittools/gitversion:$(GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning
 
 # GitVersion executable's version.
 gitversion-version: CMD = /version
@@ -27,7 +26,7 @@ gitversion-version gitversion-long gitversion-versions: gitversion
 GITVERSION_VARIABLE ?= AssemblySemFileVer
 release-version: gitversion-versions
 	$(info ### Filtering GitVersion variable: $(GITVERSION_VARIABLE))
-	$(eval $(shell echo export MAKESTER__RELEASE_VERSION=$(shell sed -e 's/=.*$$// p' .makester/versioning | jq .$(GITVERSION_VARIABLE))))
+	$(eval $(shell echo export MAKESTER__RELEASE_VERSION=$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(GITVERSION_VARIABLE))))
 	$(info ### MAKESTER__RELEASE_VERSION: $(MAKESTER__RELEASE_VERSION))
 
 versioning-help:

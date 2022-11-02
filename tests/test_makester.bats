@@ -39,6 +39,12 @@ setup() {
     [ "$status" -eq 0 ]
 }
 
+@test "which-var \"MAKESTER__WORK_DIR\" is defined" {
+    MAKESTER__VAR=MAKESTER__WORK_DIR run make -f makefiles/makester.mk which-var
+    assert_output --partial '### Checking if "MAKESTER__WORK_DIR" is defined ...'
+    [ "$status" -eq 0 ]
+}
+
 # Executable checker.
 @test "check-exe rule for \"GIT\" finds the executable" {
     run make -f makefiles/makester.mk print-GIT

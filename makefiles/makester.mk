@@ -12,6 +12,12 @@ ifndef MAKESTER__VERBOSE
   MAKEFLAGS += --no-print-directory
 endif
 
+# Prepare the makester working directory. Place all makester convenience capability here.
+MAKESTER__WORK_DIR ?= $(PWD)/.makester
+ifeq (,$(wildcard $(MAKESTER__WORK_DIR)))
+  $(shell $(shell which mkdir) -p $(MAKESTER__WORK_DIR))
+endif
+
 # Defaults to the current directory (converted to lower case).
 ifndef MAKESTER__PROJECT_NAME
   MAKESTER__PROJECT_NAME := $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
@@ -77,7 +83,8 @@ vars:
 	@echo "\n\
   HASH:                              $(HASH)\n\
   MAKESTER__LOCAL_IP:                $(MAKESTER__LOCAL_IP)\n\
-  \nOverride variables at the top of your Makefile before the includes:\n\
+  MAKESTER__WORK_DIR                 $(MAKESTER__WORK_DIR)\n\
+  \nOverride variables at the top of your Makefile before the includes:\n\n\
   MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\
   MAKESTER__RELEASE_NUMBER:          $(MAKESTER__RELEASE_NUMBER)\n\
   MAKESTER__REPO_NAME:               $(MAKESTER__REPO_NAME)\n\
