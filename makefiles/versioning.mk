@@ -18,6 +18,10 @@ _dump_versioning:
 
 # GitVersion help (default).
 CMD ?= /h
+_gitversion-cmd: MAKESTER__PROJECT_DIR := $(MAKESTER__PROJECT_DIR)
+_gitversion-cmd: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
+_gitversion-cmd: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
+_gitversion-cmd: makester-work-dir
 _gitversion-cmd:
 	@$(DOCKER) run --rm\
  -v "$(MAKESTER__PROJECT_DIR):/$(MAKESTER__PACKAGE_NAME)"\
@@ -29,26 +33,24 @@ gitversion: _gitversion-cmd _dump_versioning
 gitversion-version: _gitversion-version-msg _gitversion-version _dump_versioning
 _gitversion-version-msg:
 	$(info ### Current GitVersion version ...)
-_gitversion-version: CMD = /version
+_gitversion-version: CMD := /version
 
 # GitVersion version variables.
-_gitversion-versions: MAKESTER__PROJECT_DIR := $(MAKESTER__PROJECT_DIR)
-_gitversion-versions: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
 _gitversion-versions: CMD = /$(MAKESTER__PACKAGE_NAME) /config $(MAKESTER__GITVERSION_CONFIG)
-
-_gitversion-versions-rm: MAKESTER__PROJECT_DIR := $(MAKESTER__PROJECT_DIR)
-_gitversion-versions-rm:
-	-@$(info ### removing $(MAKESTER__WORK_DIR)/versioning $(shell rm $(MAKESTER__WORK_DIR)/versioning))
-
 
 _gitversion-version _gitversion-versions: _gitversion-cmd
 
+_gitversion-versions-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
+_gitversion-versions-rm:
+	-@$(info ### removing $(MAKESTER__WORK_DIR)/versioning $(shell rm $(MAKESTER__WORK_DIR)/versioning))
+
+release-version: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 release-version: _gitversion-versions
 	$(info ### Filtering GitVersion variable: $(MAKESTER__GITVERSION_VARIABLE))
 	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) > $(MAKESTER__WORK_DIR)/release-version)
 	$(info ### MAKESTER__RELEASE_VERSION: $(shell cat $(MAKESTER__WORK_DIR)/release-version))
 
-_release-version-rm: MAKESTER__PROJECT_DIR := $(MAKESTER__PROJECT_DIR)
+_release-version-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _release-version-rm:
 	-@$(info ### removing $(MAKESTER__WORK_DIR)/release-version $(shell rm $(MAKESTER__WORK_DIR)/release-version))
 

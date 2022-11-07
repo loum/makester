@@ -1,0 +1,29 @@
+name: Makester Test Harness
+run-name: ${{ github.actor }} ${{ github.event_name }} event Makester tests 🚀
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'task/**'
+      - 'feature/**'
+      - 'defect/**'
+  pull_request:
+    types: [opened, reopened]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Project Makester vars
+        run: make -f makefiles/makester.mk vars
+      - name: Project Makester test suite
+        run: tests/bats/bin/bats tests
+      - run: echo "🍏 This job's status is ${{ job.status }}."
