@@ -23,6 +23,11 @@ ifndef MAKESTER__PROJECT_NAME
   MAKESTER__PROJECT_NAME := $(shell basename $(dir $(realpath $(firstword $(MAKEFILE_LIST)))) | tr A-Z a-z)
 endif
 
+# Simulate PyPI package naming convention (replacing hyphens with underscores).
+MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
+
+MAKESTER__PROJECT_DIR ?= $(PWD)/$(shell echo $(MAKESTER__PROJECT_NAME) | tr A-Z a-z | tr - _)
+
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
   ifeq ($(strip $(MAKESTER__REPO_NAME)),)
@@ -35,6 +40,14 @@ endif
 # Default versioning.
 MAKESTER__VERSION := $(if $(MAKESTER__VERSION),$(MAKESTER__VERSION),0.0.0)
 MAKESTER__RELEASE_NUMBER := $(if $(MAKESTER__RELEASE_NUMBER),$(MAKESTER__RELEASE_NUMBER),1)
+MAKESTER__RELEASE_VERSION := $(if $(MAKESTER__RELEASE_VERSION),$(MAKESTER__RELEASE_VERSION),<undefined>)
+# Check if MAKESTER__RELEASE_VERSION has been overriden on the CLI.
+ifeq (<undefined>,$(MAKESTER__RELEASE_VERSION))
+  # MAKESTER__RELEASE_VERSION is not overriden. Check if a release version has been generated.
+  ifneq (,$(wildcard $(MAKESTER__WORK_DIR)/release-version))
+    MAKESTER__RELEASE_VERSION := $(shell cat $(MAKESTER__WORK_DIR)/release-version)
+  endif
+endif
 
 GIT ?= $(call check-exe,git,https://git-scm.com/downloads)
 HASH ?= $(shell $(GIT) rev-parse --short HEAD)
@@ -72,11 +85,13 @@ check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)))))
 _check-exe = $(if $(shell which $1),$(shell which $1),$(call _check-exe-err,$1,$(if $2,$2)))
 _check-exe-err = $(info ### "$1" not found) $(info ### $(if $2,Install notes: $2)) $(error ###)
 
-UNAME ?= $(shell uname)
-ifeq ($(UNAME), Darwin)
-  MAKESTER__LOCAL_IP ?= $(shell ipconfig getifaddr en0)
-else ifeq ($(UNAME), Linux)
-  MAKESTER__LOCAL_IP ?= $(shell hostname -I | awk '{print $$1}')
+ifndef MAKESTER__LOCAL_IP
+  UNAME ?= $(shell uname)
+  ifeq ($(UNAME), Darwin)
+    MAKESTER__LOCAL_IP := $(shell ipconfig getifaddr en0)
+  else ifeq ($(UNAME), Linux)
+    MAKESTER__LOCAL_IP := $(shell hostname -I | awk '{print $$1}')
+  endif
 endif
 
 vars:
@@ -84,7 +99,10 @@ vars:
   HASH:                              $(HASH)\n\
   MAKESTER__LOCAL_IP:                $(MAKESTER__LOCAL_IP)\n\
   MAKESTER__WORK_DIR                 $(MAKESTER__WORK_DIR)\n\
+  \nStandard override variables:\n\n\
+  MAKESTER__RELEASE_VERSION:         $(MAKESTER__RELEASE_VERSION)\n\
   \nOverride variables at the top of your Makefile before the includes:\n\n\
+  MAKESTER__PROJECT_DIR:             $(MAKESTER__PROJECT_DIR)\n\
   MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\
   MAKESTER__RELEASE_NUMBER:          $(MAKESTER__RELEASE_NUMBER)\n\
   MAKESTER__REPO_NAME:               $(MAKESTER__REPO_NAME)\n\
