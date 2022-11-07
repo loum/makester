@@ -11,6 +11,7 @@
   - [`makefiles/compose.mk`](#`makefiles/compose.mk`)
   - [`makefile/docker.mk`](#`makefiles/docker.mk`)
   - [`makefile/k8s.mk`](#`makefiles/k8s.mk`)
+  - [`makefile/versioning.mk`](#`makefiles/versioning.mk`)
 - [Makester Utilities](#Makester-Utilities)
 - [Makester Recipes](#Makester-Recipes)
 
@@ -85,7 +86,7 @@ git submodule add https://github.com/loum/makester.git
 ```
 git submodule update --init --recursive
 ```
- 2. Create a `Makefile` at the top-level of your `git` project repository. Not sure what that means? Then just copy over the [sample Makefile](https://github.com/loum/makester/blob/master/sample/Makefile>) and tweak the targets to suit.
+ 2. Create a `Makefile` at the top-level of your `git` project repository. Not sure what that means? Then just copy over the [sample Makefile](https://github.com/loum/makester/blob/main/sample/Makefile>) and tweak the targets to suit.
  3. Include the required makefile targets into your `Makefile`. For example:
 ```
 include makester/makefiles/makester.mk
@@ -120,9 +121,10 @@ A description of the Makester special purpose variables follows:
   > MAKESTER__SERVICE_NAME := supa-cool-service-name
   > ```
 
-- `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `master` branch, you can `make tag-latest` to tag the image with `latest`.
-- `MAKESTER__VERSION`: Control versioning (defaults to `0.0.0`)
-- `MAKESTER__RELEASE_NUMBER`: Control release number when versioning is unchanged (defaults to `1`)
+- `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `main` branch, you can `make tag-latest` to tag the image with `latest`.
+- `MAKESTER__VERSION`: Manual versioning control (defaults to `0.0.0`)
+- `MAKESTER__RELEASE_NUMBER`: Manual release number control when `MAKESTER__VERSION` is unchanged (defaults to `1`)
+- `MAKESTER__RELEASE_VERSION`: Advanced versioning control that provides a hook into an autonomous versioning facility (for example, [GitVersion](https://gitversion.net/docs/))
 - `MAKESTER__LOCAL_IP`: Platform independent way to get the local host's IP address
 - `MAKESTER__WORK_DIR`: Working area that Makester uses to store information (defaults to `$PWD/.makester`).
   > **_NOTE:_** Be sure to add the location of `MAKESTER__WORK_DIR` into your project's `.gitignore`.
@@ -245,9 +247,10 @@ make compose-config
 
 ### `makefile/docker.mk`
 #### Variables
-- `MAKESTER__CONTAINER_NAME` - Control the name of your image container (defaults to `my-container`)
-- `MAKESTER__IMAGE_TAG` - (defaults to `latest`)
-- `MAKESTER__RUN_COMMAND` - override the Docker container `run` command initiated by `make run`
+- `MAKESTER__CONTAINER_NAME`: Control the name of your image container (defaults to `my-container`)
+- `MAKESTER__IMAGE_TAG`: (defaults to `latest`)
+- `MAKESTER__RUN_COMMAND`: override the Docker container `run` command initiated by `make run`
+
 #### Command Reference
 ##### Build your Docker Image
 ```
@@ -320,7 +323,6 @@ make mk-del
 ```
 make mk-service
 ```
-
 ##### Check Current `kubectl` Context
 ```
 make kube-context
@@ -353,6 +355,56 @@ make kube-del
 ```
 make kube-get
 ```
+### `makefile/versioning.mk`
+To use add `include makester/makefiles/versioning.mk` to your `Makefile`.
+
+> **_NOTE:_** `makefile/versioning.mk` uses the [GitVersion Docker image](https://hub.docker.com/r/gittools/gitversion). As such, `makefile/docker.mk` also needs to be added to your `Makefile`. Makester will prompt you if you forget:
+> ```
+> ### Add the following include statement to your Makefile
+> include makester/makefiles/docker.mk
+> makefiles/versioning.mk:8: *** ### missing include dependency.  Stop.
+> ```
+
+`makefile/versioning.mk` extends the basic versioning capabilities provided by `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` by leveraging [GitVersion](https://gitversion.net/docs/). In brief, `makefile/versioning.mk` allows a degree of versioning autonomy based on your Git history.
+
+`makefile/versioning.mk` works with the special variable hook `makefiles/makester.mk:MAKESTER__RELEASE_VERSION` when the `release-version` target is added to your project's `Makefile`.
+> **_NOTE:_** `release-version` creates static output files under Makester's `MAKESTER__WORK_DIR`. These are namely:
+> - `$MAKESTER__WORK_DIR/release-version`
+> - `$MAKESTER__WORK_DIR/versioning`
+
+If version currency is important for a particular function then you can chain the `release-version` target to any target within your `Makefile`. For example, when you are building a fresh Docker image, the following recipe will ensure that a new `MAKESTER__RELEASE_NUMBER` is generated just prior to the Docker image build process:
+> ```
+> image-build: release-version
+> ```
+`makefile/versioning.mk` checks for a `GitVersion.yml` at the top level of your project but will default to GitVersion's internal default if one is not provided. To see the default release variables and values, run:
+```
+make release-version
+```
+... and check the contents of `$PWD/.makester/versioning`.
+
+In certain cases, GitVersion's defaults may be all that your project needs. But code versioning can be a touchy subject. Customising your own `GitVersion.yml` will give you full control over this facility. Follow the [GitVersion configuration guide](https://gitversion.net/docs/reference/configuration) to initialise your own `GitVersion.yml`. Makester also provides a [working, sample `GitVersion.yml`](https://github.com/loum/makester/blob/main/sample/GitVersion.yml) that is geared toward Python projects.
+
+#### Variables
+- `MAKESTER__GITVERSION_CONFIG`: optionally specify the location of your project's `GitVersion.yml` (defaults to `GitVersion.yml` at the top level of the project.
+- `MAKESTER__GITVERSION_VARIABLE`: the GitVersion release variable value filter (defaults to `AssemblySemFileVer`)
+- `MAKESTER__GITVERSION_VERSION`: the GitVersion docker image version (defaults to `latest`)
+
+#### Command Reference
+##### `make versioning-help`
+Displays the `makefile/versioning.mk` usage message.
+
+##### `make gitversion`
+Displays the GitVersion usage message.
+
+##### `make release-version`
+Filtered GitVersion variables against `MAKESTER__GITVERSION_VARIABLE` (defaults to `AssemblySemFileVer`). For example:
+```
+### Filtering GitVersion variable: AssemblySemFileVer
+### MAKESTER__RELEASE_VERSION: "0.1.0.0"
+```
+##### `make gitversion-clear`
+Clear the temporary GitVersion files from `$MAKESTER__WORK_DIR`
+
 ## Makester Utilities
 ### `utils/waitster.py`
 Wait until dependent service is ready:
