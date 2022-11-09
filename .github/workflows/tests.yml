@@ -8,8 +8,6 @@ on:
       - 'task/**'
       - 'feature/**'
       - 'defect/**'
-  pull_request:
-    types: [opened, reopened]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
