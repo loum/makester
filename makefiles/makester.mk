@@ -14,9 +14,12 @@ endif
 
 # Prepare the makester working directory. Place all makester convenience capability here.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester
-ifeq (,$(wildcard $(MAKESTER__WORK_DIR)))
-  $(shell $(shell which mkdir) -p $(MAKESTER__WORK_DIR))
-endif
+makester-work-dir:
+	$(info ### Creating Makester working directory "$(MAKESTER__WORK_DIR)")
+	$(shell which mkdir) -p $(MAKESTER__WORK_DIR)
+makester-work-dir-rm:
+	$(info ### Deleting Makester working directory "$(MAKESTER__WORK_DIR)")
+	$(shell which rmdir) $(MAKESTER__WORK_DIR)
 
 # Defaults to the current directory (converted to lower case).
 ifndef MAKESTER__PROJECT_NAME
@@ -69,7 +72,11 @@ submodule-update:
 #   2. (optional) Error message to print.
 check-defined = $(strip $(foreach 1,$1,$(call _check-defined,$1,$(strip $(value 2)))))
 _check-defined = $(if $(value $1),,$(call _check-defined-err,$1,$(if $2,$(value 2))))
-_check-defined-err = $(info ### "$1" undefined) $(info ### $(if $2,$(value $2))) $(error ###)
+define _check-defined-err
+	$(info ### "$1" undefined)
+	$(info ### $(if $2,$(value $2)))
+	$(error ###)
+endef
 
 which-var:
 	$(call check-defined,MAKESTER__VAR)
@@ -83,7 +90,11 @@ which-var:
 #   2. (optional) install tip or message to print.
 check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)))))
 _check-exe = $(if $(shell which $1),$(shell which $1),$(call _check-exe-err,$1,$(if $2,$2)))
-_check-exe-err = $(info ### "$1" not found) $(info ### $(if $2,Install notes: $2)) $(error ###)
+define _check-exe-err
+	$(info ### "$1" not found)
+	$(info ### $(if $2,Install notes: $2))
+	$(error ###)
+endef
 
 ifndef MAKESTER__LOCAL_IP
   UNAME ?= $(shell uname)
