@@ -74,7 +74,7 @@ make -f sample/Makefile run
 ```
 Finally, to clean up you can delete the `supa-cool-repo/my-project:99296c8` image:
 ```
-make -f sample/Makefile rmi
+make -f sample/Makefile irm
 ```
 ## Adding `Makester` to your Project's Git Repository
 
@@ -213,6 +213,14 @@ make py
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
+Traditional Makester capability has supported 
+[docker compose](https://docs.docker.com/engine/reference/commandline/compose/) capability as a basic
+multi-container orchestration facility. Makester strategy is to move more into the Kubernetes space so support
+for `makefiles/compose.mk` will continue to diminish over time.
+
+> **_NOTE:_** Support for PyPI `docker-compose` has been completely removed as there does not appear to be
+a roadmap within that project to move to [docker compose V2](https://docs.docker.com/compose/compose-v2/).
+
 As of [Moby 20.10.13](https://github.com/moby/moby/releases/tag/v20.10.13), [docker compose V2](https://docs.docker.com/compose/compose-v2/) is integrated into the Docker CLI. This means that we do not need to support the installation of the standalone [docker-compose](https://docs.docker.com/compose/install/other/).
 
 #### Variables
@@ -223,7 +231,7 @@ MAKESTER__COMPOSE_FILES = -f docker-compose-supa.yml
 If you need more control over `docker-compose`, then override the `MAKESTER__COMPOSE_RUN_CMD` parameter in your `Makefile`. For example, to specify the verbose output option:
 ```
 MAKESTER__COMPOSE_RUN_CMD ?= SERVICE_NAME=$(MAKESTER__PROJECT_NAME) HASH=$(HASH)\
- $(DOCKER_COMPOSE)\
+ $(MAKESTER__DOCKER_COMPOSE)\
  --verbose\
  $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
 ```
@@ -258,7 +266,7 @@ make build-image
 ```
 The `build-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`. For example:
 ```
-MAKESTER__BUILD_COMMAND := $(DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+MAKESTER__BUILD_COMMAND := $(MAKESTER__DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 ```
 ##### Run your Docker Images as a Container
 ```
@@ -266,7 +274,7 @@ make run
 ```
 The `run` target can be controlled in your `Makefile` by overriding the `MAKESTER__RUN_COMMAND` parameter. For example:
 ```
-MAKESTER__RUN_COMMAND := $(DOCKER) run --rm -d --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
+MAKESTER__RUN_COMMAND := $(MAKESTER__DOCKER) run --rm -d --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 ```
 ##### Tag Docker Image with the `latest` Tag
 ```
