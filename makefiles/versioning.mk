@@ -2,7 +2,7 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := versioning-help
 endif
 
-ifndef DOCKER
+ifndef MAKESTER__DOCKER
 $(info ### Add the following include statement to your Makefile)
 $(info include makester/makefiles/docker.mk)
 $(error ### missing include dependency)
@@ -23,7 +23,7 @@ _gitversion-cmd: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-cmd: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
 _gitversion-cmd: makester-work-dir
 _gitversion-cmd:
-	@$(DOCKER) run --rm\
+	@$(MAKESTER__DOCKER) run --rm\
  -v "$(MAKESTER__PROJECT_DIR):/$(MAKESTER__PACKAGE_NAME)"\
  gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning
 

@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+    redis:
+        image: nginxdemos/hello
+        container_name: makester-example
+        ports:
+            - $SAMPLE_COMPOSE_PORT:80
