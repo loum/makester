@@ -58,7 +58,7 @@ make -f sample/Makefile help
 ```
 Build a Docker image based off the "Hello World" image:
 ```
-make -f sample/Makefile build-image
+make -f sample/Makefile image-build
 ```
 ```
 /usr/bin/docker build -t supa-cool-repo/my-project:99296c8 sample
@@ -103,10 +103,9 @@ make submodule-update
 The standard [GNU Makefile variable](https://www.gnu.org/software/make/manual/html_node/Using-Variables.html) convention is adhered to within the project. Makester introduces special purpose variables are denoted as `MAKESTER__`. Makester will attempt to provide sane defaults to get you started. However, it is recommended that you override these values in your own project's Makefile to provide more informative context.
 
 Makester special purpose variable values can be viewed any time with the `vars` target:
-> ```
-> make vars
-> ```
-
+```
+make vars
+```
 A description of the Makester special purpose variables follows:
 - `MAKESTER__PROJECT_NAME`: the name of the project. Defaults to the current working directory's basename
 - `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
@@ -213,7 +212,7 @@ make py
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
-Traditional Makester capability has supported 
+Traditional Makester capability has supported
 [docker compose](https://docs.docker.com/engine/reference/commandline/compose/) capability as a basic
 multi-container orchestration facility. Makester strategy is to move more into the Kubernetes space so support
 for `makefiles/compose.mk` will continue to diminish over time.
@@ -262,11 +261,15 @@ make compose-config
 #### Command Reference
 ##### Build your Docker Image
 ```
-make build-image
+make image-build
 ```
-The `build-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`. For example:
+The `image-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`. For example:
 ```
 MAKESTER__BUILD_COMMAND := $(MAKESTER__DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+```
+Alternatively, leverage the features provided by [BuildKit](https://docs.docker.com/build/buildkit/):
+```
+make image-buildx
 ```
 ##### Run your Docker Images as a Container
 ```

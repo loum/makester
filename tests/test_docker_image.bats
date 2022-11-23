@@ -1,7 +1,7 @@
 # Test runner.
 #
 # Can be executed manually with:
-#   tests/bats/bin/bats --filter-tags docker_sample tests
+#   tests/bats/bin/bats --filter-tags docker-image tests
 #
 # bats file_tags=docker-image
 setup_file() {
@@ -21,6 +21,13 @@ teardown_file() {
 @test "hello-world Docker image build: dry" {
     MAKESTER__DOCKER=docker run make -f sample/Makefile image-build --dry-run
     assert_output --regexp 'docker build -t supa-cool-repo/my-project:[0-9a-z]{7} sample'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-build,dry-run
+@test "hello-world Docker image build with Dockerfile PATH override: dry" {
+    MAKESTER__BUILD_PATH=sample MAKESTER__DOCKER=docker MAKESTER__REPO_NAME=supa-cool-repo MAKESTER__PROJECT_NAME=my-project\
+ run make -f makefiles/makester.mk -f makefiles/docker.mk image-buildx --dry-run
+    assert_output --regexp 'docker buildx build -t supa-cool-repo/my-project:[0-9a-z]{7} sample'
     [ "$status" -eq 0 ]
 }
 

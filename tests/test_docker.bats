@@ -124,3 +124,21 @@ include makester/makefiles/makester.mk'
     assert_output 'docker tag  makester:0.0.0-1'
     [ "$status" -eq 0 ]
 }
+
+# bats test_tags=targets,docker-targets,image-buildx,dry-run
+@test "Default Docker image buildx: dry" {
+    MAKESTER__PROJECT_NAME=makester\
+ MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk -f makefiles/docker.mk image-buildx --dry-run
+    assert_output --regexp 'docker buildx build -t makester:[0-9a-z]{7} .'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-buildx,dry-run
+@test "Docker image buildx overridden tag: dry" {
+    MAKESTER__PROJECT_NAME=makester\
+ MAKESTER__DOCKER=docker\
+ MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
+ run make -f makefiles/makester.mk -f makefiles/docker.mk image-buildx --dry-run
+    assert_output 'docker buildx build -t makester:0.0.0-1 .'
+    [ "$status" -eq 0 ]
+}

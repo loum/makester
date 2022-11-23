@@ -16,7 +16,9 @@ MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
 
 MAKESTER__RUN_COMMAND ?= $(MAKESTER__DOCKER) run --rm --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
-MAKESTER__BUILD_COMMAND ?= $(MAKESTER__DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+MAKESTER__BUILD_CONTEXT ?= build
+MAKESTER__BUILD_PATH ?= .
+MAKESTER__BUILD_COMMAND ?= $(MAKESTER__DOCKER) $(MAKESTER__BUILD_CONTEXT) -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) $(MAKESTER__BUILD_PATH)
 
 # 20221027: Introduced target grouping for "image" related items.
 is image-search si search-image:
@@ -24,6 +26,9 @@ is image-search si search-image:
 
 ib image-build bi build-image:
 	$(MAKESTER__BUILD_COMMAND)
+
+ibx image-buildx: MAKESTER__BUILD_CONTEXT := buildx build
+ibx image-buildx: image-build
 
 irm image-rm rmi rm-image:
 	$(MAKESTER__DOCKER) rmi $(MAKESTER__IMAGE_TAG_ALIAS)
@@ -110,6 +115,7 @@ docker-help:
   container-status     Check container $(MAKESTER__CONTAINER_NAME) run status\n\
   container-stop       Stop container $(MAKESTER__CONTAINER_NAME)\n\
   image-build          Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) (alias bi)\n\
+  image-buildx         Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) with BuildKit\n\
   image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
   image-rm             Delete docker image \"$(MAKESTER__IMAGE_TAG_ALIAS)\" (alias rmi)\n\
   image-rm-dangling    Remove all dangling images\n\
