@@ -26,7 +26,7 @@ teardown_file() {
  run make -f makefiles/makester.mk -f makefiles/compose.mk compose-config
     assert_output "name: makester
 services:
-  redis:
+  demo:
     container_name: makester-example
     image: nginxdemos/hello
     networks:
@@ -66,6 +66,6 @@ makester            running\(1\)          .*/makester/sample/docker-compose.yml'
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/compose.mk compose-ps
     assert_output --partial "\
 NAME                COMMAND                  SERVICE             STATUS              PORTS
-makester-example    \"/docker-entrypoint.…\"   redis               running             0.0.0.0:$SAMPLE_COMPOSE_PORT->80/tcp"
+makester-example    \"/docker-entrypoint.…\"   demo                running             0.0.0.0:$SAMPLE_COMPOSE_PORT->80/tcp"
     [ "$status" -eq 0 ]
 }

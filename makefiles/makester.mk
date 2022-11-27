@@ -18,8 +18,8 @@ makester-work-dir:
 	$(info ### Creating Makester working directory "$(MAKESTER__WORK_DIR)")
 	$(shell which mkdir) -p $(MAKESTER__WORK_DIR)
 makester-work-dir-rm:
-	$(info ### Deleting Makester working directory "$(MAKESTER__WORK_DIR)")
-	$(shell which rmdir) $(MAKESTER__WORK_DIR)
+	$(info ### Clearing empty Makester working directories "$(MAKESTER__WORK_DIR)")
+	$(shell which find) $(MAKESTER__WORK_DIR) -depth -type d -empty -exec rmdir {} \;
 
 # Defaults to the current directory (converted to lower case).
 ifndef MAKESTER__PROJECT_NAME
@@ -51,6 +51,12 @@ ifeq (<undefined>,$(MAKESTER__RELEASE_VERSION))
     MAKESTER__RELEASE_VERSION := $(shell cat $(MAKESTER__WORK_DIR)/release-version)
   endif
 endif
+
+# Prepare the makester k8s manifiest directory.
+MAKESTER__K8S_MANIFESTS ?= $(MAKESTER__WORK_DIR)/k8s/manifests
+makester-k8s-manifest-dir:
+	$(info ### Creating Makester k8s manifest directory "$(MAKESTER__K8S_MANIFESTS)")
+	$(shell which mkdir) -p $(MAKESTER__K8S_MANIFESTS)
 
 GIT ?= $(call check-exe,git,https://git-scm.com/downloads)
 HASH ?= $(shell $(GIT) rev-parse --short HEAD)
@@ -109,9 +115,10 @@ vars:
 	@echo "\n\
   HASH:                              $(HASH)\n\
   MAKESTER__LOCAL_IP:                $(MAKESTER__LOCAL_IP)\n\
-  MAKESTER__WORK_DIR                 $(MAKESTER__WORK_DIR)\n\
   \nStandard override variables:\n\n\
+  MAKESTER__K8S_MANIFESTS:           $(MAKESTER__K8S_MANIFESTS)\n\
   MAKESTER__RELEASE_VERSION:         $(MAKESTER__RELEASE_VERSION)\n\
+  MAKESTER__WORK_DIR:                $(MAKESTER__WORK_DIR)\n\
   \nOverride variables at the top of your Makefile before the includes:\n\n\
   MAKESTER__PROJECT_DIR:             $(MAKESTER__PROJECT_DIR)\n\
   MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\

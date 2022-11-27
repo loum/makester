@@ -78,6 +78,19 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,makester-variables,MAKESTER__K8S_MANIFESTS
+@test "MAKESTER__K8S_MANIFESTS should be set when calling makester.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__K8S_MANIFESTS
+    assert_output --regexp 'MAKESTER__K8S_MANIFESTS=/tmp/makester-[a-zA-Z0-9]{4,8}/k8s/manifests'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__K8S_MANIFESTS
+@test "MAKESTER__K8S_MANIFESTS override" {
+    MAKESTER__K8S_MANIFESTS=dummy run make -f makefiles/makester.mk print-MAKESTER__K8S_MANIFESTS
+    assert_output --regexp 'MAKESTER__K8S_MANIFESTS=dummy'
+    [ "$status" -eq 0 ]
+}
+
 # Executable checker.
 # bats test_tags=check-exe
 @test "check-exe rule for \"GIT\" finds the executable" {

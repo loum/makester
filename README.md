@@ -12,6 +12,7 @@
   - [`makefile/docker.mk`](#`makefiles/docker.mk`)
   - [`makefile/k8s.mk`](#`makefiles/k8s.mk`)
   - [`makefile/versioning.mk`](#`makefiles/versioning.mk`)
+   - [`makefile/kompose.mk`](#`makefiles/kompose.mk`)
 - [Makester Utilities](#Makester-Utilities)
 - [Makester Recipes](#Makester-Recipes)
 
@@ -43,6 +44,8 @@ Still not sure? Try to [Run the Sample Docker "Hello World" Project](#Run-the-Sa
 If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/):
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+
+Optionally, install [kompose](https://kompose.io/installation/) if you would like to convert existing Docker Compose files into Kubernetes manifests.
 
 ## Getting Started
 Get the code and change into the top level `git` project directory:
@@ -107,8 +110,8 @@ Makester special purpose variable values can be viewed any time with the `vars` 
 make vars
 ```
 A description of the Makester special purpose variables follows:
-- `MAKESTER__PROJECT_NAME`: the name of the project. Defaults to the current working directory's basename
-- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image
+- `MAKESTER__PROJECT_NAME`: the name of the project. Defaults to the current working directory's basename.
+- `MAKESTER__SERVICE_NAME`: a service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used to target your container repository and identify your image.
 	- If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
     ```
     MAKESTER__REPO_NAME := supa-cool-repo
@@ -121,12 +124,14 @@ A description of the Makester special purpose variables follows:
   > ```
 
 - `HASH`: as per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely identify each build revision within your project. Once you merge your code changes back into the `main` branch, you can `make tag-latest` to tag the image with `latest`.
-- `MAKESTER__VERSION`: Manual versioning control (defaults to `0.0.0`)
-- `MAKESTER__RELEASE_NUMBER`: Manual release number control when `MAKESTER__VERSION` is unchanged (defaults to `1`)
-- `MAKESTER__RELEASE_VERSION`: Advanced versioning control that provides a hook into an autonomous versioning facility (for example, [GitVersion](https://gitversion.net/docs/))
-- `MAKESTER__LOCAL_IP`: Platform independent way to get the local host's IP address
+- `MAKESTER__VERSION`: Manual versioning control (defaults to `0.0.0`).
+- `MAKESTER__RELEASE_NUMBER`: Manual release number control when `MAKESTER__VERSION` is unchanged (defaults to `1`).
+- `MAKESTER__RELEASE_VERSION`: Advanced versioning control that provides a hook into an autonomous versioning facility (for example, [GitVersion](https://gitversion.net/docs/)).
+- `MAKESTER__LOCAL_IP`: Platform independent way to get the local host's IP address.
 - `MAKESTER__WORK_DIR`: Working area that Makester uses to store information (defaults to `$PWD/.makester`).
   > **_NOTE:_** Be sure to add the location of `MAKESTER__WORK_DIR` into your project's `.gitignore`.
+
+- `MAKESTER__K8S_MANIFESTS`: location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
 
 ### Makester Default Virtual Environment
 `Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
@@ -197,7 +202,7 @@ make pip-editable
 make clear-env
 ```
 ##### Build Python Package from `setup.py`
-Write wheel package to -`-wheel-dir` (defaults to `~/wheelhouse`)::
+Write wheel package to -`-wheel-dir` (defaults to `~/wheelhouse`):
 ```
 make package
 ```
@@ -303,7 +308,7 @@ make rm-dangling-images
 To use add `include makester/makefiles/k8s.mk` to your `Makefile`.
 
 Shakeout or debug your Docker image containers prior to deploying to Kubernetes.
-> **_NOTE_**: All Kubernetes manifests are expected to be in the `MAKESTER__K8_MANIFESTS` directory (defaults to `k8s/manifests`).
+> **_NOTE_**: All Kubernetes manifests are expected to be in the `MAKESTER__K8_MANIFESTS` directory (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
 
 > **_WARNING:_** Care must be taken when managing mulitple Kubernetes contexts. `kubectl` will operate against the active context.
 
@@ -353,12 +358,12 @@ make kube-context-set MAKESTER__KUBECTL_CONTEXT=<context-name>
 make kube-context-set
 ```
 ##### Create Kubernetes Resource(s)
-Builds all manifestf files in `MAKESTER__K8_MANIFESTS` directory::
+Builds all manifest files in `MAKESTER__K8_MANIFESTS` directory:
 ```
 make kube-apply
 ```
 ##### Delete Kubernetes Resource(s)
-Deletes all manifestf files in `MAKESTER__K8_MANIFESTS` directory::
+Deletes all manifest files in `MAKESTER__K8_MANIFESTS` directory:
 ```
 make kube-del
 ```
@@ -397,8 +402,8 @@ In certain cases, GitVersion's defaults may be all that your project needs. But 
 
 #### Variables
 - `MAKESTER__GITVERSION_CONFIG`: optionally specify the location of your project's `GitVersion.yml` (defaults to `GitVersion.yml` at the top level of the project.
-- `MAKESTER__GITVERSION_VARIABLE`: the GitVersion release variable value filter (defaults to `AssemblySemFileVer`)
-- `MAKESTER__GITVERSION_VERSION`: the GitVersion docker image version (defaults to `latest`)
+- `MAKESTER__GITVERSION_VARIABLE`: the GitVersion release variable value filter (defaults to `AssemblySemFileVer`).
+- `MAKESTER__GITVERSION_VERSION`: the GitVersion docker image version (defaults to `latest`).
 
 #### Command Reference
 ##### `make versioning-help`
@@ -415,6 +420,22 @@ Filtered GitVersion variables against `MAKESTER__GITVERSION_VARIABLE` (defaults 
 ```
 ##### `make gitversion-clear`
 Clear the temporary GitVersion files from `$MAKESTER__WORK_DIR`
+
+### `makefile/kompose.mk`
+Convert Docker Compose artifacts into container orchestrator manifests.
+
+`makefile/kompose.mk` leverages (Kubernetes `kompose`)[https://kompose.io/] which is a handy tool if you are moving to Kubernetes from Docker Compose.
+
+#### Variables
+- `MAKESTER__COMPOSE_K8S_EPHEMERAL`: optionally specify the location of your project's `docker-compose.yml` (defaults to `docker-compose.yml` at the top level of the project.
+- `MAKESTER__K8S_MANIFESTS`: Kubernetes manifest target output (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
+
+#### Command Reference
+##### `make kompose-help`
+Displays the `makefile/kompose.mk` usage message.
+
+##### `make kompose`
+Translate Docker Compose to Kubernetes manifests.
 
 ## Makester Utilities
 ### `utils/waitster.py`

@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-    redis:
+    demo:
         image: nginxdemos/hello
         container_name: makester-example
         ports:
