@@ -1,4 +1,4 @@
-# Test runner.
+# Versioning test runner.
 #
 # Can be executed manually with:
 #   tests/bats/bin/bats --file-filter versioning tests
@@ -113,6 +113,7 @@ include makester/makefiles/docker.mk'
     MAKESTER__PROJECT_DIR=$PWD\
  MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
+    assert_output --regexp '### Filtering GitVersion variable: AssemblySemFileVer
 ### MAKESTER__RELEASE_VERSION: "[0-9]+\.[0-9]+\.[0-9a-z]+"'
     [ "$status" -eq 0 ]
 }

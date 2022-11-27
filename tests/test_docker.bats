@@ -1,4 +1,4 @@
-# Test runner.
+# Docker test runner.
 #
 # Can be executed manually with:
 #   tests/bats/bin/bats --filter-tags docker tests
