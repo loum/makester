@@ -9,7 +9,7 @@ $(error ### missing include dependency)
 endif
 
 # Defaults.
-MAKESTER__GITVERSION_CONFIG ?= GitVersion.yml
+MAKESTER__GITVERSION_CONFIG ?= makester/sample/GitVersion.yml
 MAKESTER__GITVERSION_VARIABLE ?= AssemblySemFileVer
 MAKESTER__GITVERSION_VERSION ?= latest
 
@@ -18,7 +18,6 @@ _dump_versioning:
 
 # GitVersion help (default).
 CMD ?= /h
-_gitversion-cmd: MAKESTER__PROJECT_DIR := $(MAKESTER__PROJECT_DIR)
 _gitversion-cmd: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-cmd: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
 _gitversion-cmd: makester-work-dir
