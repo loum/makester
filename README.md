@@ -239,8 +239,9 @@ MAKESTER__COMPOSE_RUN_CMD ?= SERVICE_NAME=$(MAKESTER__PROJECT_NAME) HASH=$(HASH)
  --verbose\
  $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
 ```
-- `MAKESTER__COMPOSE_FILES` - override the `docker-compose` `-file` switch (defaults to `-f docker-compose.yml`
-- `MAKESTER__COMPOSE_RUN_CMD` - override the `docker-compose` run command
+- `MAKESTER__COMPOSE_FILES`: override the `docker-compose` `-file` switch (defaults to `-f docker-compose.yml`
+- `MAKESTER__COMPOSE_RUN_CMD`: override the `docker-compose` run command
+
 #### Command Reference
 ##### Build your Compose Stack
 ```
@@ -262,15 +263,15 @@ make compose-config
 - `MAKESTER__CONTAINER_NAME`: Control the name of your image container (defaults to `my-container`)
 - `MAKESTER__IMAGE_TAG`: (defaults to `latest`)
 - `MAKESTER__RUN_COMMAND`: override the Docker container `run` command initiated by `make run`
+- `MAKESTER__BUILD_COMMAND`: override the command line options to `docker build` or `docker buildx build` to have more fine-grained control over the container image build process. For example, the following snippet overrides the image tag:
+   ```
+  MAKESTER__BUILD_COMMAND := -t $(MAKESTER__SERVICE_NAME):$(HASH) .
+  ```
 
 #### Command Reference
 ##### Build your Docker Image
 ```
 make image-build
-```
-The `image-image` target can be controlled by overrding the `MAKESTER__BUILD_COMMAND` parameter in your `Makefile`. For example:
-```
-MAKESTER__BUILD_COMMAND := $(MAKESTER__DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) .
 ```
 Alternatively, leverage the features provided by [BuildKit](https://docs.docker.com/build/buildkit/):
 ```
