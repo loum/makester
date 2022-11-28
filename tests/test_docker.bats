@@ -79,14 +79,14 @@ include makester/makefiles/makester.mk'
 # bats test_tags=variables,docker-variables,MAKESTER__BUILD_COMMAND
 @test "MAKESTER__BUILD_COMMAND default should be set when calling docker.mk" {
     run make -f makefiles/makester.mk -f makefiles/docker.mk print-MAKESTER__BUILD_COMMAND
-    assert_output --regexp '^MAKESTER__BUILD_COMMAND=.*/docker build -t makefiles:[0-9a-z]{7} \.$'
+    assert_output --regexp '^MAKESTER__BUILD_COMMAND=-t makefiles:[0-9a-z]{7} \.$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,docker-variables,MAKESTER__BUILD_COMMAND
 @test "MAKESTER__BUILD_COMMAND override" {
-    MAKESTER__BUILD_COMMAND="\$(MAKESTER__DOCKER) build --no-cache -t \$(MAKESTER__IMAGE_TAG_ALIAS) ."\
+    MAKESTER__BUILD_COMMAND="--no-cache -t \$(MAKESTER__IMAGE_TAG_ALIAS) ."\
  run make -f makefiles/makester.mk -f makefiles/docker.mk print-MAKESTER__BUILD_COMMAND
-    assert_output --regexp '^MAKESTER__BUILD_COMMAND=.*/docker build --no-cache -t makefiles:[0-9a-z]{7} \.$'
+    assert_output --regexp '^MAKESTER__BUILD_COMMAND=--no-cache -t makefiles:[0-9a-z]{7} \.$'
     [ "$status" -eq 0 ]
 }
 

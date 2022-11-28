@@ -6,7 +6,7 @@ include makefiles/makester.mk
 include makefiles/docker.mk
 include makefiles/python-venv.mk
 
-MAKESTER__BUILD_COMMAND = $(MAKESTER__DOCKER) build -t $(MAKESTER__SERVICE_NAME):$(HASH) sample
+MAKESTER__BUILD_COMMAND = -t $(MAKESTER__SERVICE_NAME):$(HASH) sample
 
 init: pip-requirements
 
