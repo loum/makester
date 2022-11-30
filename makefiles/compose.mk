@@ -2,36 +2,46 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := compose-help
 endif
 
-# Look for podman. Falls through to docker.
-_DOCKER := $(shell which podman 2>/dev/null)
-ifndef _DOCKER
-_DOCKER := $(shell which docker 2>/dev/null)
+ifndef MAKESTER__DOCKER
+$(info ### Add the following include statement to your Makefile)
+$(info include makester/makefiles/docker.mk)
+$(error ### missing include dependency)
 endif
-$(call check_defined, _DOCKER, can't find a container compose spec: docker and podman supported)
-DOCKER_COMPOSE := $(shell which $(_DOCKER)-compose 2>/dev/null || echo "3env/bin/$(shell basename $(_DOCKER))-compose")
+
+MAKESTER__DOCKER_COMPOSE ?= $(MAKESTER__DOCKER) compose
 
 MAKESTER__COMPOSE_FILES ?= -f docker-compose.yml
 
+ifndef COMPOSE_CMD
+override COMPOSE_CMD = version
+endif
 MAKESTER__COMPOSE_RUN_CMD ?= SERVICE_NAME=$(MAKESTER__SERVICE_NAME) HASH=$(HASH)\
- $(DOCKER_COMPOSE)\
+ $(MAKESTER__DOCKER_COMPOSE)\
  --project-name $(MAKESTER__PROJECT_NAME)\
  $(MAKESTER__COMPOSE_FILES) $(COMPOSE_CMD)
 
-compose-cmd:
+_compose-cmd:
 	@$(MAKESTER__COMPOSE_RUN_CMD)
 
 compose-config: COMPOSE_CMD = config
 
-compose-up: COMPOSE_CMD = up -d
-
 compose-down: COMPOSE_CMD = down -v
 
-compose-config compose-up compose-down: compose-cmd
+compose-ls: COMPOSE_CMD = ls
+
+compose-ps: COMPOSE_CMD = ps
+
+compose-up: COMPOSE_CMD = up -d
+
+compose-config compose-down compose-ls compose-ps compose-up compose-version: _compose-cmd
 
 compose-help:
 	@echo "(makefiles/compose.mk)\n\
   compose-config       Compose stack \"$(MAKESTER__PROJECT_NAME)\" config ($(MAKESTER__COMPOSE_FILES))\n\
+  compose-down         Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes)\n\
+  compose-ls           List running compose projects\n\
+  compose-ps           List running compose containers\n\
   compose-up           Compose stack \"$(MAKESTER__PROJECT_NAME)\" create ($(MAKESTER__COMPOSE_FILES))\n\
-  compose-down         Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes)\n"
+  compose-version      Compose version\n"
 
 .PHONY: compose-help
