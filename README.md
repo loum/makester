@@ -13,6 +13,7 @@
   - [`makefile/k8s.mk`](#`makefiles/k8s.mk`)
   - [`makefile/versioning.mk`](#`makefiles/versioning.mk`)
    - [`makefile/kompose.mk`](#`makefiles/kompose.mk`)
+   - [`makefile/docs.mk`](#`makefiles/docs.mk`)
 - [Makester Utilities](#Makester-Utilities)
 - [Makester Recipes](#Makester-Recipes)
 
@@ -425,7 +426,7 @@ Clear the temporary GitVersion files from `$MAKESTER__WORK_DIR`
 ### `makefile/kompose.mk`
 Convert Docker Compose artifacts into container orchestrator manifests.
 
-`makefile/kompose.mk` leverages (Kubernetes `kompose`)[https://kompose.io/] which is a handy tool if you are moving to Kubernetes from Docker Compose.
+`makefile/kompose.mk` leverages [Kubernetes `kompose`](https://kompose.io/) which is a handy tool if you are moving to Kubernetes from Docker Compose.
 
 #### Variables
 - `MAKESTER__COMPOSE_K8S_EPHEMERAL`: optionally specify the location of your project's `docker-compose.yml` (defaults to `docker-compose.yml` at the top level of the project.
@@ -437,6 +438,47 @@ Displays the `makefile/kompose.mk` usage message.
 
 ##### `make kompose`
 Translate Docker Compose to Kubernetes manifests.
+
+### `makefile/docs.mk`
+Prepare documentation scaffolding.
+
+Sadly, technical documentation has become an oversight in many projects. `makefile/docs.mk` attempts to reduce the burden of project documentation setup and maintenance that is not bound to a single programming language. It's just Markdown.
+
+`makefile/docs.mk` leverages [the Materials for MkDocs theme](https://squidfunk.github.io/mkdocs-material/).
+
+#### Variables
+- `MAKESTER__DOCS_DIR`: Location of MkDocs documentation structure (default `$MAKESTER__PROJECT_DIR/docs`).
+- `MAKESTER__DOCS_IP`: The documentation preview server's IP address (default `$MAKESTER__LOCAL_IP`).
+- `MAKESTER__DOCS_PORT`: The documentation preview server's port (default `8000`).
+- `MAKESTER__DOCS_BUILD_PATH`: The directory to output the result of the documentation build (default `$MAKESTER__DOCS_DIR/out`).
+
+#### Command Reference
+##### `make docs-help`
+Displays the `makefile/docs.mk` usage message.
+
+##### `make docs-bootstrap`
+Creates the project's documentation directory structure [based on this](https://squidfunk.github.io/mkdocs-material/creating-your-site/).
+
+If the default settings are accepted, this will create a `docs` directory under the top level of you project code repository. The minimal content is:
+```
+docs
+├── docs
+│   └── index.md
+└── mkdocs.yml
+```
+From this point onward, you will need to modify the files directly under the `docs` directory. Some things you probably want to do in the first instance include:
+- Change the name of your site's documentation. Edit the `site_name` setting in the `docs/mkdocs.yml`.
+- Unless you are happy the the standard [MkDocs default theme](https://www.mkdocs.org/), enable the MkDocs `material` theme. Append the following to `docs/mkdocs.yml`:
+  ```
+  theme:
+  name: material
+  ```
+
+##### `make docs-preview`
+Enable the [MkDocs preview server](https://squidfunk.github.io/mkdocs-material/creating-your-site/#previewing-as-you-write).
+
+##### `make docs-build`
+Build your site's [static documentation](https://squidfunk.github.io/mkdocs-material/creating-your-site/#building-your-site).
 
 ## Makester Utilities
 ### `utils/waitster.py`

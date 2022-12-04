@@ -1,4 +1,4 @@
-# Test runner.
+# Makester test runner.
 #
 # Can be executed manually with:
 #   tests/bats/bin/bats --file-filter makester tests

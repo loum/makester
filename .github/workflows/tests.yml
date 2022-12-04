@@ -23,5 +23,7 @@ jobs:
       - name: Project Makester vars
         run: make -f makefiles/makester.mk vars
       - name: Project Makester test suite
-        run: make tests
+        run: |
+          make init
+          make tests
       - run: echo "🍏 This job's status is ${{ job.status }}."
