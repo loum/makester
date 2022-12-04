@@ -48,12 +48,24 @@ If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environ
 
 Optionally, install [kompose](https://kompose.io/installation/) if you would like to convert existing Docker Compose files into Kubernetes manifests.
 
+### Extras for macOS
+- `brew install wget findutils coreutils`
+
 ## Getting Started
 Get the code and change into the top level `git` project directory:
 ```
 git clone https://github.com/loum/makester.git && cd makester
 ```
 > **_NOTE:_** Run all commands from the top-level directory of the `git` repository.
+
+For first-time setup, prime the [Makester project](https://github.com/loum/makester.git):
+```
+git submodule update --init
+```
+Next, prepare the Makester environment:
+```
+make init
+```
 
 ### Run the Sample Docker "Hello World" Project
 To get help at any time:

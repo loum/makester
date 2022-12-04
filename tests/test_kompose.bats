@@ -5,7 +5,7 @@
 #
 # bats file_tags=kompose
 setup_file() {
-    export MAKESTER__WORK_DIR=$(mktemp -d -t makester-XXXXXX)
+    export MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
 }
 setup() {
   load 'test_helper/common-setup'
@@ -55,6 +55,6 @@ include makester/makefiles/makester.mk'
 @test "Convert compose to k8s manifest" {
     MAKESTER__KOMPOSE=kompose MAKESTER__COMPOSE_K8S_EPHEMERAL=sample/docker-compose.yml\
  run make -f makefiles/makester.mk -f makefiles/kompose.mk kompose --dry-run
-    assert_output --regexp 'kompose convert --file sample/docker-compose.yml --out /tmp/makester-[a-zA-Z0-9]{4,8}/k8s/manifests'
+    assert_output --regexp 'kompose convert --file sample/docker-compose.yml --out /.*/makester-[a-zA-Z0-9]{4,8}/k8s/manifests'
     [ "$status" -eq 0 ]
 }
