@@ -5,7 +5,7 @@
 #
 # bats file_tags=makester
 setup_file() {
-    export MAKESTER__WORK_DIR=$(mktemp -d -t makester-XXXXXX)
+    export MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
 }
 setup() {
     load 'test_helper/common-setup'
@@ -81,7 +81,7 @@ teardown_file() {
 # bats test_tags=variables,makester-variables,MAKESTER__K8S_MANIFESTS
 @test "MAKESTER__K8S_MANIFESTS should be set when calling makester.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__K8S_MANIFESTS
-    assert_output --regexp 'MAKESTER__K8S_MANIFESTS=/tmp/makester-[a-zA-Z0-9]{4,8}/k8s/manifests'
+    assert_output --regexp 'MAKESTER__K8S_MANIFESTS=/.*/makester-[a-zA-Z0-9]{4,8}/k8s/manifests'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__K8S_MANIFESTS

@@ -4,7 +4,7 @@
 #
 # bats file_tags=docs
 setup_file() {
-    export MAKESTER__PROJECT_DIR=$(mktemp -d -t makester-XXXXXX)
+    export MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
 }
 setup() {
     load 'test_helper/common-setup'
@@ -36,7 +36,7 @@ include makester/makefiles/makester.mk'
 # bats test_tags=variables,docs-variables,MAKESTER__DOCS_DIR
 @test "MAKESTER__DOCS_DIR should be set when calling docs.mk" {
     run make -f makefiles/makester.mk -f makefiles/docs.mk print-MAKESTER__DOCS_DIR
-    assert_output --regexp 'MAKESTER__DOCS_DIR=/tmp/makester-[a-zA-Z0-9]{4,8}/docs'
+    assert_output --regexp 'MAKESTER__DOCS_DIR=/.*/makester-[a-zA-Z0-9]{4,8}/docs'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,docs-variables,MAKESTER__DOCS_DIR
@@ -63,7 +63,7 @@ include makester/makefiles/makester.mk'
 # bats test_tags=variables,docs-variables,MAKESTER__DOCS_BUILD_PATH
 @test "MAKESTER__DOCS_BUILD_PATH should be set when calling docs.mk" {
     run make -f makefiles/makester.mk -f makefiles/docs.mk print-MAKESTER__DOCS_BUILD_PATH
-    assert_output --regexp 'MAKESTER__DOCS_BUILD_PATH=/tmp/makester-[a-zA-Z0-9]{4,8}/docs/site'
+    assert_output --regexp 'MAKESTER__DOCS_BUILD_PATH=/.*/makester-[a-zA-Z0-9]{4,8}/docs/site'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,docs-variables,MAKESTER__DOCS_BUILD_PATH
@@ -79,8 +79,8 @@ include makester/makefiles/makester.mk'
 # bats test_tags=targets,docs-targets,docs-bootstrap,dry-run
 @test "Docs project bootstrap: dry" {
     run make -f makefiles/makester.mk -f makefiles/docs.mk docs-bootstrap --dry-run
-    assert_output --regexp '### Bootstrapping project documentation at "/tmp/makester-[a-zA-Z0-9]{4,8}/docs"
-.*/3env/bin/mkdocs new /tmp/makester-[a-zA-Z0-9]{4,8}/docs'
+    assert_output --regexp '### Bootstrapping project documentation at "/.*/makester-[a-zA-Z0-9]{4,8}/docs"
+.*/3env/bin/mkdocs new /.*/makester-[a-zA-Z0-9]{4,8}/docs'
     [ "$status" -eq 0 ]
 }
 
@@ -95,22 +95,22 @@ include makester/makefiles/makester.mk'
     MAKESTER__DOCS_IP=0.0.0.0 MAKESTER__DOCS_PORT=18999\
  run make -f makefiles/makester.mk -f makefiles/docs.mk docs-preview --dry-run
     assert_output --regexp '### Starting the live preview server at "0.0.0.0:18999" .*
-cd /tmp/makester-[a-zA-Z0-9]{4,8}/docs;\\
- .*/3env/bin/mkdocs serve --dev-addr 0.0.0.0:18999 --watch /tmp/makester-[a-zA-Z0-9]{4,8}/docs'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\\
+ .*/3env/bin/mkdocs serve --dev-addr 0.0.0.0:18999 --watch /.*/makester-[a-zA-Z0-9]{4,8}/docs'
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,docs-targets,docs-build,dry-run
 @test "Docs static site builder: dry" {
     run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
-    assert_output --regexp '### Building static project documentation at "/tmp/makester-[a-zA-Z0-9]{4,8}/docs/site"
-cd /tmp/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs build --site-dir /tmp/makester-[a-zA-Z0-9]{4,8}/docs/site'
+    assert_output --regexp '### Building static project documentation at "/.*/makester-[a-zA-Z0-9]{4,8}/docs/site"
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs build --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docs-targets,docs-build,dry-run
 @test "Docs static site builder override: dry" {
     MAKESTER__DOCS_BUILD_PATH=dummy run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
     assert_output --regexp '### Building static project documentation at "dummy"
-cd /tmp/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs build --site-dir dummy'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs build --site-dir dummy'
     [ "$status" -eq 0 ]
 }
