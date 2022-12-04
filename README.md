@@ -442,9 +442,9 @@ Translate Docker Compose to Kubernetes manifests.
 ### `makefile/docs.mk`
 Prepare documentation scaffolding.
 
-Sadly, technical documenation has become an oversight in many projects. `makefile/docs.mk` attempts to reduce the burden of project documentation setup and maintenance that is not bound to a single programming language. It's just Markdown.
+Sadly, technical documentation has become an oversight in many projects. `makefile/docs.mk` attempts to reduce the burden of project documentation setup and maintenance that is not bound to a single programming language. It's just Markdown.
 
-`makefile/docs.mk` leverages [the Materials for MkDocs theme](https://squidfunk.github.io/mkdocs-material/) MkDocs theme.
+`makefile/docs.mk` leverages [the Materials for MkDocs theme](https://squidfunk.github.io/mkdocs-material/).
 
 #### Variables
 - `MAKESTER__DOCS_DIR`: Location of MkDocs documentation structure (default `$MAKESTER__PROJECT_DIR/docs`).
