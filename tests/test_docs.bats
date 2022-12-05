@@ -114,3 +114,18 @@ cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs build --site-dir /.*/m
 cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs build --site-dir dummy'
     [ "$status" -eq 0 ]
 }
+
+# bats test_tags=targets,docs-targets,docs-gh-deploy,dry-run
+@test "Docs GitHub deploy: dry" {
+    run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
+    assert_output --regexp '### Deploying static project documentation to GitHub
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs gh-deploy --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site --force'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docs-targets,docs-gh-deploy,dry-run
+@test "Docs GitHub deploy override: dry" {
+    MAKESTER__DOCS_BUILD_PATH=dummy run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
+    assert_output --regexp '### Deploying static project documentation to GitHub
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs gh-deploy --site-dir dummy --force'
+    [ "$status" -eq 0 ]
+}
