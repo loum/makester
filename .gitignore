@@ -1,3 +1,6 @@
+# MkDocs static content
+docs/site
+
 # Makester
 .makester
 

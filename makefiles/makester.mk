@@ -12,6 +12,9 @@ ifndef MAKESTER__VERBOSE
   MAKEFLAGS += --no-print-directory
 endif
 
+# Add PyPI bin to PATH.
+export PATH := $(shell echo $(PWD)/3env/bin:$$PATH)
+
 # Prepare the makester working directory. Place all makester convenience capability here.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester
 makester-work-dir:
@@ -95,7 +98,7 @@ which-var:
 #   1. Executable name to test.
 #   2. (optional) install tip or message to print.
 check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)))))
-_check-exe = $(if $(shell which $1),$(shell which $1),$(call _check-exe-err,$1,$(if $2,$2)))
+_check-exe = $(if $(shell PATH=$(PATH); which $1),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2)))
 define _check-exe-err
 	$(info ### "$1" not found)
 	$(info ### $(if $2,Install notes: $2))

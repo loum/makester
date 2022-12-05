@@ -6,3 +6,6 @@ pylint
 
 # Templating
 Jinja2
+
+# Docs.
+mkdocs-material
