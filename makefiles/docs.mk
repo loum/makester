@@ -35,9 +35,15 @@ docs-build:
 	$(info ### Building static project documentation at "$(MAKESTER__DOCS_BUILD_PATH)")
 	cd $(MAKESTER__DOCS_DIR); $(MAKESTER__DOCS) build --site-dir $(MAKESTER__DOCS_BUILD_PATH)
 
+docs-gh-deploy:
+	$(info ### Deploying static project documentation to GitHub)
+	cd $(MAKESTER__DOCS_DIR); $(MAKESTER__DOCS) gh-deploy --site-dir $(MAKESTER__DOCS_BUILD_PATH) --force
+
 docs-help:
 	@echo "(makefiles/docs.mk)\n\
-  docs-bootstrap       Bootstrapping the project documentation\n\
-  docs-preview       Bootstrapping the project documentation\n"
+  docs-bootstrap       Bootstrap the project documentation directory structure\n\
+  docs-build           Build the project static site documentation\n\
+  docs-gh-deploy       Deploy documentation to GitHub\n\
+  docs-preview         Site documentation live preview\n"
 
 .PHONY: docs-help

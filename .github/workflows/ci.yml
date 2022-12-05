@@ -1,5 +1,5 @@
-name: Makester Test Harness
-run-name: ${{ github.actor }} ${{ github.event_name }} event Makester tests 🚀
+name: Makester CI
+run-name: ${{ github.actor }} ${{ github.event_name }} event Makester CI 🚀
 on:
   push:
     branches:
@@ -8,8 +8,10 @@ on:
       - 'task/**'
       - 'feature/**'
       - 'defect/**'
+permissions:
+  contents: write
 jobs:
-  Explore-GitHub-Actions:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -26,4 +28,18 @@ jobs:
         run: |
           make init
           make tests
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "🍏 ${{ job.status }}"
+  docs:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Project Makester docs build
+        run: |
+          make init
+          make docs-gh-deploy
+      - run: echo "🍏 ${{ job.status }}"

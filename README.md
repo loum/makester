@@ -483,7 +483,7 @@ From this point onward, you will need to modify the files directly under the `do
 - Unless you are happy the the standard [MkDocs default theme](https://www.mkdocs.org/), enable the MkDocs `material` theme. Append the following to `docs/mkdocs.yml`:
   ```
   theme:
-  name: material
+    name: material
   ```
 
 ##### `make docs-preview`
