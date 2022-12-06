@@ -188,6 +188,11 @@ It is also possible to combine `makester-requirements` with your Project's `requ
 init: makester-requirements
 	$(MAKE) pip-requirements
 ```
+#### Variables
+- `MAKESTER__PYTHON`: Path to the Python virtual environment `python` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PYTHON)`.
+- `MAKESTER__PIP`: Path to the Python virtual environment `pip` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PIP)`.
+- `MAKESTER__WHEELHOUSE`:  Control the location to where Python will build its wheels to. See [wheel-dir].(https://pip.pypa.io/en/stable/cli/pip_wheel/)
+
 #### Command Reference
 ##### Display your Local Environment's Python Setup
 ```
@@ -197,10 +202,10 @@ Sample output:
 ```
 python3 version: Python 3.6.10
 python3 minor: 6
-path to python3 executable: /home/lupco/.pyenv/shims/python3
-python3 virtual env command: /home/lupco/.pyenv/shims/python3 -m venv
+path to python3 executable: /home/user/.pyenv/shims/python3
+python3 virtual env command: /home/user/.pyenv/shims/python3 -m venv
 python2 virtual env command:
-virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
+virtual env tooling: /home/user/.pyenv/shims/python3 -m venv
 ```
 ##### Build Virtual Environment with Dependencies from `requirements.txt`
 ```
