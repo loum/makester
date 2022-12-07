@@ -32,7 +32,7 @@ endif
 # Simulate PyPI package naming convention (replacing hyphens with underscores).
 MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
 
-MAKESTER__PROJECT_DIR ?= $(PWD)/$(shell echo $(MAKESTER__PROJECT_NAME) | tr A-Z a-z | tr - _)
+MAKESTER__PROJECT_DIR ?= $(PWD)
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)

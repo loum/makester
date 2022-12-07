@@ -91,6 +91,19 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,makester-variables,MAKESTER__PROJECT_DIR
+@test "MAKESTER__PROJECT_DIR should be set when calling makester.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__PROJECT_DIR
+    assert_output --regexp "MAKESTER__PROJECT_DIR=$PWD"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__PROJECT_DIR
+@test "MAKESTER__PROJECT_DIR override" {
+    MAKESTER__PROJECT_DIR=dummy run make -f makefiles/makester.mk print-MAKESTER__PROJECT_DIR
+    assert_output --regexp 'MAKESTER__PROJECT_DIR=dummy'
+    [ "$status" -eq 0 ]
+}
+
 # Executable checker.
 # bats test_tags=check-exe
 @test "check-exe rule for \"GIT\" finds the executable" {
