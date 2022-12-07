@@ -144,7 +144,9 @@ A description of the Makester special purpose variables follows:
 - `MAKESTER__WORK_DIR`: Working area that Makester uses to store information (defaults to `$PWD/.makester`).
   > **_NOTE:_** Be sure to add the location of `MAKESTER__WORK_DIR` into your project's `.gitignore`.
 
-- `MAKESTER__K8S_MANIFESTS`: location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
+- `MAKESTER__K8S_MANIFESTS`: Location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
+- `MAKESTER__PROJECT_DIR`: The home directory of the project (defaults to `$PWD` or the top level
+  of where your project's `.git` directory can be found).
 
 ### Makester Default Virtual Environment
 `Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
@@ -188,6 +190,11 @@ It is also possible to combine `makester-requirements` with your Project's `requ
 init: makester-requirements
 	$(MAKE) pip-requirements
 ```
+#### Variables
+- `MAKESTER__PYTHON`: Path to the Python virtual environment `python` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PYTHON)`.
+- `MAKESTER__PIP`: Path to the Python virtual environment `pip` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PIP)`.
+- `MAKESTER__WHEELHOUSE`:  Control the location to where Python will build its wheels to. See [wheel-dir].(https://pip.pypa.io/en/stable/cli/pip_wheel/)
+
 #### Command Reference
 ##### Display your Local Environment's Python Setup
 ```
@@ -197,10 +204,10 @@ Sample output:
 ```
 python3 version: Python 3.6.10
 python3 minor: 6
-path to python3 executable: /home/lupco/.pyenv/shims/python3
-python3 virtual env command: /home/lupco/.pyenv/shims/python3 -m venv
+path to python3 executable: /home/user/.pyenv/shims/python3
+python3 virtual env command: /home/user/.pyenv/shims/python3 -m venv
 python2 virtual env command:
-virtual env tooling: /home/lupco/.pyenv/shims/python3 -m venv
+virtual env tooling: /home/user/.pyenv/shims/python3 -m venv
 ```
 ##### Build Virtual Environment with Dependencies from `requirements.txt`
 ```

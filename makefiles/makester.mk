@@ -12,8 +12,8 @@ ifndef MAKESTER__VERBOSE
   MAKEFLAGS += --no-print-directory
 endif
 
-# Add PyPI bin to PATH.
-export PATH := $(shell echo $(PWD)/3env/bin:$$PATH)
+# Add PyPI bin to the end of PATH to ensure system Python is found first.
+export PATH := $(shell echo $$PATH:$(PWD)/3env/bin)
 
 # Prepare the makester working directory. Place all makester convenience capability here.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester
@@ -32,7 +32,7 @@ endif
 # Simulate PyPI package naming convention (replacing hyphens with underscores).
 MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
 
-MAKESTER__PROJECT_DIR ?= $(PWD)/$(shell echo $(MAKESTER__PROJECT_NAME) | tr A-Z a-z | tr - _)
+MAKESTER__PROJECT_DIR ?= $(PWD)
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
@@ -91,6 +91,16 @@ which-var:
 	$(call check-defined,MAKESTER__VAR)
 	$(info ### Checking if "$(MAKESTER__VAR)" is defined ...)
 	$(call check-defined,$(MAKESTER__VAR),MAKESTER__VAR_INFO)
+
+#   1. Symbol name to be deprecated.
+#   2. Makester version when symbol will be deprecated.
+#   3. Replacement symbol.
+deprecated = $(call _deprecated-err,$1,$2,$3)
+define _deprecated-err
+	$(info ### "$1" will be deprecated in Makester: $2)
+    $(info ### Replace "$1" with "$3")
+    $(error ###)
+endef
 
 # Check that a dependent executable is available. Exit with an error otherwise.
 #
