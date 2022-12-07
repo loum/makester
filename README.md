@@ -144,7 +144,9 @@ A description of the Makester special purpose variables follows:
 - `MAKESTER__WORK_DIR`: Working area that Makester uses to store information (defaults to `$PWD/.makester`).
   > **_NOTE:_** Be sure to add the location of `MAKESTER__WORK_DIR` into your project's `.gitignore`.
 
-- `MAKESTER__K8S_MANIFESTS`: location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
+- `MAKESTER__K8S_MANIFESTS`: Location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
+- `MAKESTER__PROJECT_DIR`: The home directory of the project (defaults to `$PWD` or the top level
+  of where your project's `.git` directory can be found).
 
 ### Makester Default Virtual Environment
 `Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
