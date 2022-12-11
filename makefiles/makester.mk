@@ -13,13 +13,13 @@ ifndef MAKESTER__VERBOSE
 endif
 
 # Add PyPI bin to the end of PATH to ensure system Python is found first.
-export PATH := $(shell echo $$PATH:$(PWD)/3env/bin)
+export PATH := $(shell echo $$PATH:$(PWD)/venv/bin)
 
 # Prepare the makester working directory. Place all makester convenience capability here.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester
 makester-work-dir:
 	$(info ### Creating Makester working directory "$(MAKESTER__WORK_DIR)")
-	$(shell which mkdir) -p $(MAKESTER__WORK_DIR)
+	$(shell which mkdir) -pv $(MAKESTER__WORK_DIR)
 makester-work-dir-rm:
 	$(info ### Clearing empty Makester working directories "$(MAKESTER__WORK_DIR)")
 	$(shell which find) $(MAKESTER__WORK_DIR) -depth -type d -empty -exec rmdir {} \;
@@ -59,7 +59,7 @@ endif
 MAKESTER__K8S_MANIFESTS ?= $(MAKESTER__WORK_DIR)/k8s/manifests
 makester-k8s-manifest-dir:
 	$(info ### Creating Makester k8s manifest directory "$(MAKESTER__K8S_MANIFESTS)")
-	$(shell which mkdir) -p $(MAKESTER__K8S_MANIFESTS)
+	$(shell which mkdir) -pv $(MAKESTER__K8S_MANIFESTS)
 
 GIT ?= $(call check-exe,git,https://git-scm.com/downloads)
 HASH ?= $(shell $(GIT) rev-parse --short HEAD)
@@ -68,7 +68,7 @@ print-%:
 	@echo '$*=$($*)'
 
 clean:
-	$(GIT) clean -xdf -e .vagrant -e *.swp -e 2env -e 3env
+	$(GIT) clean -xdf -e .vagrant -e *.swp -e 2env -e 3env -e venv
 
 submodule-update:
 	$(GIT) submodule update --remote --merge
@@ -95,11 +95,11 @@ which-var:
 #   1. Symbol name to be deprecated.
 #   2. Makester version when symbol will be deprecated.
 #   3. Replacement symbol.
-deprecated = $(call _deprecated-err,$1,$2,$3)
+deprecated = $(call _deprecated-err,$1,$2,$3,$(strip $(value 4)))
 define _deprecated-err
 	$(info ### "$1" will be deprecated in Makester: $2)
     $(info ### Replace "$1" with "$3")
-    $(error ###)
+	$(if $4,$(error ###),)
 endef
 
 # Check that a dependent executable is available. Exit with an error otherwise.

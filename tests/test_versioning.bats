@@ -5,14 +5,14 @@
 #
 # bats file_tags=versioning
 setup_file() {
-    export MAKESTER__WORK_DIR=$(mktemp -d -t makester-XXXXXX)
+    export MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
 }
 setup() {
     load 'test_helper/common-setup'
     _common_setup
 }
 teardown_file() {
-    MAKESTER__PROJECT_DIR=$PWD make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-clear
+    make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-clear
     MAKESTER__WORK_DIR=$MAKESTER__WORK_DIR make -f makefiles/makester.mk makester-work-dir-rm
 }
 
@@ -102,7 +102,7 @@ include makester/makefiles/docker.mk'
 #
 # bats test_tags=gitversion-version
 @test "GitVersion version" {
-    MAKESTER__PROJECT_DIR=$PWD MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
+    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-version
     assert_output --regexp '[0-9]+\.[0-9]+\.[0-9]+\+Branch.support-5.x.Sha.[0-9a-z]+'
     [ "$status" -eq 0 ]
@@ -110,35 +110,17 @@ include makester/makefiles/docker.mk'
 
 # bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,release-version
 @test "Makester sample/GitVersion.yml release version" {
-    MAKESTER__PROJECT_DIR=$PWD\
- MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
+    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
     assert_output --regexp '### Filtering GitVersion variable: AssemblySemFileVer
-### MAKESTER__RELEASE_VERSION: "[0-9]+\.[0-9]+\.[0-9a-z]+"'
+### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9a-z]+'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,release-version
 @test "Makester sample/GitVersion.yml release version with overridden version variable" {
-    MAKESTER__PROJECT_DIR=$PWD MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
+    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
     assert_output --regexp '### Filtering GitVersion variable: ShortSha
-### MAKESTER__RELEASE_VERSION: "[0-9a-z]+"'
-    [ "$status" -eq 0 ]
-}
-
-# bats test_tags=release-version
-@test "Default GitVersion.yml release version" {
-    MAKESTER__PROJECT_DIR=$PWD\
- run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
-    assert_output --regexp '### Filtering GitVersion variable: AssemblySemFileVer
-### MAKESTER__RELEASE_VERSION: "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"'
-    [ "$status" -eq 0 ]
-}
-# bats test_tags=release-version
-@test "Default GitVersion.yml release version with overridden version variable" {
-    MAKESTER__PROJECT_DIR=$PWD MAKESTER__GITVERSION_VARIABLE=ShortSha\
- run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
-    assert_output --regexp '### Filtering GitVersion variable: ShortSha
-### MAKESTER__RELEASE_VERSION: "[0-9a-z]+"'
+### MAKESTER__RELEASE_VERSION: [0-9a-z]+'
     [ "$status" -eq 0 ]
 }

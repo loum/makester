@@ -19,6 +19,16 @@ ignore:
   sha: []
 merge-message-formats: {}
 branches:
+  feature:
+    regex: ^feature[/-]
+    mode: ContinuousDeployment
+    tag: a
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
+    source-branches: ['main', 'develop', 'feature', 'hotfix', 'support']
   task:
     regex: ^task[/-]
     mode: ContinuousDeployment
@@ -28,7 +38,7 @@ branches:
     track-merge-target: false
     tracks-release-branches: false
     is-release-branch: false
-    source-branches: ['main', 'develop', 'feature', 'hotfix', 'support']
+    source-branches: ['main', 'develop', 'hotfix', 'support']
   develop:
     regex: ^develop$
     mode: ContinuousDeployment

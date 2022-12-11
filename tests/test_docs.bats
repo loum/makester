@@ -78,54 +78,56 @@ include makester/makefiles/makester.mk'
 #
 # bats test_tags=targets,docs-targets,docs-bootstrap,dry-run
 @test "Docs project bootstrap: dry" {
-    run make -f makefiles/makester.mk -f makefiles/docs.mk docs-bootstrap --dry-run
+    MAKESTER__DOCS=mkdocs run make -f makefiles/makester.mk -f makefiles/docs.mk docs-bootstrap --dry-run
     assert_output --regexp '### Bootstrapping project documentation at "/.*/makester-[a-zA-Z0-9]{4,8}/docs"
-.*/3env/bin/mkdocs new /.*/makester-[a-zA-Z0-9]{4,8}/docs'
+mkdocs new /.*/makester-[a-zA-Z0-9]{4,8}/docs'
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,docs-targets,docs-preview,dry-run
 @test "Docs project live server: dry" {
-    run make -f makefiles/makester.mk -f makefiles/docs.mk docs-preview --dry-run
+    MAKESTER__DOCS=mkdocs run make -f makefiles/makester.mk -f makefiles/docs.mk docs-preview --dry-run
     assert_output --regexp '### Starting the live preview server at "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:8000"'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docs-targets,docs-preview,dry-run
 @test "Docs project live server override: dry" {
-    MAKESTER__DOCS_IP=0.0.0.0 MAKESTER__DOCS_PORT=18999\
+    MAKESTER__DOCS=mkdocs MAKESTER__DOCS_IP=0.0.0.0 MAKESTER__DOCS_PORT=18999\
  run make -f makefiles/makester.mk -f makefiles/docs.mk docs-preview --dry-run
-    assert_output --regexp '### Starting the live preview server at "0.0.0.0:18999" .*
+    assert_output --regexp '### Starting the live preview server at "0.0.0.0:18999" \(Ctrl-C to stop\)
 cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\\
- .*/3env/bin/mkdocs serve --dev-addr 0.0.0.0:18999 --watch /.*/makester-[a-zA-Z0-9]{4,8}/docs'
+ mkdocs serve --dev-addr 0.0.0.0:18999 --watch /.*/makester-[a-zA-Z0-9]{4,8}/docs'
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,docs-targets,docs-build,dry-run
 @test "Docs static site builder: dry" {
-    run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
+    MAKESTER__DOCS=mkdocs run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
     assert_output --regexp '### Building static project documentation at "/.*/makester-[a-zA-Z0-9]{4,8}/docs/site"
-cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs build --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; mkdocs build --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docs-targets,docs-build,dry-run
 @test "Docs static site builder override: dry" {
-    MAKESTER__DOCS_BUILD_PATH=dummy run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
+    MAKESTER__DOCS=mkdocs MAKESTER__DOCS_BUILD_PATH=dummy\
+ run make -f makefiles/makester.mk -f makefiles/docs.mk docs-build --dry-run
     assert_output --regexp '### Building static project documentation at "dummy"
-cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs build --site-dir dummy'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; mkdocs build --site-dir dummy'
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,docs-targets,docs-gh-deploy,dry-run
 @test "Docs GitHub deploy: dry" {
-    run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
+    MAKESTER__DOCS=mkdocs run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
     assert_output --regexp '### Deploying static project documentation to GitHub
-cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; .*/3env/bin/mkdocs gh-deploy --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site --force'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; mkdocs gh-deploy --site-dir /.*/makester-[a-zA-Z0-9]{4,8}/docs/site --force'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docs-targets,docs-gh-deploy,dry-run
 @test "Docs GitHub deploy override: dry" {
-    MAKESTER__DOCS_BUILD_PATH=dummy run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
+    MAKESTER__DOCS=mkdocs MAKESTER__DOCS_BUILD_PATH=dummy\
+ run make -f makefiles/makester.mk -f makefiles/docs.mk docs-gh-deploy --dry-run
     assert_output --regexp '### Deploying static project documentation to GitHub
-cd /.*/makester-[a-zA-Z0-9]{4,8}/docs;\ .*/3env/bin/mkdocs gh-deploy --site-dir dummy --force'
+cd /.*/makester-[a-zA-Z0-9]{4,8}/docs; mkdocs gh-deploy --site-dir dummy --force'
     [ "$status" -eq 0 ]
 }

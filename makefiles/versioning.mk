@@ -9,7 +9,9 @@ $(error ### missing include dependency)
 endif
 
 # Defaults.
-MAKESTER__GITVERSION_CONFIG ?= makester/sample/GitVersion.yml
+ifndef MAKESTER__GITVERSION_CONFIG
+  MAKESTER__GITVERSION_CONFIG := makester/sample/GitVersion.yml
+endif
 MAKESTER__GITVERSION_VARIABLE ?= AssemblySemFileVer
 MAKESTER__GITVERSION_VERSION ?= latest
 
@@ -21,7 +23,6 @@ CMD ?= /h
 _gitversion-cmd: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-cmd: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
 _gitversion-cmd: makester-work-dir
-_gitversion-cmd:
 	@$(MAKESTER__DOCKER) run --rm\
  -v "$(MAKESTER__PROJECT_DIR):/$(MAKESTER__PACKAGE_NAME)"\
  gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning
@@ -46,7 +47,7 @@ _gitversion-versions-rm:
 release-version: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 release-version: _gitversion-versions
 	$(info ### Filtering GitVersion variable: $(MAKESTER__GITVERSION_VARIABLE))
-	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) > $(MAKESTER__WORK_DIR)/release-version)
+	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"' > $(MAKESTER__WORK_DIR)/release-version)
 	$(info ### MAKESTER__RELEASE_VERSION: $(shell cat $(MAKESTER__WORK_DIR)/release-version))
 
 _release-version-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)

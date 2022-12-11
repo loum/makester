@@ -4,12 +4,12 @@ MAKESTER__CONTAINER_NAME := mega-container
 
 include makefiles/makester.mk
 include makefiles/docker.mk
-include makefiles/python-venv.mk
+include makefiles/py.mk
 
 MAKESTER__BUILD_COMMAND = -t $(MAKESTER__SERVICE_NAME):$(HASH) sample
 
-init: pip-requirements
+init: py-venv-clear py-venv-init py-install
 
-help: makester-help docker-help python-venv-help
+help: makester-help docker-help py-help
 	@echo "(simple/Makefile)\n\
   init                 Build Makester environment\n"

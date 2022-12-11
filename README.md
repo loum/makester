@@ -7,13 +7,13 @@
   - [Makester Default Virtual Environment](#Makester-Default-Virtual-Environment)
 - [Makester Tooling](#Makester-Tooling)
   - [`makefile/makester.mk`](#`makefile/makester.mk`)
-  - [`makefiles/python-venv.mk`](#`makefiles/python-venv.mk`)
+  - [`makefiles/py.mk` (originally `makefiles/python-venv`)](#`makefiles/py.mk`)
   - [`makefiles/compose.mk`](#`makefiles/compose.mk`)
   - [`makefile/docker.mk`](#`makefiles/docker.mk`)
   - [`makefile/k8s.mk`](#`makefiles/k8s.mk`)
   - [`makefile/versioning.mk`](#`makefiles/versioning.mk`)
-   - [`makefile/kompose.mk`](#`makefiles/kompose.mk`)
-   - [`makefile/docs.mk`](#`makefiles/docs.mk`)
+  - [`makefile/kompose.mk`](#`makefiles/kompose.mk`)
+  - [`makefile/docs.mk`](#`makefiles/docs.mk`)
 - [Makester Utilities](#Makester-Utilities)
 - [Makester Recipes](#Makester-Recipes)
 
@@ -32,9 +32,9 @@ makefiles/
 ├── docker.mk
 ├── k8s.mk
 ├── makester.mk
-└── python-venv.mk
+└── py.mk
 ```
-Each `Makefile` is a group of concerns for a particular project build/infrastructure component. For example, `makefiles/python-venv.mk` has targets that allow you to create and manage Python virtual environments.
+Each `Makefile` is a group of concerns for a particular project build/infrastructure component. For example, `makefiles/py.mk` has targets that allow you to create and manage Python virtual environments.
 
 Still not sure? Try to [Run the Sample Docker "Hello World" Project](#Run-the-Sample-Docker-"Hello-World"-Project).
 
@@ -49,8 +49,10 @@ If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environ
 Optionally, install [kompose](https://kompose.io/installation/) if you would like to convert existing Docker Compose files into Kubernetes manifests.
 
 ### Extras for macOS
-- `brew install wget findutils coreutils`
-
+To develop Makester on macOS you will need to install these additional packages with [brew](https://brew.sh/):
+```
+brew install wget findutils coreutils
+```
 ## Getting Started
 Get the code and change into the top level `git` project directory:
 ```
@@ -90,7 +92,7 @@ make -f sample/Makefile run
 ```
 Finally, to clean up you can delete the `supa-cool-repo/my-project:99296c8` image:
 ```
-make -f sample/Makefile irm
+make -f sample/Makefile image-rm
 ```
 ## Adding `Makester` to your Project's Git Repository
 
@@ -111,12 +113,12 @@ include makester/makefiles/makester.mk
 ```
 git submodule update --remote --merge
 ```
-or, as a convenience:
+... or, as a convenience:
 ```
 make submodule-update
 ```
 ### Makester Variables
-The standard [GNU Makefile variable](https://www.gnu.org/software/make/manual/html_node/Using-Variables.html) convention is adhered to within the project. Makester introduces special purpose variables are denoted as `MAKESTER__`. Makester will attempt to provide sane defaults to get you started. However, it is recommended that you override these values in your own project's Makefile to provide more informative context.
+The standard [GNU Makefile variable](https://www.gnu.org/software/make/manual/html_node/Using-Variables.html) convention is adhered to within the project. Makester introduces special purpose variables are denoted as `MAKESTER__<VARIABLE_NAME>`. Makester will attempt to provide sane defaults to get you started. However, it is recommended that you override these values in your own project's Makefile to provide more informative context.
 
 Makester special purpose variable values can be viewed any time with the `vars` target:
 ```
@@ -148,15 +150,6 @@ A description of the Makester special purpose variables follows:
 - `MAKESTER__PROJECT_DIR`: The home directory of the project (defaults to `$PWD` or the top level
   of where your project's `.git` directory can be found).
 
-### Makester Default Virtual Environment
-`Makester` provides a Python virtual environment that adds dependencies that are used by `Makester` to get things done. First, you need to place the following target in your `Makefile`:
-```
-makester-init: makester-requirements
-```
-To then build the Python virtual environment under the directory `3env`:
-```
-make makester-init
-```
 ## Makester Tooling
 ### `makefile/makester.mk`
 > **_NOTE:_** This Makefile should be included in all of your projects as a minimum.
@@ -168,69 +161,67 @@ To use add `include makester/makefiles/makester.mk` to your `Makefile`.
 ```
 make submodule-update
 ```
-### Makester `makefiles/python-venv.mk`
-To use add `include makester/makefiles/python-venv.mk` to your `Makefile`.
+### Makester `makefiles/py.mk`
+> **_NOTE:_** renamed from `makefiles/python-venv.mk` in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4).
+
+To use add `include makester/makefiles/py.mk` to your `Makefile`.
 
 To build a project-purposed Python virtual environment, add your dependencies to `requirements.txt` or `setup.py` in the top level of you project directory.
 
-> **_NOTE:_** Both `requirements.txt` and `setup.py` for `pip install` are supported here. Depending on your preference, create a target in your `Makefile` and chain either `pip-requirements` or `pip-editable`. For example, if your environment features a `setup.py` then create a new target called `init` (can be any meaningful target name you choose) as follows:
-```
-init: pip-editable
-```
-Likewise, if you have a `requirements.txt`:
-```
-init: pip-requirements
-```
-Then, execute the `init` target:
-```
-make -f sample/Makefile init
-```
-It is also possible to combine `makester-requirements` with your Project's `requirements.txt`
-```
-init: makester-requirements
-	$(MAKE) pip-requirements
-```
+Both `requirements.txt` and `setup.py` for `pip install` are still supported. Depending on your preference, create a target in your `Makefile` and chain either `pip-requirements` or `pip-editable`. For example, if your environment features a `setup.py` then create a new target called `init` (can be any meaningful target name you choose) as follows:
+
 #### Variables
+- `MAKESTER__SYSTEM_PYTHON`: Path to the current system-wide `python` executable. In Makester context, this should only be used to create a Python virtual environment for your project.
 - `MAKESTER__PYTHON`: Path to the Python virtual environment `python` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PYTHON)`.
 - `MAKESTER__PIP`: Path to the Python virtual environment `pip` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PIP)`.
 - `MAKESTER__WHEELHOUSE`:  Control the location to where Python will build its wheels to. See [wheel-dir].(https://pip.pypa.io/en/stable/cli/pip_wheel/)
 
 #### Command Reference
-##### Display your Local Environment's Python Setup
+##### Display your Local Environment's Python Setup -  [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
 ```
-make py-versions
+make py-vars
 ```
-Sample output:
 ```
-python3 version: Python 3.6.10
-python3 minor: 6
-path to python3 executable: /home/user/.pyenv/shims/python3
-python3 virtual env command: /home/user/.pyenv/shims/python3 -m venv
-python2 virtual env command:
-virtual env tooling: /home/user/.pyenv/shims/python3 -m venv
+### System python3: <$HOME>/.pyenv/shims/python3
+### System python3 version: Python 3.10.8
+### ---
+### Virtual env tooling: <$HOME>/.pyenv/shims/python3 -m venv
+### Virtual env Python: <$HOME>/dev/makester/venv/bin/python
+### Virtual env pip: <$HOME>/dev/makester/venv/bin/pip
 ```
-##### Build Virtual Environment with Dependencies from `requirements.txt`
+##### Build Virtual Environment `venv` - [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
+```
+make py-venv-create
+```
+> **_NOTE:_** Makester virtual environment creation will also automatically update `pip` and `setuptools` versions to the latest whilst also installing the `wheel` package.
+##### Delete Virtual Environment `venv` - [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
+```
+make py-venv-clear
+```
+##### Install Python Package Dependencies from `requirements.txt`
+`pip` editable install with package dependencies taken from `requirements.txt`:
 ```
 make pip-requirements
 ```
-##### Build Virtual Environment with Dependencies from `setup.py`
+##### Install Python Package Dependencies from `setup.py`
+`pip` editable install with package dependencies taken from `setup.py`:
 ```
 make pip-editable
 ```
-##### Remove Existing Virtual Environment
+##### Install Python Package Dependencies from `pyproject.toml` - [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
+
+As per [PEP 660](https://peps.python.org/pep-0660/), editable installs are now supported from `pyproject.toml`:
 ```
-make clear-env
+make py-install
 ```
+> **_NOTE_** `pip` editable installs via `pyproject.toml` are supported in conjuction with [setuptools v64.0.0](https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400) as the backend and [pip v21.3](https://pip.pypa.io/en/stable/news/#v21-3) as the frontend. Both `setuptools` and `pip` are automatically updated as part of `make py-venv-create`.
+
 ##### Build Python Package from `setup.py`
-Write wheel package to -`-wheel-dir` (defaults to `~/wheelhouse`):
+Write wheel package to `--wheel-dir` (defaults to `~/wheelhouse`):
 ```
 make package
 ```
-##### Build Virtual Environment
-```
-make init-env
-```
-##### Invoke the Python REPL
+##### Invoke the Python Virtual Environment REPL
 ```
 make py
 ```
@@ -366,9 +357,9 @@ make kube-context
 ```
 > **_NOTE:_** Current context name is delimited with the `*`:
 > ```
->      CURRENT   NAME                CLUSTER             AUTHINFO                                                                NAMESPACE
->                SupaAKSCluster      SupaAKSCluster      clusterUser_RESOURCE_GROUP_SupaAKSCluster
->      *         minikube            minikube            minikube
+>  CURRENT   NAME                CLUSTER             AUTHINFO                                                                NAMESPACE
+>            SupaAKSCluster      SupaAKSCluster      clusterUser_RESOURCE_GROUP_SupaAKSCluster
+>  *         minikube            minikube            minikube
 > ```
 ##### Change `kubectl` Context
 ```
@@ -500,10 +491,10 @@ Enable the [MkDocs preview server](https://squidfunk.github.io/mkdocs-material/c
 Build your site's [static documentation](https://squidfunk.github.io/mkdocs-material/creating-your-site/#building-your-site).
 
 ## Makester Utilities
-### `utils/waitster.py`
+### `src/waitster.py`
 Wait until dependent service is ready:
 ```
-3env/bin/python utils/waitster.py
+venv/bin/python src/waitster.py
 ```
 ```
 usage: waitster.py [-h] -p PORT [-d DETAIL] host
@@ -519,10 +510,10 @@ optional arguments:
   -d DETAIL, --detail DETAIL
                         Meaningful description for backoff port
 ```
-### `utils/templatester.py`
+### `src/templatester.py`
 Template against environment variables or optional JSON values (`--mapping` switch):
 ```
-3env/bin/python utils/templatester.py --help
+venv/bin/python src/templatester.py --help
 ```
 
 ```
@@ -542,7 +533,7 @@ optional arguments:
   -w, --write           Write out templated file alongside Jinja2 template
   -q, --quiet           Disable logs to screen (to log level "ERROR")
 ```
-`utils/templatester.py` takes file path to `template` and renders the template against target variables. The variables can be specified as a JSON document defined by `--mapping`.
+`src/templatester.py` takes file path to `template` and renders the template against target variables. The variables can be specified as a JSON document defined by `--mapping`.
 
 The `template` path needs to end with a `.j2` extension. If the `--write` switch is provided then generated content will be output to the `template` less the `.j2`.
 
@@ -563,26 +554,26 @@ Otherwise:
 ```
 default
 ```
-`utils/templatester.py` example:
+`src/templatester.py` example:
 ```
 # Create the Jinja2 template.
 cat << EOF > my_template.j2
 This is my CUSTOM variable value: {{ CUSTOM }}
 EOF
 # Template!
-CUSTOM=bananas 3env/bin/python utils/templatester.py --quiet my_template.j2
+CUSTOM=bananas venv/bin/python src/templatester.py --quiet my_template.j2
 ```
 Outputs:
 ```
 This is my CUSTOM variable value: bananas
 ```
 ## Makester Recipes
-### Integrate `utils/backoff.py` with `makefile/compose.mk` in your Makefile
+### Integrate `src/backoff.py` with `makefile/compose.mk` in your Makefile
 The following recipe defines a *backoff* strategy with `docker-compose` in addition to adding an action to run the initialisation script, `init-script.sh`:
 ```
 backoff:
-    @$(PYTHON) makester/utils/waitster.py -d "HiveServer2" -p 10000 localhost
-    @$(PYTHON) makester/utils/waitster.py -d "Web UI for HiveServer2" -p 10002 localhost
+    @$(PYTHON) makester/src/waitster.py -d "HiveServer2" -p 10000 localhost
+    @$(PYTHON) makester/src/waitster.py -d "Web UI for HiveServer2" -p 10002 localhost
 
 local-build-up: compose-up backoff
     @./init-sript.sh
