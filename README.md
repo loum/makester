@@ -497,37 +497,51 @@ make py-install-makester
 ```
 The target script is `venv/bin/makester`:
 ```
-usage: makester [-h] [-q] {primer,templater} ...
+usage: makester [-h] [-q] {primer,templater,backoff} ...
 
 Makester CLI tool
 
 positional arguments:
-  {primer,templater}
-    primer            Makester Python project primer
-    templater         Makester document templater
+  {primer,templater,backoff}
+    primer              Makester Python project primer
+    templater           Makester document templater
+    backoff             Makester backoff until all ports ready
 
 options:
-  -h, --help          show this help message and exit
-  -q, --quiet         Disable logs to screen (to log level "ERROR")
+  -h, --help            show this help message and exit
+  -q, --quiet           Disable logs to screen (to log level "ERROR")
 ```
-### `src/waitster.py`
+### `makester backoff`
+> **_NOTE:_** `src/waitster.py` was refactored into the `makester backoff` CLI in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4).
+
 Wait until dependent service is ready:
 ```
-venv/bin/python src/waitster.py
+venv/bin/makester backoff --help
 ```
 ```
-usage: waitster.py [-h] -p PORT [-d DETAIL] host
-
-Backoff until all ports ready
-
 positional arguments:
   host                  Connection host
+  port                  Backoff port number until ready
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -p PORT, --port PORT  Backoff port number until ready
   -d DETAIL, --detail DETAIL
                         Meaningful description for backoff port
+```
+`makester backoff` will poll `port` for 300 seconds before a time out error is reported.
+
+#### `makester backoff` Example
+Start listening on a port:
+```
+nc -l 19999
+```
+Poll the port:
+```
+venv/bin/makester backoff  localhost 19999 --detail "Just a port check ..."
+```
+```
+2022-12-13 07:55:20,037:makester:INFO: Checking host:port localhost:19999 Just a port check ... ...
+2022-12-13 07:55:21,042:makester:INFO: Port 19999 ready
 ```
 ### `makester templater`
 > **_NOTE:_** `src/templatester.py` was refactored into the `makester templater` CLI in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4).
@@ -579,22 +593,22 @@ EOF
 ```
 Template!
 ```
-CUSTOM=bananas venv/bin/python src/templatester.py --quiet my_template.j2
+CUSTOM=bananas venv/bin/makester --quiet templater my_template.j2
 ```
 Output:
 ```
 This is my CUSTOM variable value: bananas
 ```
 ## Makester Recipes
-### Integrate `src/waitster.py` with `makefile/compose.mk` in your Makefile
-The following recipe defines a *backoff* strategy with `docker-compose` in addition to adding an action to run the initialisation script, `init-script.sh`:
+### Integrate `makester backoff` with `makefile/compose.mk` in your Makefile
+The following recipe defines a *backoff* strategy with `docker compose` in addition to adding an action to run the initialisation script, `init-script.sh`:
 ```
 backoff:
-    @$(PYTHON) makester/src/waitster.py -d "HiveServer2" -p 10000 localhost
-    @$(PYTHON) makester/src/waitster.py -d "Web UI for HiveServer2" -p 10002 localhost
+    @makester backoff localhost 10000 --detail "HiveServer2"
+    @makester backoff localhost 10002 --detail "Web UI for HiveServer2"
 
 local-build-up: compose-up backoff
-    @./init-sript.sh
+    @./init-script.sh
 ```
 ### Provide Multiple `docker-compose` `up`/`down` Targets
 Override `MAKESTER__COMPOSE_FILES` Makester parameter to customise multiple build/destroy environments:

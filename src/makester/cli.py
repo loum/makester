@@ -1,10 +1,12 @@
 """Makester CLI.
 
 """
-import json
 import argparse
+import telnetlib
+import json
 import logging
 
+import backoff
 import makester
 import makester.templater
 
@@ -35,10 +37,10 @@ def main():
     subparsers = parser.add_subparsers()
 
     # 'primer' subcommand.
-    primer_parser = subparsers.add_parser('primer', help='Makester Python project primer')
+    primer_parser = subparsers.add_parser('primer', help='Python project primer')
 
     # 'templater' subcommand.
-    templater_parser = subparsers.add_parser('templater', help='Makester document templater')
+    templater_parser = subparsers.add_parser('templater', help='Document templater')
     templater_parser.add_argument('template',
                                   help=('Path to Jinja2 template '
                                         '(absolute, or relative to user home)'))
@@ -55,6 +57,16 @@ def main():
                                   action='store_true',
                                   help='Write out templated file alongside Jinja2 template')
     templater_parser.set_defaults(func=render_template)
+
+    # 'backoff' subcommand.
+    backoff_parser = subparsers.add_parser('backoff', help='Backoff until all ports ready')
+    backoff_parser.add_argument('host', help='Connection host')
+    backoff_parser.add_argument('port', help='Backoff port number until ready')
+    backoff_parser.add_argument('-d',
+                                '--detail',
+                                default='Service',
+                                help='Meaningful description for backoff port')
+    backoff_parser.set_defaults(func=port_backoff)
 
     # Prepare the argument list.
     args = parser.parse_args()
@@ -81,3 +93,23 @@ def render_template(args):
     LOG.info('Template mapping values sourced:\n%s', json.dumps(mappings, indent=2))
 
     makester.templater.build_from_template(mappings, args.template, write_output=args.write)
+
+
+@backoff.on_exception(backoff.constant,
+                      (OSError, EOFError, ConnectionRefusedError),
+                      max_time=300,
+                      interval=5)
+def port_backoff(args):
+    """Service backoff until ready.
+
+    """
+    msg = f'Checking host:port {args.host}:{args.port}'
+    if args.detail is not None:
+        msg += f' {args.detail}'
+
+    LOG.info('%s ...', msg)
+
+    with telnetlib.Telnet(args.host, int(args.port)) as _tn:
+        _tn.set_debuglevel(5)
+        _tn.read_until(b' ', 1)
+        LOG.info('Port %s ready', args.port)
