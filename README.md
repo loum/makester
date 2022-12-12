@@ -491,6 +491,25 @@ Enable the [MkDocs preview server](https://squidfunk.github.io/mkdocs-material/c
 Build your site's [static documentation](https://squidfunk.github.io/mkdocs-material/creating-your-site/#building-your-site).
 
 ## Makester Utilities
+The Makester utilities are Python scripts that available to your project when you construct the Makester environment with:
+```
+make py-install-makester
+```
+The target script is `venv/bin/makester`:
+```
+usage: makester [-h] [-q] {primer,templater} ...
+
+Makester CLI tool
+
+positional arguments:
+  {primer,templater}
+    primer            Makester Python project primer
+    templater         Makester document templater
+
+options:
+  -h, --help          show this help message and exit
+  -q, --quiet         Disable logs to screen (to log level "ERROR")
+```
 ### `src/waitster.py`
 Wait until dependent service is ready:
 ```
@@ -510,65 +529,64 @@ optional arguments:
   -d DETAIL, --detail DETAIL
                         Meaningful description for backoff port
 ```
-### `src/templatester.py`
+### `makester templater`
+> **_NOTE:_** `src/templatester.py` was refactored into the `makester templater` CLI in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4).
+
 Template against environment variables or optional JSON values (`--mapping` switch):
 ```
-venv/bin/python src/templatester.py --help
+venv/bin/makester templater --help
 ```
-
 ```
-usage: templatester.py [-h] [-f FILTER] [-m MAPPING] [-w] [-q] template
-
-Set Interpreter values dynamically
+usage: makester templater [-h] [-f FILTER] [-m MAPPING] [-w] template
 
 positional arguments:
   template              Path to Jinja2 template (absolute, or relative to user home)
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -f FILTER, --filter FILTER
                         Environment variable filter (ignored when mapping is taken from JSON file)
   -m MAPPING, --mapping MAPPING
-                        Optional path to JSON mappings (absolute, or relative to user home).
+                        Optional path to JSON mappings (absolute, or relative to user home)
   -w, --write           Write out templated file alongside Jinja2 template
-  -q, --quiet           Disable logs to screen (to log level "ERROR")
 ```
-`src/templatester.py` takes file path to `template` and renders the template against target variables. The variables can be specified as a JSON document defined by `--mapping`.
+`makester templater` takes a file path as defined by the `template` positional argument and renders the template against target variables. The variables can be specified as a JSON document defined by `--mapping`.
 
-The `template` path needs to end with a `.j2` extension. If the `--write` switch is provided then generated content will be output to the `template` less the `.j2`.
+The `template` files needs to end with a `.j2` extension. If the `--write` switch is provided, then the generated content will be output to the `template` path less the `.j2` extension.
 
 A special custom filter `env_override` is available to bypass `MAPPING` values and source the environment for variable substitution. Use the custom filter `env_override` in your template as follows:
 ```
 "test" : {{ "default" | env_override('CUSTOM') }}
 ```
-
 Provided an environment variable as been set:
 ```
 export CUSTOM=some_value
 ```
 The template will render:
 ```
-some_value
+test: some_value
 ```
 Otherwise:
 ```
-default
+test: default
 ```
-`src/templatester.py` example:
+#### `makester templater` Example
+Create the Jinja2 template:
 ```
-# Create the Jinja2 template.
 cat << EOF > my_template.j2
 This is my CUSTOM variable value: {{ CUSTOM }}
 EOF
-# Template!
+```
+Template!
+```
 CUSTOM=bananas venv/bin/python src/templatester.py --quiet my_template.j2
 ```
-Outputs:
+Output:
 ```
 This is my CUSTOM variable value: bananas
 ```
 ## Makester Recipes
-### Integrate `src/backoff.py` with `makefile/compose.mk` in your Makefile
+### Integrate `src/waitster.py` with `makefile/compose.mk` in your Makefile
 The following recipe defines a *backoff* strategy with `docker-compose` in addition to adding an action to run the initialisation script, `init-script.sh`:
 ```
 backoff:
