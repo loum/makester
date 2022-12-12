@@ -116,6 +116,20 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,py-variables,MAKESTER__PYLINT_RCFILE
+@test "MAKESTER__PYLINT_RCFILE default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYLINT_RCFILE
+    assert_output --regexp 'MAKESTER__PYLINT_RCFILE=.*/pylintrc'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,py-variables,MAKESTER__PYLINT_RCFILE
+@test "MAKESTER__PYLINT_RCFILE override" {
+    MAKESTER__PYLINT_RCFILE=pylintrc\
+ run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYLINT_RCFILE
+    assert_output --regexp 'MAKESTER__PYLINT_RCFILE=pylintrc'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=py-vars
@@ -156,5 +170,18 @@ include makester/makefiles/makester.mk'
 .*/venv/bin/pip install --find-links=~/wheelhouse -e makester
 ### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e makester'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=py-pylintrc
+@test "Python pylint configuration generator: dry" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
+    assert_output --regexp 'pylint --generate-rcfile > /.*/pylintrc'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=py-pylintrc
+@test "Python pylint configuration generator MAKESTER__PYLINT_RCFILE override: dry" {
+    MAKESTER__PYLINT_RCFILE=pylintrc run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
+    assert_output --regexp 'pylint --generate-rcfile > pylintrc'
     [ "$status" -eq 0 ]
 }

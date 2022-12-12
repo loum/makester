@@ -39,6 +39,11 @@ py-install:
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
 py-install-makester: py-venv-clear py-venv-init py-install
 
+MAKESTER__PYLINT_RCFILE ?= $(MAKESTER__PROJECT_DIR)/pylintrc
+py-pylintrc:
+	$(info ### Generating project pylint configuration to $(MAKESTER__PYLINT_RCFILE) ...)
+	@pylint --generate-rcfile > $(MAKESTER__PYLINT_RCFILE)
+
 # Private Makefile includes that leverage capabilities in this Makefile.
 include makefiles/_py-venv.mk
 
