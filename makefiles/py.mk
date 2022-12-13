@@ -32,6 +32,8 @@ ifndef MAKESTER__PIP_INSTALL
   MAKESTER__PIP_INSTALL := -e .
 endif
 
+MAKESTER__PYTHON_PROJECT_ROOT ?= $(MAKESTER__PROJECT_DIR)/src/$(MAKESTER__PACKAGE_NAME)
+
 py-install:
 	$(info ### Installing project dependencies into $(MAKESTER__VENV_HOME) ...)
 	$(MAKESTER__PIP) install --find-links=$(MAKESTER__WHEEL) $(MAKESTER__PIP_INSTALL)
@@ -47,6 +49,9 @@ py-pylintrc:
 # Private Makefile includes that leverage capabilities in this Makefile.
 include makefiles/_py-venv.mk
 
+py-distribution:
+	$(MAKESTER__PYTHON) -m build
+
 py-vars: _py-vars py-venv-vars
 _py-vars: 
 	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
@@ -56,5 +61,6 @@ py-help: _py-help _py-venv-help
 
 _py-help:
 	@echo "(makefiles/py.mk)\n\
+  py-distribution      Create a versioned archive file that contains your Python project's packages\n\
   py-vars              Display system Python settings\n\
   py-install           Install Python project package dependencies"

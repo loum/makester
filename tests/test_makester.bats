@@ -104,6 +104,20 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,makester-variables,MAKESTER__PACKAGE_NAME
+@test "MAKESTER__PACKAGE_NAME default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
+    assert_output 'MAKESTER__PACKAGE_NAME=makefiles'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__PACKAGE_NAME
+@test "MAKESTER__PACKAGE_NAME override" {
+    MAKESTER__PACKAGE_NAME=makester\
+ run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
+    assert_output 'MAKESTER__PACKAGE_NAME=makester'
+    [ "$status" -eq 0 ]
+}
+
 # Executable checker.
 # bats test_tags=check-exe
 @test "check-exe rule for \"GIT\" finds the executable" {

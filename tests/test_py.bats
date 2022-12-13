@@ -130,6 +130,20 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,py-variables,MAKESTER__PYTHON_PROJECT_ROOT
+@test "MAKESTER__PYTHON_PROJECT_ROOT default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYTHON_PROJECT_ROOT
+    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/src/makefiles'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,py-variables,MAKESTER__PYTHON_PROJECT_ROOT
+@test "MAKESTER__PYTHON_PROJECT_ROOT override" {
+    MAKESTER__PYTHON_PROJECT_ROOT=$PWD\
+ run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYTHON_PROJECT_ROOT
+    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/makester'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=py-vars

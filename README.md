@@ -149,6 +149,7 @@ A description of the Makester special purpose variables follows:
 - `MAKESTER__K8S_MANIFESTS`: Location of your project's Kubernetes manifests (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
 - `MAKESTER__PROJECT_DIR`: The home directory of the project (defaults to `$PWD` or the top level
   of where your project's `.git` directory can be found).
+- `MAKESTER__PACKAGE_NAME`: The name to use for the package distribution. Defaults to the `MAKESTER__PROJECT_NAME` but available if a distinction is required. `MAKESTER__PACKAGE_NAME` is also used to build the `MAKESTER__PYTHON_PROJECT_ROOT`  directory.
 
 ## Makester Tooling
 ### `makefile/makester.mk`
@@ -174,9 +175,23 @@ Both `requirements.txt` and `setup.py` for `pip install` are still supported. De
 - `MAKESTER__SYSTEM_PYTHON`: Path to the current system-wide `python` executable. In Makester context, this should only be used to create a Python virtual environment for your project.
 - `MAKESTER__PYTHON`: Path to the Python virtual environment `python` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PYTHON)`.
 - `MAKESTER__PIP`: Path to the Python virtual environment `pip` executable. You can reference this anywhere in your `Makefile` as `$(MAKESTER__PIP)`.
-- `MAKESTER__WHEELHOUSE`:  Control the location to where Python will build its wheels to. See [wheel-dir].(https://pip.pypa.io/en/stable/cli/pip_wheel/)
+- `MAKESTER__WHEELHOUSE`:  Control the location to where Python will build its wheels to. See [wheel-dir](https://pip.pypa.io/en/stable/cli/pip_wheel/).
+- `MAKESTER__PYTHON_PROJECT_ROOT`: Path to the Python package contents. For example, `MAKESTER__PYTHON_PROJECT_ROOT` would be `project/src/my_package` if your Python project structure follows this format:
+  ```
+  project/
+  └── src/
+      └── my_package/
+          ├── __init__.py
+          └── example.py
+  ```
 
 #### Command Reference
+##### Create a Python Distribution Package -  [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
+Create a versioned archive file that contains your Python packages:
+```
+make py-distribution
+```
+See [# Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/) for more information.
 ##### Display your Local Environment's Python Setup -  [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
 ```
 make py-vars
@@ -393,29 +408,15 @@ To use add `include makester/makefiles/versioning.mk` to your `Makefile`.
 > makefiles/versioning.mk:8: *** ### missing include dependency.  Stop.
 > ```
 
-`makefile/versioning.mk` extends the basic versioning capabilities provided by `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` by leveraging [GitVersion](https://gitversion.net/docs/). In brief, `makefile/versioning.mk` allows a degree of versioning autonomy based on your Git history.
+`makefile/versioning.mk` extends the basic versioning capabilities provided by `MAKESTER__VERSION` and `MAKESTER__RELEASE_NUMBER` by leveraging [GitVersion](https://gitversion.net/docs/). In brief, `makefile/versioning.mk` allows a degree of versioning autonomy based on your Git history. `makefile/versioning.mk` works with the special variable hook `makefiles/makester.mk:MAKESTER__RELEASE_VERSION` when the `gitversion-release` target is added to your project's `Makefile`.
 
-`makefile/versioning.mk` works with the special variable hook `makefiles/makester.mk:MAKESTER__RELEASE_VERSION` when the `release-version` target is added to your project's `Makefile`.
-> **_NOTE:_** `release-version` creates static output files under Makester's `MAKESTER__WORK_DIR`. These are namely:
-> - `$MAKESTER__WORK_DIR/release-version`
-> - `$MAKESTER__WORK_DIR/versioning`
-
-If version currency is important for a particular function then you can chain the `release-version` target to any target within your `Makefile`. For example, when you are building a fresh Docker image, the following recipe will ensure that a new `MAKESTER__RELEASE_NUMBER` is generated just prior to the Docker image build process:
-> ```
-> image-build: release-version
-> ```
-`makefile/versioning.mk` checks for a `GitVersion.yml` at the top level of your project but will default to GitVersion's internal default if one is not provided. To see the default release variables and values, run:
-```
-make release-version
-```
-... and check the contents of `$PWD/.makester/versioning`.
-
-In certain cases, GitVersion's defaults may be all that your project needs. But code versioning can be a touchy subject. Customising your own `GitVersion.yml` will give you full control over this facility. Follow the [GitVersion configuration guide](https://gitversion.net/docs/reference/configuration) to initialise your own `GitVersion.yml`. Makester also provides a [working, sample `GitVersion.yml`](https://github.com/loum/makester/blob/main/sample/GitVersion.yml) that is geared toward Python projects.
+In most cases, GitVersion's defaults may be all that your project needs. But code versioning can be a touchy subject. Customising your own `GitVersion.yml` will give you full control over this facility. Follow the [GitVersion configuration guide](https://gitversion.net/docs/reference/configuration) to initialise your own `GitVersion.yml`. Makester also provides a [working, sample `GitVersion.yml`](https://github.com/loum/makester/blob/main/sample/GitVersion.yml) that is geared toward Python projects.
 
 #### Variables
-- `MAKESTER__GITVERSION_CONFIG`: optionally specify the location of your project's `GitVersion.yml` (defaults to `GitVersion.yml` at the top level of the project.
-- `MAKESTER__GITVERSION_VARIABLE`: the GitVersion release variable value filter (defaults to `AssemblySemFileVer`).
-- `MAKESTER__GITVERSION_VERSION`: the GitVersion docker image version (defaults to `latest`).
+- `MAKESTER__VERSION_FILE`: Configurable, static file reference to write the output of `gitversion-release` target (defaults to `$PWD/.makester/VERSION`).
+- `MAKESTER__GITVERSION_CONFIG`: Optionally specify the location of your project's `GitVersion.yml` (defaults to `GitVersion.yml` at the top level of the project.
+- `MAKESTER__GITVERSION_VARIABLE`: GitVersion release variable value filter (defaults to `AssemblySemFileVer`).
+- `MAKESTER__GITVERSION_VERSION`: GitVersion docker image version (defaults to `latest`).
 
 #### Command Reference
 ##### `make versioning-help`
@@ -424,12 +425,27 @@ Displays the `makefile/versioning.mk` usage message.
 ##### `make gitversion`
 Displays the GitVersion usage message.
 
-##### `make release-version`
+##### `make gitversion-release`
+> **_NOTE:_** The `gitversion-release` target was renamed `gitversion-release`  from `makefiles/python-venv.mk` in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4). `gitversion-release` will be deprecated in [Makester v0.3.0](https://github.com/loum/makester/releases/tag/0.3.0)
+
 Filtered GitVersion variables against `MAKESTER__GITVERSION_VARIABLE` (defaults to `AssemblySemFileVer`). For example:
 ```
 ### Filtering GitVersion variable: AssemblySemFileVer
 ### MAKESTER__RELEASE_VERSION: "0.1.0.0"
 ```
+`gitversion-release` creates static output files under Makester's `MAKESTER__WORK_DIR`. These are namely:
+> - `$MAKESTER__WORK_DIR/VERSION`
+> - `$MAKESTER__WORK_DIR/versioning`
+
+If version currency is important for a particular function then you can chain the `gitversion-release` target to any target within your `Makefile`. For example, when you are building a fresh Docker image, the following recipe will ensure that a new `MAKESTER__RELEASE_NUMBER` is generated just prior to the Docker image build process:
+> ```
+> image-build: gitversion-release
+> ```
+`makefile/versioning.mk` checks for a `GitVersion.yml` at the top level of your project but will default to GitVersion's internal default if one is not provided. To see the default release variables and values, run:
+```
+make gitversion-release
+```
+... and check the contents of `$MAKESTER__VERSION_FILE/VERSION` (defaults to `$PWD/.makester/VERSION`).
 ##### `make gitversion-clear`
 Clear the temporary GitVersion files from `$MAKESTER__WORK_DIR`
 
