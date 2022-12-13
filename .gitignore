@@ -1,9 +1,6 @@
 # MkDocs static content
 docs/site
 
-# Dynamic versioning.
-src/makester/VERSION
-
 # Makester
 .makester
 

@@ -40,7 +40,7 @@ py-install:
 
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
 py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
-py-install-makester: MAKESTER__VERSION_FILE := $(PWD)/makester/src/makester/VERSION
+py-install-makester: MAKESTER__VERSION_FILE := makester/src/makester/VERSION
 py-install-makester: MAKESTER__PROJECT_NAME := makester
 py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
 py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
