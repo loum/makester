@@ -186,6 +186,26 @@ Both `requirements.txt` and `setup.py` for `pip install` are still supported. De
   ```
 
 #### Command Reference
+##### Create a Simple Python Project Directory Layout - [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
+Quick start Python project setup based on [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
+> **_NOTE_**: Defaults to [src-layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/).
+```
+make py-project-create
+```
+For example, given `MAKESTER__PROJECT_DIR=/var/tmp/fruit`:
+```
+MAKESTER__PACKAGE_NAME=banana make py-project-create
+```
+```
+/var/tmp/fruit
+├── LICENSE.md
+├── pyproject.toml
+├── src
+│   └── banana
+│       └── __init__.py
+└── tests
+    └── banana
+```
 ##### Create a Python Distribution Package -  [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)
 Create a versioned archive file that contains your Python packages:
 ```

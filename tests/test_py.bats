@@ -146,21 +146,21 @@ include makester/makefiles/makester.mk'
 
 # Targets.
 #
-# bats test_tags=py-vars
+# bats test_tags=target,py-vars
 @test "Python system variables" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-vars
     refute_output --regexp '### System python3: .*/3env/.*/python3'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=py-install
+# bats test_tags=target,py-install
 @test "Python package install: dry" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-install --dry-run
     assert_output --regexp '### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e .'
     [ "$status" -eq 0 ]
 }
-# bats test_tags=py-install
+# bats test_tags=target,py-install
 @test "Python package install MAKESTER__WHEEL override: dry" {
     MAKESTER__WHEEL=.wheelhouse\
  run make -f makefiles/makester.mk -f makefiles/py.mk py-install --dry-run
@@ -169,7 +169,7 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=py-install-makester
+# bats test_tags=target,py-install-makester
 @test "Python package install MAKESTER__PIP_INSTALL override: dry" {
     _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk -f makefiles/py.mk py-install-makester --dry-run
     assert_output --regexp '### Deleting virtual environment .*/venv ...
@@ -187,15 +187,32 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=py-pylintrc
+# bats test_tags=target,py-pylintrc
 @test "Python pylint configuration generator: dry" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
     assert_output --regexp 'pylint --generate-rcfile > /.*/pylintrc'
     [ "$status" -eq 0 ]
 }
-# bats test_tags=py-pylintrc
+# bats test_tags=target,py-pylintrc
 @test "Python pylint configuration generator MAKESTER__PYLINT_RCFILE override: dry" {
     MAKESTER__PYLINT_RCFILE=pylintrc run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
     assert_output --regexp 'pylint --generate-rcfile > pylintrc'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-project-create
+@test "Python project scaffolding: dry" {
+    MAKESTER__RESOURCES_DIR=resources MAKESTER__PROJECT_DIR=/var/tmp/fruit MAKESTER__PACKAGE_NAME=banana\
+ run make -f makefiles/makester.mk -f makefiles/py.mk py-project-create --dry-run
+    assert_output --regexp '### Adding a sane .gitignore to "/var/tmp/fruit"
+/.*/cp resources/project.gitignore /var/tmp/fruit/.gitignore
+### Adding MIT license to "/var/tmp/fruit"
+/.*/cp resources/mit.md /var/tmp/fruit/LICENSE.md
+### Creating a Python project directory structure under /var/tmp/fruit/src/banana
+/.*/mkdir -pv /var/tmp/fruit/src/banana
+/.*/touch /var/tmp/fruit/src/banana/__init__.py
+/.*/mkdir -pv /var/tmp/fruit/tests/banana
+/.*/cp resources/blank_directory.gitignore /var/tmp/fruit/tests/banana/.gitignore
+/.*/cp resources/pyproject.toml /var/tmp/fruit'
     [ "$status" -eq 0 ]
 }

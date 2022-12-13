@@ -118,10 +118,39 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
-# Executable checker.
-# bats test_tags=check-exe
+# Targets.
+#
+# bats test_tags=target,check-exe
 @test "check-exe rule for \"GIT\" finds the executable" {
     run make -f makefiles/makester.mk print-GIT
     assert_output --regexp 'GIT=.*/git'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-gitignore,dry-run
+@test "Project level .gitignore copy: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-gitignore --dry-run
+    assert_output --regexp "/.*/cp /.*/makester/resources/project.gitignore $PWD/.gitignore"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,makester-gitignore,dry-run
+@test "Project level .gitignore copy override: dry" {
+    MAKESTER__PROJECT_DIR=$PWD MAKESTER__RESOURCES_DIR=$PWD/resources\
+ run make -f makefiles/makester.mk makester-gitignore --dry-run
+    assert_output --regexp "/.*/cp /.*/resources/project.gitignore $PWD/.gitignore"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-mit-license,dry-run
+@test "Project level MIT license copy: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-mit-license --dry-run
+    assert_output --regexp "/.*/cp /.*/makester/resources/mit.md $PWD/LICENSE"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,makester-mit-license,dry-run
+@test "Project level MIT license copy override: dry" {
+    MAKESTER__PROJECT_DIR=$PWD MAKESTER__RESOURCES_DIR=$PWD/resources\
+ run make -f makefiles/makester.mk makester-mit-license --dry-run
+    assert_output --regexp "/.*/cp /.*/resources/mit.md $PWD/LICENSE"
     [ "$status" -eq 0 ]
 }

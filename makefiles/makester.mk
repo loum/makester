@@ -61,6 +61,15 @@ makester-k8s-manifest-dir:
 	$(info ### Creating Makester k8s manifest directory "$(MAKESTER__K8S_MANIFESTS)")
 	$(shell which mkdir) -pv $(MAKESTER__K8S_MANIFESTS)
 
+MAKESTER__RESOURCES_DIR ?= $(MAKESTER__PROJECT_DIR)/makester/resources
+makester-gitignore:
+	$(info ### Adding a sane .gitignore to "$(MAKESTER__PROJECT_DIR)")
+	$(shell which cp) $(MAKESTER__RESOURCES_DIR)/project.gitignore $(MAKESTER__PROJECT_DIR)/.gitignore
+
+makester-mit-license:
+	$(info ### Adding MIT license to "$(MAKESTER__PROJECT_DIR)")
+	$(shell which cp) $(MAKESTER__RESOURCES_DIR)/mit.md $(MAKESTER__PROJECT_DIR)/LICENSE.md
+
 GIT ?= $(call check-exe,git,https://git-scm.com/downloads)
 HASH ?= $(shell $(GIT) rev-parse --short HEAD)
 
@@ -147,6 +156,8 @@ Targets\n\
 --------------------------------------------------------------------------------------------\n"
 	@echo "(makefiles/makester.mk)\n\
   clean                Remove all files not tracked by Git\n\
+  makester-gitignore   Adding a sane .gitignore to \"$(MAKESTER__PROJECT_DIR)\"\n\
+  makester-mit-license Remove all files not tracked by Git\n\
   print-<var>          Display the Makefile global variable '<var>' value\n\
   submodule-update     Update your existing Git submodules\n\
   vars                 Display all Makester global variable values\n"

@@ -41,6 +41,14 @@ py-install:
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
 py-install-makester: py-venv-clear py-venv-init py-install
 
+py-project-create: makester-gitignore makester-mit-license
+	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))
+	@$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
+	@$(shell which touch) $(MAKESTER__PYTHON_PROJECT_ROOT)/__init__.py
+	@$(shell which mkdir) -pv $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)
+	@$(shell which cp) $(MAKESTER__RESOURCES_DIR)/blank_directory.gitignore $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)/.gitignore
+	@$(shell which cp) $(MAKESTER__RESOURCES_DIR)/pyproject.toml $(MAKESTER__PROJECT_DIR)
+
 MAKESTER__PYLINT_RCFILE ?= $(MAKESTER__PROJECT_DIR)/pylintrc
 py-pylintrc:
 	$(info ### Generating project pylint configuration to $(MAKESTER__PYLINT_RCFILE) ...)
@@ -62,5 +70,6 @@ py-help: _py-help _py-venv-help
 _py-help:
 	@echo "(makefiles/py.mk)\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
-  py-vars              Display system Python settings\n\
-  py-install           Install Python project package dependencies"
+  py-install           Install Python project package dependencies\n\
+  py-project-create    Create a minimal Python project directory structure scaffolding\n\
+  py-vars              Display system Python settings\n"
