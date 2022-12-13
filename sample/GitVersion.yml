@@ -28,7 +28,7 @@ branches:
     track-merge-target: false
     tracks-release-branches: false
     is-release-branch: false
-    source-branches: ['main', 'develop', 'feature', 'hotfix', 'support']
+    source-branches: ['main', 'develop', 'hotfix', 'support']
   task:
     regex: ^task[/-]
     mode: ContinuousDeployment
@@ -38,7 +38,7 @@ branches:
     track-merge-target: false
     tracks-release-branches: false
     is-release-branch: false
-    source-branches: ['main', 'develop', 'hotfix', 'support']
+    source-branches: ['main', 'develop', 'feature', 'hotfix', 'support']
   develop:
     regex: ^develop$
     mode: ContinuousDeployment

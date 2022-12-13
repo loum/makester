@@ -39,6 +39,11 @@ py-install:
 	$(MAKESTER__PIP) install --find-links=$(MAKESTER__WHEEL) $(MAKESTER__PIP_INSTALL)
 
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
+py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
+py-install-makester: MAKESTER__VERSION_FILE := $(PWD)/makester/src/makester/VERSION
+py-install-makester: MAKESTER__PROJECT_NAME := makester
+py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
+py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
 py-install-makester: py-venv-clear py-venv-init py-install
 
 py-project-create: makester-gitignore makester-mit-license
@@ -55,7 +60,7 @@ py-pylintrc:
 	@pylint --generate-rcfile > $(MAKESTER__PYLINT_RCFILE)
 
 # Private Makefile includes that leverage capabilities in this Makefile.
-include makefiles/_py-venv.mk
+include $(MAKESTER__MAKEFILES)/_py-venv.mk
 
 py-distribution:
 	$(MAKESTER__PYTHON) -m build

@@ -6,6 +6,7 @@
 # bats file_tags=versioning
 setup_file() {
     export MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    export MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml
 }
 setup() {
     load 'test_helper/common-setup'
@@ -40,7 +41,7 @@ include makester/makefiles/docker.mk'
 @test "MAKESTER__GITVERSION_CONFIG default should be set when calling versioning.mk" {
     MAKESTER__DOCKER=dummy\
  run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_CONFIG
-    assert_output 'MAKESTER__GITVERSION_CONFIG=makester/sample/GitVersion.yml'
+    assert_output 'MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_CONFIG

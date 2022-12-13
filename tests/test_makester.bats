@@ -118,6 +118,19 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
+@test "MAKESTER__MAKEFILES default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+    assert_output "MAKESTER__MAKEFILES=makefiles"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
+@test "MAKESTER__MAKEFILES alternate when MAKESTER__SUBMODULE_NAME directory does exist" {
+    MAKESTER__SUBMODULE_NAME=makefiles run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+    assert_output "MAKESTER__MAKEFILES=makester/makefiles"
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=target,check-exe

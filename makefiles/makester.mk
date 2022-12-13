@@ -12,6 +12,16 @@ ifndef MAKESTER__VERBOSE
   MAKEFLAGS += --no-print-directory
 endif
 
+MAKESTER__SUBMODULE_NAME ?= makester
+_MAKESTER__SUBMODULE_EXISTS := $(shell [ -e "$(MAKESTER__SUBMODULE_NAME)" ] && echo 1 || echo 0)
+ifndef MAKESTER__MAKEFILES
+  ifeq ($(_MAKESTER__SUBMODULE_EXISTS), 1)
+    MAKESTER__MAKEFILES := makester/makefiles
+  else
+    MAKESTER__MAKEFILES := makefiles
+  endif
+endif
+
 # Add PyPI bin to the end of PATH to ensure system Python is found first.
 export PATH := $(shell echo $$PATH:$(PWD)/venv/bin)
 
@@ -33,6 +43,7 @@ endif
 MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
 
 MAKESTER__PROJECT_DIR ?= $(PWD)
+MAKESTER__GIT_DIR ?= $(MAKESTER__PROJECT_DIR)
 
 # MAKESTER__SERVICE_NAME supports optional MAKESTER__REPO_NAME.
 ifeq ($(strip $(MAKESTER__SERVICE_NAME)),)
@@ -50,8 +61,8 @@ MAKESTER__RELEASE_VERSION := $(if $(MAKESTER__RELEASE_VERSION),$(MAKESTER__RELEA
 # Check if MAKESTER__RELEASE_VERSION has been overriden on the CLI.
 ifeq (<undefined>,$(MAKESTER__RELEASE_VERSION))
   # MAKESTER__RELEASE_VERSION is not overriden. Check if a release version has been generated.
-  ifneq (,$(wildcard $(MAKESTER__WORK_DIR)/release-version))
-    MAKESTER__RELEASE_VERSION := $(shell cat $(MAKESTER__WORK_DIR)/release-version)
+  ifneq (,$(wildcard $(MAKESTER__VERSION_FILE)))
+    MAKESTER__RELEASE_VERSION := $(shell cat $(MAKESTER__VERSION_FILE))
   endif
 endif
 
