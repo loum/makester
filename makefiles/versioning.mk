@@ -18,12 +18,9 @@ _dump_versioning:
 
 # GitVersion help (default).
 CMD ?= /h
-_gitversion-cmd: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
-_gitversion-cmd: MAKESTER__GITVERSION_CONFIG := $(MAKESTER__GITVERSION_CONFIG)
 _gitversion-cmd: makester-work-dir
-_gitversion-cmd:
 	@$(MAKESTER__DOCKER) run --rm\
- -v "$(MAKESTER__PROJECT_DIR):/$(MAKESTER__PACKAGE_NAME)"\
+ -v "$(MAKESTER__GIT_DIR):/$(MAKESTER__PROJECT_NAME)"\
  gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning
 
 gitversion: _gitversion-cmd _dump_versioning
@@ -35,7 +32,7 @@ _gitversion-version-msg:
 _gitversion-version: CMD := /version
 
 # GitVersion version variables.
-_gitversion-versions: CMD = /$(MAKESTER__PACKAGE_NAME) /config $(MAKESTER__GITVERSION_CONFIG)
+_gitversion-versions: CMD = /$(MAKESTER__PROJECT_NAME) /config $(MAKESTER__GITVERSION_CONFIG)
 
 _gitversion-version _gitversion-versions: _gitversion-cmd
 
@@ -43,23 +40,28 @@ _gitversion-versions-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-versions-rm:
 	-@$(info ### removing $(MAKESTER__WORK_DIR)/versioning $(shell rm $(MAKESTER__WORK_DIR)/versioning))
 
-release-version: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
-release-version: _gitversion-versions
+MAKESTER__VERSION_FILE ?= $(MAKESTER__WORK_DIR)/VERSION
+
+# Symbol to be deprecated in Makester 0.3.0
+release-version: _release-version-warn gitversion-release
+_release-version-warn:
+	$(call deprecated,release-version,0.3.0,gitversion-release)
+
+gitversion-release: _gitversion-versions
 	$(info ### Filtering GitVersion variable: $(MAKESTER__GITVERSION_VARIABLE))
-	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) > $(MAKESTER__WORK_DIR)/release-version)
-	$(info ### MAKESTER__RELEASE_VERSION: $(shell cat $(MAKESTER__WORK_DIR)/release-version))
+	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"' > $(MAKESTER__VERSION_FILE))
+	$(info ### MAKESTER__RELEASE_VERSION: $(shell cat $(MAKESTER__VERSION_FILE)))
 
-_release-version-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
-_release-version-rm:
-	-@$(info ### removing $(MAKESTER__WORK_DIR)/release-version $(shell rm $(MAKESTER__WORK_DIR)/release-version))
+_gitversion-release-rm:
+	-@$(info ### removing $(MAKESTER__VERSION_FILE) $(shell rm $(MAKESTER__VERSION_FILE)))
 
-gitversion-clear: _release-version-rm _gitversion-versions-rm
+gitversion-clear: _gitversion-release-rm _gitversion-versions-rm
 
 versioning-help:
 	@echo "(makefiles/versioning.mk)\n\
   gitversion           GitVersion usage message\n\
   gitversion-clear     Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\"\n\
-  gitversion-version   The actual GitVersion version\n\
-  release-version      Filtered GitVersion variables against \"$(MAKESTER__GITVERSION_VARIABLE)\"\n"
+  gitversion-release   Filtered GitVersion variables against \"$(MAKESTER__GITVERSION_VARIABLE)\"\n\
+  gitversion-version   The actual GitVersion version\n"
 
 .PHONY: versioning-help

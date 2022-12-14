@@ -21,10 +21,21 @@ MAKESTER__BUILD_PATH ?= .
 MAKESTER__BUILD_COMMAND ?= -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) $(MAKESTER__BUILD_PATH)
 
 # 20221027: Introduced target grouping for "image" related items.
-is image-search si search-image:
+#
+# Symbol to be deprecated in Makester 0.3.0
+search-image: _search-image-warn image-search
+_search-image-warn:
+	$(call deprecated,search-image,0.3.0,image-search)
+
+is image-search si:
 	-$(MAKESTER__DOCKER) images "$(MAKESTER__SERVICE_NAME)*"
 
-ib image-build bi build-image:
+# Symbol to be deprecated in Makester 0.3.0
+build-image: _build-image-warn image-build
+_build-image-warn:
+	$(call deprecated,build-image,0.3.0,image-build)
+
+ib image-build bi:
 	$(MAKESTER__DOCKER) $(MAKESTER__BUILD_CONTEXT) $(MAKESTER__BUILD_COMMAND)
 
 ibx image-buildx: MAKESTER__BUILD_CONTEXT := buildx build
@@ -33,9 +44,14 @@ ibx image-buildx: image-build
 irm image-rm rmi rm-image:
 	$(MAKESTER__DOCKER) rmi $(MAKESTER__IMAGE_TAG_ALIAS)
 
+# Symbol to be deprecated in Makester 0.3.0
+tag-image: _tag-image-warn image-tag
+_tag-image-warn:
+	$(call deprecated,tag-image,0.3.0,image-tag)
+
 IMAGE_TAG_ID := $(shell $(MAKESTER__DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
 MAKESTER__IMAGE_TAG_ALIAS ?= $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)
-image-tag tag tag-image:
+image-tag tag:
 	-$(MAKESTER__DOCKER) tag $(IMAGE_TAG_ID) $(MAKESTER__IMAGE_TAG_ALIAS)
 
 _image-tag-msg:
@@ -79,26 +95,62 @@ image-rm-dangling rm-dangling-images:
 	-$(shell $(MAKESTER__DOCKER) rmi $(shell $(MAKESTER__DOCKER) images -f "dangling=true" -q))
 
 # 20221027: Introduced target grouping for "container" related items.
-container-run run:
+#
+# Symbol to be deprecated in Makester 0.3.0
+run: _run-warn container-run
+_run-warn:
+	$(call deprecated,run,0.3.0,container-run)
+
+container-run:
 	-$(MAKESTER__RUN_COMMAND)
 
-container-stop stop:
+# Symbol to be deprecated in Makester 0.3.0
+stop: _stop-warn container-stop
+_stop-warn:
+	$(call deprecated,stop,0.3.0,container-stop)
+
+container-stop:
 	-$(MAKESTER__DOCKER) stop $(MAKESTER__CONTAINER_NAME)
 
-container-root root:
+# Symbol to be deprecated in Makester 0.3.0
+root: _root-warn container-root
+_root-warn:
+	$(call deprecated,root,0.3.0,container-root)
+
+container-root:
 	-$(MAKESTER__DOCKER) exec -ti -u 0 $(MAKESTER__CONTAINER_NAME) sh || true
 
-container-sh sh:
+# Symbol to be deprecated in Makester 0.3.0
+sh: _sh-warn container-sh
+_sh-warn:
+	$(call deprecated,sh,0.3.0,container-sh)
+
+container-sh:
 	-$(MAKESTER__DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) sh || true
 
-container-bash bash:
+# Symbol to be deprecated in Makester 0.3.0
+bash: _bash-warn container-bash
+_bash-warn:
+	$(call deprecated,bash,0.3.0,container-bash)
+
+container-bash:
 	-$(MAKESTER__DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash || true
 
-container-logs logs:
+# Symbol to be deprecated in Makester 0.3.0
+logs: _logs-warn container-logs
+_logs-warn:
+	$(call deprecated,logs,0.3.0,container-logs)
+
+container-logs:
 	-$(MAKESTER__DOCKER) logs --follow $(MAKESTER__CONTAINER_NAME)
 
+# Symbol to be deprecated in Makester 0.3.0
+status: _status-warn container-status
+_status-warn:
+	$(call deprecated,status,0.3.0,container-status)
+
 RUNNING_CONTAINER := $($(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
-container-status status:
+container-status:
 ifneq ($(RUNNING_CONTAINER),)
 	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container is running.  Run \"make stop\" to terminate
 else
