@@ -104,10 +104,66 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
-# Executable checker.
-# bats test_tags=check-exe
+# bats test_tags=variables,makester-variables,MAKESTER__PACKAGE_NAME
+@test "MAKESTER__PACKAGE_NAME default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
+    assert_output 'MAKESTER__PACKAGE_NAME=makefiles'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__PACKAGE_NAME
+@test "MAKESTER__PACKAGE_NAME override" {
+    MAKESTER__PACKAGE_NAME=makester\
+ run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
+    assert_output 'MAKESTER__PACKAGE_NAME=makester'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
+@test "MAKESTER__MAKEFILES default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+    assert_output "MAKESTER__MAKEFILES=makefiles"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
+@test "MAKESTER__MAKEFILES alternate when MAKESTER__SUBMODULE_NAME directory does exist" {
+    MAKESTER__SUBMODULE_NAME=makefiles run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+    assert_output "MAKESTER__MAKEFILES=makester/makefiles"
+    [ "$status" -eq 0 ]
+}
+
+# Targets.
+#
+# bats test_tags=target,check-exe
 @test "check-exe rule for \"GIT\" finds the executable" {
     run make -f makefiles/makester.mk print-GIT
     assert_output --regexp 'GIT=.*/git'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-gitignore,dry-run
+@test "Project level .gitignore copy: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-gitignore --dry-run
+    assert_output --regexp "/.*/cp /.*/makester/resources/project.gitignore $PWD/.gitignore"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,makester-gitignore,dry-run
+@test "Project level .gitignore copy override: dry" {
+    MAKESTER__PROJECT_DIR=$PWD MAKESTER__RESOURCES_DIR=$PWD/resources\
+ run make -f makefiles/makester.mk makester-gitignore --dry-run
+    assert_output --regexp "/.*/cp /.*/resources/project.gitignore $PWD/.gitignore"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-mit-license,dry-run
+@test "Project level MIT license copy: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-mit-license --dry-run
+    assert_output --regexp "/.*/cp /.*/makester/resources/mit.md $PWD/LICENSE"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,makester-mit-license,dry-run
+@test "Project level MIT license copy override: dry" {
+    MAKESTER__PROJECT_DIR=$PWD MAKESTER__RESOURCES_DIR=$PWD/resources\
+ run make -f makefiles/makester.mk makester-mit-license --dry-run
+    assert_output --regexp "/.*/cp /.*/resources/mit.md $PWD/LICENSE"
     [ "$status" -eq 0 ]
 }

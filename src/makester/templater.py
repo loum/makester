@@ -1,16 +1,16 @@
 """Template environment variables.
 
 """
-import os
-import sys
-import argparse
-import tempfile
-import shutil
-import logging
+from typing import Text
 import json
+import logging
+import os
+import shutil
+import tempfile
+
 import jinja2
 
-LOG = logging.getLogger('templatester')
+LOG = logging.getLogger('templater')
 if not LOG.handlers:
     LOG.propagate = 0
     CONSOLE = logging.StreamHandler()
@@ -23,7 +23,7 @@ LOG.setLevel(logging.INFO)
 DESCRIPTION = """Set Interpreter values dynamically"""
 
 
-def _get_environment_values(token=None) -> dict:
+def get_environment_values(token: Text=None) -> dict:
     """
     Returns a dictionary structure of all environment values.
 
@@ -44,7 +44,7 @@ def _get_environment_values(token=None) -> dict:
     return env_variables
 
 
-def _get_json_values(path_to_json) -> dict:
+def get_json_values(path_to_json) -> dict:
     """
     Parse JSON file *path_to_json* into a Python dictionary.
 
@@ -53,7 +53,7 @@ def _get_json_values(path_to_json) -> dict:
 
     json_mapping = {}
     if os.path.exists(path_to_json):
-        with open(path_to_json) as _fp:
+        with open(path_to_json, encoding='utf-8') as _fp:
             json_mapping.update(json.load(_fp))
     else:
         LOG.error('Path to JSON "%s" does not exist', path_to_json)
@@ -61,7 +61,7 @@ def _get_json_values(path_to_json) -> dict:
     return json_mapping
 
 
-def _build_from_template(env_map, template_file_path, write_output=False):
+def build_from_template(env_map, template_file_path, write_output=False):
     """
     Take *template_file_path* and template against variables
     defined by *env_map*.
@@ -105,61 +105,10 @@ def _build_from_template(env_map, template_file_path, write_output=False):
         print(output)
 
         if write_output:
-            out_fh = tempfile.NamedTemporaryFile()
-            out_fh.write(output.encode())
-            out_fh.flush()
-            shutil.copy(out_fh.name, target_template_file_path[0])
-            LOG.info('Templated file "%s" generated', target_template_file_path[0])
+            with tempfile.NamedTemporaryFile() as out_fh:
+                out_fh.write(output.encode())
+                out_fh.flush()
+                shutil.copy(out_fh.name, target_template_file_path[0])
+                LOG.info('Templated file "%s" generated', target_template_file_path[0])
     else:
         LOG.error('Skipping "%s" templating as it does not end with ".j2"', template_file_path)
-
-
-def main():
-    """Script entry point.
-    """
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('template',
-                        help='Path to Jinja2 template (absolute, or relative to user home)')
-    parser.add_argument('-f',
-                        '--filter',
-                        help=('Environment variable filter '
-                              '(ignored when mapping is taken from JSON file)'))
-    parser.add_argument('-m',
-                        '--mapping',
-                        help=('Optional path to JSON mappings '
-                              '(absolute, or relative to user home).'))
-    parser.add_argument('-w',
-                        '--write',
-                        action='store_true',
-                        help='Write out templated file alongside Jinja2 template')
-    parser.add_argument('-q',
-                        '--quiet',
-                        action='store_true',
-                        help='Disable logs to screen (to log level "ERROR")')
-
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
-
-    args = parser.parse_args()
-
-    if args.quiet:
-        logging.disable(logging.ERROR)
-
-    if args.mapping and args.filter:
-        LOG.warning(('Environment variable filter "%s" does not have effect '
-                     'over JSON mapping file "%s"'), args.filter, args.mapping)
-
-    mappings = {}
-    if args.mapping:
-        mappings.update(_get_json_values(args.mapping))
-    else:
-        mappings.update(_get_environment_values(token=(args.filter)))
-
-    LOG.info('Template mapping values sourced:\n%s', json.dumps(mappings, indent=2))
-
-    _build_from_template(mappings, args.template, write_output=args.write)
-
-
-if __name__ == '__main__':
-    main()
