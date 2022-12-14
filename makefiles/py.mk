@@ -28,15 +28,15 @@ endif
 # Python defaults.
 MAKESTER__WHEEL ?= ~/wheelhouse
 
-ifndef MAKESTER__PIP_INSTALL
-  MAKESTER__PIP_INSTALL := -e .
-endif
-
-MAKESTER__PYTHON_PROJECT_ROOT ?= $(MAKESTER__PROJECT_DIR)/src/$(MAKESTER__PACKAGE_NAME)
+MAKESTER__PIP_INSTALL ?= -e .
 
 py-install:
 	$(info ### Installing project dependencies into $(MAKESTER__VENV_HOME) ...)
 	$(MAKESTER__PIP) install --find-links=$(MAKESTER__WHEEL) $(MAKESTER__PIP_INSTALL)
+
+MAKESTER__PIP_INSTALL_EXTRAS ?= dev
+py-install-extras: MAKESTER__PIP_INSTALL := -e .[$(MAKESTER__PIP_INSTALL_EXTRAS)]
+py-install-extras: py-install
 
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
 py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
@@ -44,7 +44,9 @@ py-install-makester: MAKESTER__VERSION_FILE := makester/src/makester/VERSION
 py-install-makester: MAKESTER__PROJECT_NAME := makester
 py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
 py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
-py-install-makester: py-venv-clear py-venv-init py-install
+py-install-makester: py-install
+
+MAKESTER__PYTHON_PROJECT_ROOT ?= $(MAKESTER__PROJECT_DIR)/src/$(MAKESTER__PACKAGE_NAME)
 
 py-project-create: makester-gitignore makester-mit-license
 	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))

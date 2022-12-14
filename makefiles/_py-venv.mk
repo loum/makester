@@ -35,7 +35,7 @@ init-env: _init-env-warn py-venv-init
 _init-env-warn:
 	$(call deprecated,init-env,0.3.0,py-venv-init)
 
-py-venv-init: wheel-dir py-venv-create py-venv-install
+py-venv-init: wheel-dir py-venv-create
 
 MAKESTER__VENV_HOME ?= $(MAKESTER__PROJECT_DIR)/venv
 py-venv-create:
@@ -49,10 +49,6 @@ else
 	$(warn ### Virtual environment not created)
 endif
 
-py-venv-install:
-	$(info ### Installing project packages into $(MAKESTER__VENV_HOME) ...)
-	$(MAKESTER__PIP) install --find-links=$(MAKESTER__WHEEL) $(MAKESTER__PIP_INSTALL)
-
 wheel-dir:
 	$(info ### Creating Wheel directory "$(MAKESTER__WHEEL)"...)
 	$(shell which mkdir) -pv $(MAKESTER__WHEEL)
@@ -62,13 +58,13 @@ wheel: wheel-dir
 	$(MAKESTER__PIP) wheel --wheel-dir $(MAKESTER__WHEEL) --find-links=$(MAKESTER__WHEEL) $(MAKESTER__PIP_INSTALL)
 
 PIP_REQUIREMENTS := $(shell [ -f ./requirements.txt ] && echo --requirement requirements.txt)
-pip-requirements: MAKESTER__PIP_INSTALL = $(PIP_REQUIREMENTS)
+pip-requirements: MAKESTER__PIP_INSTALL := $(PIP_REQUIREMENTS)
 pip-requirements: py-venv-init
 
-makester-requirements: MAKESTER__PIP_INSTALL = --requirement makester/requirements.txt
+makester-requirements: MAKESTER__PIP_INSTALL := --requirement makester/requirements.txt
 makester-requirements: py-venv-init
 
-pip-editable: MAKESTER__PIP_INSTALL = -e .
+pip-editable: MAKESTER__PIP_INSTALL := -e .
 pip-editable: py-venv-init
 
 SETUP_PY := $(MAKESTER__PROJECT_DIR)/setup.py

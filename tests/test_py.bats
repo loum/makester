@@ -144,6 +144,20 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
+@test "MAKESTER__PIP_INSTALL_EXTRAS default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PIP_INSTALL_EXTRAS
+    assert_output --regexp 'MAKESTER__PIP_INSTALL_EXTRAS=dev'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
+@test "MAKESTER__PIP_INSTALL_EXTRAS override" {
+    MAKESTER__PIP_INSTALL_EXTRAS=test\
+ run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PIP_INSTALL_EXTRAS
+    assert_output --regexp 'MAKESTER__PIP_INSTALL_EXTRAS=test'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=target,py-vars
@@ -153,14 +167,14 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=target,py-install
+# bats test_tags=target,py-install,dry-run
 @test "Python package install: dry" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-install --dry-run
     assert_output --regexp '### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e .'
     [ "$status" -eq 0 ]
 }
-# bats test_tags=target,py-install
+# bats test_tags=target,py-install,dry-run
 @test "Python package install MAKESTER__WHEEL override: dry" {
     MAKESTER__WHEEL=.wheelhouse\
  run make -f makefiles/makester.mk -f makefiles/py.mk py-install --dry-run
@@ -169,38 +183,44 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=target,py-install-makester
+# bats test_tags=target,py-install-extras,dry-run
+@test "Python package extras install: dry" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk py-install-extras --dry-run
+    assert_output --regexp '### Installing project dependencies into .*/venv ...
+.*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[dev\]'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-install-extras,dry-run
+@test "Python package extras install +MAKESTER__PIP_INSTALL_EXTRAS override: dry" {
+    MAKESTER__PIP_INSTALL_EXTRAS=test\
+ run make -f makefiles/makester.mk -f makefiles/py.mk py-install-extras --dry-run
+    assert_output --regexp '### Installing project dependencies into .*/venv ...
+.*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[test\]'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-install-makester,dry-run
 @test "Python package install MAKESTER__PIP_INSTALL override: dry" {
     _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk -f makefiles/py.mk py-install-makester --dry-run
-    assert_output --regexp '### Deleting virtual environment .*/venv ...
-.*/rm -fr .*/venv
-### Creating Wheel directory "~/wheelhouse"...
-.*/mkdir -pv ~/wheelhouse
-### Creating virtual environment .*/venv ...
-### Preparing pip and setuptools ...
-.*/python3 -m venv .*/venv
-.*/venv/bin/pip install --upgrade pip setuptools wheel
-### Installing project packages into .*/venv ...
-.*/venv/bin/pip install --find-links=~/wheelhouse -e makester
-### Installing project dependencies into .*/venv ...
+    assert_output --regexp '### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e makester'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=target,py-pylintrc
+# bats test_tags=target,py-pylintrc,dry-run
 @test "Python pylint configuration generator: dry" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
     assert_output --regexp 'pylint --generate-rcfile > /.*/pylintrc'
     [ "$status" -eq 0 ]
 }
-# bats test_tags=target,py-pylintrc
+# bats test_tags=target,py-pylintrc,dry-run
 @test "Python pylint configuration generator MAKESTER__PYLINT_RCFILE override: dry" {
     MAKESTER__PYLINT_RCFILE=pylintrc run make -f makefiles/makester.mk -f makefiles/py.mk py-pylintrc --dry-run
     assert_output --regexp 'pylint --generate-rcfile > pylintrc'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=target,py-project-create
+# bats test_tags=target,py-project-create,dry-run
 @test "Python project scaffolding: dry" {
     MAKESTER__RESOURCES_DIR=resources MAKESTER__PROJECT_DIR=/var/tmp/fruit MAKESTER__PACKAGE_NAME=banana\
  run make -f makefiles/makester.mk -f makefiles/py.mk py-project-create --dry-run
