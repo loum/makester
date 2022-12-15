@@ -21,7 +21,7 @@ CMD ?= /h
 _gitversion-cmd: makester-work-dir
 	@$(MAKESTER__DOCKER) run --rm\
  -v "$(MAKESTER__GIT_DIR):/$(MAKESTER__PROJECT_NAME)"\
- gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning
+ gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning 2>/dev/null
 
 gitversion: _gitversion-cmd _dump_versioning
 
@@ -38,22 +38,30 @@ _gitversion-version _gitversion-versions: _gitversion-cmd
 
 _gitversion-versions-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-versions-rm:
-	-@$(info ### removing $(MAKESTER__WORK_DIR)/versioning $(shell rm $(MAKESTER__WORK_DIR)/versioning))
-
-MAKESTER__VERSION_FILE ?= $(MAKESTER__WORK_DIR)/VERSION
+	$(info ### Removing $(MAKESTER__WORK_DIR)/versioning)
+	$(shell rm $(MAKESTER__WORK_DIR)/versioning 2>/dev/null)
 
 # Symbol to be deprecated in Makester 0.3.0
 release-version: _release-version-warn gitversion-release
 _release-version-warn:
 	$(call deprecated,release-version,0.3.0,gitversion-release)
 
-gitversion-release: _gitversion-versions
+MAKESTER__VERSION_FILE ?= $(MAKESTER__WORK_DIR)/VERSION
+
+_GITVERSION_FILTER := sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"'
+
+_gitversion-release-msg:
 	$(info ### Filtering GitVersion variable: $(MAKESTER__GITVERSION_VARIABLE))
-	$(shell sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"' > $(MAKESTER__VERSION_FILE))
-	$(info ### MAKESTER__RELEASE_VERSION: $(shell cat $(MAKESTER__VERSION_FILE)))
+
+gitversion-release: _gitversion-release-msg _gitversion-versions-rm _gitversion-versions
+	$(info ### MAKESTER__RELEASE_VERSION: $(shell $(_GITVERSION_FILTER) | tee $(MAKESTER__VERSION_FILE)))
+
+gitversion-release-ro: _gitversion-release-msg _gitversion-versions-rm _gitversion-versions
+	$(info ### MAKESTER__RELEASE_VERSION: $(shell $(_GITVERSION_FILTER)))
 
 _gitversion-release-rm:
-	-@$(info ### removing $(MAKESTER__VERSION_FILE) $(shell rm $(MAKESTER__VERSION_FILE)))
+	$(info ### Removing $(MAKESTER__VERSION_FILE))
+	$(shell rm $(MAKESTER__VERSION_FILE) 2>/dev/null))
 
 gitversion-clear: _gitversion-release-rm _gitversion-versions-rm
 

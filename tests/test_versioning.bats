@@ -113,16 +113,41 @@ include makester/makefiles/docker.mk'
 @test "Makester sample/GitVersion.yml release version" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release
-    assert_output --regexp '### Filtering GitVersion variable: AssemblySemFileVer
-### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9a-z]+'
+    assert_output --regexp "### Filtering GitVersion variable: AssemblySemFileVer
+### Removing $MAKESTER__WORK_DIR/versioning
+### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
+### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release
 @test "Makester sample/GitVersion.yml release version with overridden version variable" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release
-    assert_output --regexp '### Filtering GitVersion variable: ShortSha
-### MAKESTER__RELEASE_VERSION: [0-9a-z]+'
+    assert_output --regexp "### Filtering GitVersion variable: ShortSha
+### Removing $MAKESTER__WORK_DIR/versioning
+### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
+### MAKESTER__RELEASE_VERSION: [0-9a-z]{0,7}"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release-ro
+@test "Makester sample/GitVersion.yml release version read only" {
+    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
+ run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release-ro
+    assert_output --regexp "### Filtering GitVersion variable: AssemblySemFileVer
+### Removing $MAKESTER__WORK_DIR/versioning
+### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
+### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release-ro
+@test "Makester sample/GitVersion.yml release version with overridden version variable read only" {
+    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
+ run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release-ro
+    assert_output --regexp "### Filtering GitVersion variable: ShortSha
+### Removing $MAKESTER__WORK_DIR/versioning
+### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
+### MAKESTER__RELEASE_VERSION: [0-9a-z]{0,7}"
     [ "$status" -eq 0 ]
 }
 
@@ -132,8 +157,11 @@ include makester/makefiles/docker.mk'
 @test "Warning for deprecated symbol target release-version" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk release-version
-    assert_output --partial '### "release-version" will be deprecated in Makester: 0.3.0
-### Replace "release-version" with "gitversion-release"
-### Creating Makester working directory'
+    assert_output --regexp "### \"release-version\" will be deprecated in Makester: 0.3.0
+### Replace \"release-version\" with \"gitversion-release\"
+### Filtering GitVersion variable: AssemblySemFileVer
+### Removing $MAKESTER__WORK_DIR/versioning
+### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
+### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
     [ "$status" -eq 0 ]
 }
