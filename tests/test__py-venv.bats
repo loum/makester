@@ -67,17 +67,32 @@ teardown_file() {
 
 # Targets.
 #
-# bats test_tags=py-venv-create
-@test "Python virtual environmnent create" {
+# bats test_tags=target,py-venv-create,dry
+@test "Python virtual environmnent create: dry" {
     run make -f makefiles/makester.mk -f makefiles/py.mk py-venv-create --dry-run
     assert_output --regexp "### Creating virtual environment .*/venv ..."
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=py-venv-clear
-@test "Python virtual environmnent delete" {
+# bats test_tags=target,py-venv-clear,dry
+@test "Python virtual environmnent delete: dry" {
     _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk -f makefiles/py.mk py-venv-clear --dry-run
     assert_output --regexp "### Deleting virtual environment .*/venv ..."
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,pip-editable,dry
+@test "Python setup.py editable install: dry" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk pip-editable --dry-run
+    assert_output --regexp '### Installing project dependencies into /.*/venv ...
+/.*/venv/bin/pip install --find-links=~/wheelhouse -e .'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,pip-editable,dry
+@test "Python setup.py editable install MAKESTER__PIP_INSTALL override: dry" {
+    MAKESTER__PIP_INSTALL="-e .[extra]" run make -f makefiles/makester.mk -f makefiles/py.mk pip-editable --dry-run
+    assert_output --regexp '### Installing project dependencies into /.*/venv ...
+/.*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[extra\]'
     [ "$status" -eq 0 ]
 }
 
