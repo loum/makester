@@ -59,13 +59,12 @@ wheel: wheel-dir
 
 PIP_REQUIREMENTS := $(shell [ -f ./requirements.txt ] && echo --requirement requirements.txt)
 pip-requirements: MAKESTER__PIP_INSTALL := $(PIP_REQUIREMENTS)
-pip-requirements: py-venv-init
+pip-requirements: py-install
 
 makester-requirements: MAKESTER__PIP_INSTALL := --requirement makester/requirements.txt
-makester-requirements: py-venv-init
+makester-requirements: py-install
 
-pip-editable: MAKESTER__PIP_INSTALL := -e .
-pip-editable: py-venv-init
+pip-editable: py-install
 
 SETUP_PY := $(MAKESTER__PROJECT_DIR)/setup.py
 package-clean:
@@ -93,8 +92,8 @@ py-venv-repl py:
 _py-venv-help:
 	@echo "  ---\n\
   package              Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse)\n\
-  pip-editable         \"py-venv-clear\"|\"py-venv-init\" and build virtual environment deps from \"setup.py\"\n\
-  pip-requirements     \"py-venv-clear\"|\"py-venv-init\" and build virtual environment deps from \"requirements.txt\"\n\
+  pip-editable         Build virtual environment deps from \"setup.py\"\n\
+  pip-requirements     Build virtual environment deps from \"requirements.txt\"\n\
   py-venv-clear        Delete virtual environment \"$(MAKESTER__VENV_HOME)\"\n\
   py-venv-init         Build virtual environment \"$(MAKESTER__VENV_HOME)\"\n\
   py-venv-repl         Start the vitual environment Python REPL\n\
