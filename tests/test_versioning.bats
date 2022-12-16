@@ -68,22 +68,6 @@ include makester/makefiles/docker.mk'
     [ "$status" -eq 0 ]
 }
 
-# MAKESTER__GITVERSION_VERSION
-# bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
-@test "MAKESTER__GITVERSION_VERSION default should be set when calling versioning.mk" {
-    MAKESTER__DOCKER=dummy\
- run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_VERSION
-    assert_output 'MAKESTER__GITVERSION_VERSION=latest'
-    [ "$status" -eq 0 ]
-}
-# bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
-@test "MAKESTER__GITVERSION_VERSION override" {
-    MAKESTER__DOCKER=dummy MAKESTER__GITVERSION_VERSION=override\
- run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_VERSION
-    assert_output 'MAKESTER__GITVERSION_VERSION=override'
-    [ "$status" -eq 0 ]
-}
-
 # bats test_tags=variables,versioning-variables,MAKESTER__VERSION_FILE
 @test "MAKESTER__VERSION_FILE default should be set when calling versioning.mk" {
     MAKESTER__DOCKER=dummy\
@@ -99,9 +83,31 @@ include makester/makefiles/docker.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
+@test "MAKESTER__GITVERSION_VERSION when MAKESTER__ARCH is arm64" {
+    MAKESTER__DOCKER=dummy MAKESTER__ARCH=arm64\
+ run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_VERSION
+    assert_output "MAKESTER__GITVERSION_VERSION=5.11.1-ubuntu.20.04-6.0-arm64"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
+@test "MAKESTER__GITVERSION_VERSION when MAKESTER__ARCH is other than arm64" {
+    MAKESTER__DOCKER=dummy MAKESTER__ARCH=anything_else\
+ run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_VERSION
+    assert_output "MAKESTER__GITVERSION_VERSION=5.11.1-alpine.3.13-6.0"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
+@test "MAKESTER__GITVERSION_VERSION override" {
+    MAKESTER__DOCKER=dummy MAKESTER__GITVERSION_VERSION=override\
+ run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__GITVERSION_VERSION
+    assert_output 'MAKESTER__GITVERSION_VERSION=override'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
-# bats test_tags=gitversion-version
+# bats test_tags=target,gitversion-version
 @test "GitVersion version" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-version
@@ -109,7 +115,7 @@ include makester/makefiles/docker.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release
+# bats test_tags=target,gitversion-release
 @test "Makester sample/GitVersion.yml release version" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release
@@ -119,7 +125,7 @@ include makester/makefiles/docker.mk'
 ### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
     [ "$status" -eq 0 ]
 }
-# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release
+# bats test_tags=target,gitversion-release
 @test "Makester sample/GitVersion.yml release version with overridden version variable" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release
@@ -130,7 +136,7 @@ include makester/makefiles/docker.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release-ro
+# bats test_tags=target,gitversion-release-ro
 @test "Makester sample/GitVersion.yml release version read only" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release-ro
@@ -140,7 +146,7 @@ include makester/makefiles/docker.mk'
 ### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
     [ "$status" -eq 0 ]
 }
-# bats test_tags=variables,versioning-variables,MAKESTER__RELEASE_VERSION,gitversion-release-ro
+# bats test_tags=target,gitversion-release-ro
 @test "Makester sample/GitVersion.yml release version with overridden version variable read only" {
     MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml MAKESTER__GITVERSION_VARIABLE=ShortSha\
  run make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-release-ro

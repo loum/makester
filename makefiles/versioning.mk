@@ -11,7 +11,13 @@ endif
 # Defaults.
 MAKESTER__GITVERSION_CONFIG ?= makester/sample/GitVersion.yml
 MAKESTER__GITVERSION_VARIABLE ?= AssemblySemFileVer
-MAKESTER__GITVERSION_VERSION ?= latest
+ifndef MAKESTER__GITVERSION_VERSION
+  ifeq ($(MAKESTER__ARCH), arm64)
+    MAKESTER__GITVERSION_VERSION ?= 5.11.1-ubuntu.20.04-6.0-arm64
+  else 
+    MAKESTER__GITVERSION_VERSION ?= 5.11.1-alpine.3.13-6.0
+  endif
+endif
 
 _dump_versioning:
 	$(shell which cat) $(MAKESTER__WORK_DIR)/versioning

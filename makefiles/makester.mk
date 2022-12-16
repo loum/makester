@@ -135,6 +135,8 @@ define _check-exe-err
 	$(error ###)
 endef
 
+MAKESTER__ARCH ?= $(shell uname -m)
+
 ifndef MAKESTER__LOCAL_IP
   UNAME ?= $(shell uname)
   ifeq ($(UNAME), Darwin)
