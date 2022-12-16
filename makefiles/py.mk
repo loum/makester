@@ -46,8 +46,6 @@ py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
 py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
 py-install-makester: py-install
 
-MAKESTER__PYTHON_PROJECT_ROOT ?= $(MAKESTER__PROJECT_DIR)/src/$(MAKESTER__PACKAGE_NAME)
-
 py-project-create: makester-gitignore makester-mit-license
 	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))
 	@$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
