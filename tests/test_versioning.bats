@@ -68,21 +68,6 @@ include makester/makefiles/docker.mk'
     [ "$status" -eq 0 ]
 }
 
-# bats test_tags=variables,versioning-variables,MAKESTER__VERSION_FILE
-@test "MAKESTER__VERSION_FILE default should be set when calling versioning.mk" {
-    MAKESTER__DOCKER=dummy\
- run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__VERSION_FILE
-    assert_output "MAKESTER__VERSION_FILE=$MAKESTER__WORK_DIR/VERSION"
-    [ "$status" -eq 0 ]
-}
-# bats test_tags=variables,versioning-variables,MAKESTER__VERSION_FILE
-@test "MAKESTER__VERSION_FILE override" {
-    MAKESTER__DOCKER=dummy MAKESTER__VERSION_FILE=my_package/VERSION\
- run make -f makefiles/makester.mk -f makefiles/versioning.mk print-MAKESTER__VERSION_FILE
-    assert_output 'MAKESTER__VERSION_FILE=my_package/VERSION'
-    [ "$status" -eq 0 ]
-}
-
 # bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
 @test "MAKESTER__GITVERSION_VERSION when MAKESTER__ARCH is arm64" {
     MAKESTER__DOCKER=dummy MAKESTER__ARCH=arm64\

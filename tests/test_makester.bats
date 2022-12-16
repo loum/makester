@@ -68,13 +68,46 @@ teardown_file() {
 # bats test_tags=variables,makester-variables,MAKESTER__RELEASE_VERSION
 @test "MAKESTER__RELEASE_VERSION defaults to HASH" {
     run make -f makefiles/makester.mk print-MAKESTER__RELEASE_VERSION
-    assert_output 'MAKESTER__RELEASE_VERSION=<undefined>'
+    assert_output 'MAKESTER__RELEASE_VERSION=0.0.0'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__RELEASE_VERSION
+@test "MAKESTER__RELEASE_VERSION with dynamic versioning" {
+    MAKESTER__VERSION_FILE=$PWD/src/makester/VERSION\
+ run make -f makefiles/makester.mk print-MAKESTER__RELEASE_VERSION
+    assert_output --regexp '^MAKESTER__RELEASE_VERSION=[0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__RELEASE_VERSION
 @test "MAKESTER__RELEASE_VERSION override" {
     MAKESTER__RELEASE_VERSION=override run make -f makefiles/makester.mk print-MAKESTER__RELEASE_VERSION
     assert_output --regexp '^MAKESTER__RELEASE_VERSION=override$'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,makester-variables,MAKESTER__VERSION_FILE
+@test "MAKESTER__VERSION_FILE default should be set when calling versioning.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__VERSION_FILE
+    assert_output "MAKESTER__VERSION_FILE=$MAKESTER__WORK_DIR/VERSION"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__VERSION_FILE
+@test "MAKESTER__VERSION_FILE override" {
+    MAKESTER__VERSION_FILE=my_package/VERSION run make -f makefiles/makester.mk print-MAKESTER__VERSION_FILE
+    assert_output 'MAKESTER__VERSION_FILE=my_package/VERSION'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,makester-variables,MAKESTER__VERSION
+@test "MAKESTER__VERSION default should be set when calling versioning.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__VERSION
+    assert_output "MAKESTER__VERSION=0.0.0"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__VERSION
+@test "MAKESTER__VERSION override" {
+    MAKESTER__VERSION=1.2.3 run make -f makefiles/makester.mk print-MAKESTER__VERSION
+    assert_output 'MAKESTER__VERSION=1.2.3'
     [ "$status" -eq 0 ]
 }
 
@@ -128,6 +161,20 @@ teardown_file() {
 @test "MAKESTER__MAKEFILES alternate when MAKESTER__SUBMODULE_NAME directory does exist" {
     MAKESTER__SUBMODULE_NAME=makefiles run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
     assert_output "MAKESTER__MAKEFILES=makester/makefiles"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,makester-variables,MAKESTER__PYTHON_PROJECT_ROOT
+@test "MAKESTER__PYTHON_PROJECT_ROOT default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__PYTHON_PROJECT_ROOT
+    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/src/makefiles'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__PYTHON_PROJECT_ROOT
+@test "MAKESTER__PYTHON_PROJECT_ROOT override" {
+    MAKESTER__PYTHON_PROJECT_ROOT=$PWD\
+ run make -f makefiles/makester.mk print-MAKESTER__PYTHON_PROJECT_ROOT
+    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/makester'
     [ "$status" -eq 0 ]
 }
 
