@@ -10,9 +10,9 @@ include makefiles/docker.mk
 include makefiles/py.mk
 include makefiles/versioning.mk
 
-init: py-venv-clear py-venv-init py-install
+MAKESTER__VERSION_FILE := $(MAKESTER__PYTHON_PROJECT_ROOT)/VERSION
 
-gitversion-release: MAKESTER__VERSION_FILE := $(MAKESTER__PYTHON_PROJECT_ROOT)/VERSION
+init: py-venv-clear py-venv-init py-install
 
 TESTS_TO_RUN := $(if $(TESTS),$(TESTS),tests)
 tests:
