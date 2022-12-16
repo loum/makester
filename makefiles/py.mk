@@ -61,6 +61,10 @@ py-pylintrc:
 	$(info ### Generating project pylint configuration to $(MAKESTER__PYLINT_RCFILE) ...)
 	@pylint --generate-rcfile > $(MAKESTER__PYLINT_RCFILE)
 
+py-deps:
+	$(info ### Displaying "$(MAKESTER__PACKAGE_NAME)" package dependencies ...)
+	@pipdeptree
+
 # Private Makefile includes that leverage capabilities in this Makefile.
 include $(MAKESTER__MAKEFILES)/_py-venv.mk
 
@@ -76,6 +80,7 @@ py-help: _py-help _py-venv-help
 
 _py-help:
 	@echo "(makefiles/py.mk)\n\
+  py-dep           	   Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
   py-install           Install Python project package dependencies\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\

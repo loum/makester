@@ -236,3 +236,11 @@ include makester/makefiles/makester.mk'
 /.*/cp resources/pyproject.toml /var/tmp/fruit'
     [ "$status" -eq 0 ]
 }
+
+# bats test_tags=target,py-deps,dry-run
+@test "Python project package dependency dump" {
+    run make -f makefiles/makester.mk -f makefiles/py.mk py-deps --dry-run
+    assert_output '### Displaying "makefiles" package dependencies ...
+pipdeptree'
+    [ "$status" -eq 0 ]
+}

@@ -260,6 +260,11 @@ make package
 ```
 make py
 ```
+##### Show Python Package Dependencies
+Leverage the awesome [pipdeptree](https://pypi.org/project/pipdeptree/) tool.
+```
+make py-deps
+```
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
