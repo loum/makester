@@ -260,6 +260,11 @@ make package
 ```
 make py
 ```
+##### Show Python Package Dependencies
+Leverage the awesome [pipdeptree](https://pypi.org/project/pipdeptree/) tool.
+```
+make py-deps
+```
 ### `makefiles/compose.mk`
 To use add `include makester/makefiles/compose.mk` to your `Makefile`.
 
@@ -466,6 +471,10 @@ If version currency is important for a particular function then you can chain th
 make gitversion-release
 ```
 ... and check the contents of `$MAKESTER__VERSION_FILE/VERSION` (defaults to `$PWD/.makester/VERSION`).
+
+##### `make gitversion-release-ro`
+A read-only variant of `gitversion-release` that will not clobber version content in `MAKESTER__VERSION_FILE`.
+
 ##### `make gitversion-clear`
 Clear the temporary GitVersion files from `$MAKESTER__WORK_DIR`
 
