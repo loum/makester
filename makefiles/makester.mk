@@ -13,14 +13,7 @@ ifndef MAKESTER__VERBOSE
 endif
 
 MAKESTER__SUBMODULE_NAME ?= makester
-_MAKESTER__SUBMODULE_EXISTS := $(shell [ -e "$(MAKESTER__SUBMODULE_NAME)" ] && echo 1 || echo 0)
-ifndef MAKESTER__MAKEFILES
-  ifeq ($(_MAKESTER__SUBMODULE_EXISTS), 1)
-    MAKESTER__MAKEFILES := makester/makefiles
-  else
-    MAKESTER__MAKEFILES := makefiles
-  endif
-endif
+MAKESTER__MAKEFILES ?= $(if $(wildcard $(MAKESTER__SUBMODULE_NAME)),makester/makefiles,makefiles)
 
 # Add PyPI bin to the end of PATH to ensure system Python is found first.
 export PATH := $(shell echo $$PATH:$(PWD)/venv/bin)
@@ -124,13 +117,14 @@ endef
 #
 # Params:
 #   1. Executable name to test.
-#   2. (optional) install tip or message to print.
-check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)))))
-_check-exe = $(if $(shell PATH=$(PATH); which $1),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2)))
+#   2. Install tip or message to print.
+#   3. (optional) Add "warn/option" symbol to not exit. Symbol can be anything.
+check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)),$(strip $(value 3)))))
+_check-exe = $(if $(shell PATH=$(PATH); which $1),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2),$(if $3,$3)))
 define _check-exe-err
-	$(info ### "$1" not found)
-	$(info ### $(if $2,Install notes: $2))
-	$(error ###)
+	$(if $3,,$(info ### "$1" not found))
+	$(if $3,,$(info ### Install notes: $2))
+	$(if $3,,$(error ###))
 endef
 
 MAKESTER__ARCH ?= $(shell uname -m)
@@ -148,8 +142,13 @@ endif
 # Default fall-back to static versioning via MAKESTER.
 #
 _version_val = $(if $(wildcard $(MAKESTER__VERSION_FILE)),$(shell cat $(MAKESTER__VERSION_FILE)),$(MAKESTER__VERSION))
-
 MAKESTER__RELEASE_VERSION ?= $(call _version_val)
+
+# Makester includes happen here.
+_makefiles := py docker compose k8s kompose versioning docs
+_includes = $(foreach _m,$(_makefiles),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
+include $(call _includes)
+
 vars:
 	@echo "\n\
   HASH:                              $(HASH)\n\
@@ -168,15 +167,16 @@ vars:
   MAKESTER__SERVICE_NAME:            $(MAKESTER__SERVICE_NAME)\n\
   MAKESTER__VERSION_FILE:            $(MAKESTER__VERSION_FILE)\n"
 
-makester-help:
-	@echo "\n\
+makester-help: _makester-help py-help docker-help compose-help k8s-help kompose-help versioning-help docs-help
+_makester-help:
+	@echo "\
 --------------------------------------------------------------------------------------------\n\
 Targets\n\
 --------------------------------------------------------------------------------------------\n"
-	@echo "(makefiles/makester.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/makester.mk)\n\
   clean                Remove all files not tracked by Git\n\
   makester-gitignore   Adding a sane .gitignore to \"$(MAKESTER__PROJECT_DIR)\"\n\
-  makester-mit-license Remove all files not tracked by Git\n\
+  makester-mit-license Add an MIT license to \"$(MAKESTER__PROJECT_DIR)\"\n\
   print-<var>          Display the Makefile global variable '<var>' value\n\
   submodule-update     Update your existing Git submodules\n\
   vars                 Display all Makester global variable values\n"

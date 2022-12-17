@@ -158,7 +158,7 @@ else
 endif
 
 docker-help:
-	@echo "(makefiles/docker.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/docker.mk)\n\
   container-bash       Bash on container $(MAKESTER__CONTAINER_NAME) as \"USER\"\n\
   container-logs       Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
   container-root       Shell on container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\

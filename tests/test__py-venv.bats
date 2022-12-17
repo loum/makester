@@ -20,13 +20,13 @@ teardown_file() {
 # MAKESTER__PIP
 # bats test_tags=variables,_py-venv-variables,MAKESTER__PIP
 @test "MAKESTER__PIP default should be set when calling py.mk" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PIP
+    run make -f makefiles/makester.mk print-MAKESTER__PIP
     assert_output --regexp 'MAKESTER__PIP=.*/venv/bin/pip'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,_py-venv-variables,MAKESTER__PIP
 @test "MAKESTER__PIP override" {
-    MAKESTER__PIP=dummy/bin/pip run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PIP
+    MAKESTER__PIP=dummy/bin/pip run make -f makefiles/makester.mk print-MAKESTER__PIP
     assert_output 'MAKESTER__PIP=dummy/bin/pip'
     [ "$status" -eq 0 ]
 }
@@ -34,13 +34,13 @@ teardown_file() {
 # MAKESTER__PYTHON
 # bats test_tags=variables,_py-venv-variables,MAKESTER__PYTHON
 @test "MAKESTER__PYTHON default should be set when calling py.mk" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYTHON
+    run make -f makefiles/makester.mk print-MAKESTER__PYTHON
     assert_output --regexp 'MAKESTER__PYTHON=.*/venv/bin/python'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,_py-venv-variables,MAKESTER__PYTHON
 @test "MAKESTER__PYTHON override" {
-    MAKESTER__PYTHON=dummy/bin/python run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__PYTHON
+    MAKESTER__PYTHON=dummy/bin/python run make -f makefiles/makester.mk print-MAKESTER__PYTHON
     assert_output 'MAKESTER__PYTHON=dummy/bin/python'
     [ "$status" -eq 0 ]
 }
@@ -48,19 +48,19 @@ teardown_file() {
 # MAKESTER__VENV_HOME
 # bats test_tags=variables,_py-venv-variables,MAKESTER__VENV_HOME
 @test "MAKESTER__VENV_HOME default should be set when calling py.mk" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__VENV_HOME
+    run make -f makefiles/makester.mk print-MAKESTER__VENV_HOME
     assert_output --regexp 'MAKESTER__VENV_HOME=.*/venv'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,_py-venv-variables,MAKESTER__VENV_HOME
 @test "MAKESTER__VENV_HOME override" {
-    MAKESTER__VENV_HOME=/tmp/dummy/venv run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__VENV_HOME
+    MAKESTER__VENV_HOME=/tmp/dummy/venv run make -f makefiles/makester.mk print-MAKESTER__VENV_HOME
     assert_output 'MAKESTER__VENV_HOME=/tmp/dummy/venv'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,_py-venv-variables,MAKESTER__VENV_HOME
 @test "MAKESTER__VENV_HOME with MAKESTER__PROJECT_DIR override" {
-    MAKESTER__PROJECT_DIR=/tmp/dummy run make -f makefiles/makester.mk -f makefiles/py.mk print-MAKESTER__VENV_HOME
+    MAKESTER__PROJECT_DIR=/tmp/dummy run make -f makefiles/makester.mk print-MAKESTER__VENV_HOME
     assert_output 'MAKESTER__VENV_HOME=/tmp/dummy/venv'
     [ "$status" -eq 0 ]
 }
@@ -69,28 +69,28 @@ teardown_file() {
 #
 # bats test_tags=target,py-venv-create,dry
 @test "Python virtual environmnent create: dry" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk py-venv-create --dry-run
+    run make -f makefiles/makester.mk py-venv-create --dry-run
     assert_output --regexp "### Creating virtual environment .*/venv ..."
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=target,py-venv-clear,dry
 @test "Python virtual environmnent delete: dry" {
-    _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk -f makefiles/py.mk py-venv-clear --dry-run
+    _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk py-venv-clear --dry-run
     assert_output --regexp "### Deleting virtual environment .*/venv ..."
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=target,pip-editable,dry
 @test "Python setup.py editable install: dry" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk pip-editable --dry-run
+    run make -f makefiles/makester.mk pip-editable --dry-run
     assert_output --regexp '### Installing project dependencies into /.*/venv ...
 /.*/venv/bin/pip install --find-links=~/wheelhouse -e .'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=target,pip-editable,dry
 @test "Python setup.py editable install MAKESTER__PIP_INSTALL override: dry" {
-    MAKESTER__PIP_INSTALL="-e .[extra]" run make -f makefiles/makester.mk -f makefiles/py.mk pip-editable --dry-run
+    MAKESTER__PIP_INSTALL="-e .[extra]" run make -f makefiles/makester.mk pip-editable --dry-run
     assert_output --regexp '### Installing project dependencies into /.*/venv ...
 /.*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[extra\]'
     [ "$status" -eq 0 ]
@@ -100,7 +100,7 @@ teardown_file() {
 #
 # bats test_tags=deprecated
 @test "Warning for deprecated symbol target py-versions" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk py-versions
+    run make -f makefiles/makester.mk py-versions
     assert_output --partial '### "py-versions" will be deprecated in Makester: 0.3.0
 ### Replace "py-versions" with "py-venv-vars"'
     [ "$status" -eq 0 ]
@@ -108,7 +108,7 @@ teardown_file() {
 
 # bats test_tags=deprecated
 @test "Warning for deprecated symbol target clear-env" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk clear-env --dry-run
+    run make -f makefiles/makester.mk clear-env --dry-run
     assert_output --partial '### "clear-env" will be deprecated in Makester: 0.3.0
 ### Replace "clear-env" with "py-venv-clear"'
     [ "$status" -eq 0 ]
@@ -116,7 +116,7 @@ teardown_file() {
 
 # bats test_tags=deprecated
 @test "Warning for deprecated symbol target init-env" {
-    run make -f makefiles/makester.mk -f makefiles/py.mk init-env --dry-run
+    run make -f makefiles/makester.mk init-env --dry-run
     assert_output --partial '### "init-env" will be deprecated in Makester: 0.3.0
 ### Replace "init-env" with "py-venv-init"'
     [ "$status" -eq 0 ]
