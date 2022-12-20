@@ -8,15 +8,30 @@ $(info include makester/makefiles/makester.mk)
 $(error ### missing include dependency)
 endif
 
-MINIKUBE := $(shell which minikube)
-MAKESTER__KUBECTL ?= $(call check-exe,kubectl,https://kubernetes.io/docs/tasks/tools/)
+# Defaults that can be overridden.
+MAKESTER__MINIKUBE_EXE_NAME ?= minikube
+MAKESTER__MINIKUBE_EXE_INSTALL ?= https://kubernetes.io/docs/tasks/tools/\#minikube
+MAKESTER__KUBECTL_EXE_NAME ?= kubectl
+MAKESTER__KUBECTL_EXE_INSTALL ?= https://kubernetes.io/docs/tasks/tools/
+
+MAKESTER__MINIKUBE := $(call check-exe,$(MAKESTER__MINIKUBE_EXE_NAME),$(MAKESTER__MINIKUBE_EXE_INSTALL),optional)
+MAKESTER__KUBECTL := $(call check-exe,$(MAKESTER__KUBECTL_EXE_NAME),$(MAKESTER__KUBECTL_EXE_INSTALL),optional)
 
 minikube-cmd:
-	$(MINIKUBE) $(MK_CMD) || true
+	$(if $(MAKESTER__MINIKUBE),,$(call _minikube-cmd-err))
+	$(MAKESTER__MINIKUBE) $(MK_CMD) || true
 
+define _minikube-cmd-err
+	$(info ### MAKESTER__MINIKUBE: <undefined>)
+	$(info ### MAKESTER__MINIKUBE_EXE_NAME set as "$(MAKESTER__MINIKUBE_EXE_NAME)")
+	$(call check-exe,$(MAKESTER__MINIKUBE_EXE_NAME),$(MAKESTER__MINIKUBE_EXE_INSTALL))
+endef
+
+ifdef MAKESTER__MINIKUBE
 .makester/mk-docker-env.mk: Makefile
 	-@$(shell which mkdir) -p .makester
-	@$(MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
+	@$(MAKESTER__MINIKUBE) docker-env | grep '=' | cut -d' ' -f 2 > $@
+endif
 
 -include .makester/mk-docker-env.mk
 MK_DOCKER_ENV_VARS = $(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' .makester/mk-docker-env.mk)
@@ -36,7 +51,14 @@ mk-service: MK_CMD = service $(MAKESTER__PROJECT_NAME) --url
 mk-status mk-start mk-dashboard mk-stop mk-del mk-service: minikube-cmd
 
 kubectl-cmd:
+	$(if $(MAKESTER__KUBECTL),,$(call _kubectl-cmd-err))
 	-@$(MAKESTER__KUBECTL) $(KCTL_CMD) || true
+
+define _kubectl-cmd-err
+	$(info ### MAKESTER__KUBECTL: <undefined>)
+	$(info ### MAKESTER__KUBECTL_EXE_NAME set as "$(MAKESTER__KUBECTL_EXE_NAME)")
+	$(call check-exe,$(MAKESTER__KUBECTL_EXE_NAME),$(MAKESTER__KUBECTL_EXE_INSTALL))
+endef
 
 MAKESTER__K8_MANIFESTS := $(if $(MAKESTER__K8_MANIFESTS),$(MAKESTER__K8_MANIFESTS),./k8s/manifests)
 MAKESTER__KUBECTL_CONTEXT := $(if $(MAKESTER__KUBECTL_CONTEXT),$(MAKESTER__KUBECTL_CONTEXT),minikube)

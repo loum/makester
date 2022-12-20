@@ -78,7 +78,7 @@ py-help: _py-help _py-venv-help
 
 _py-help:
 	@echo "(makefiles/py.mk)\n\
-  py-dep           	   Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
+  py-dep               Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
   py-install           Install Python project package dependencies\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\

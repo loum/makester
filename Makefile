@@ -5,10 +5,6 @@ MAKESTER__PROJECT_NAME := makester
 MAKESTER__GITVERSION_CONFIG := sample/GitVersion.yml
 
 include makefiles/makester.mk
-include makefiles/docs.mk
-include makefiles/docker.mk
-include makefiles/py.mk
-include makefiles/versioning.mk
 
 MAKESTER__VERSION_FILE := $(MAKESTER__PYTHON_PROJECT_ROOT)/VERSION
 
@@ -20,7 +16,7 @@ tests:
 
 MAKESTER__RESOURCES_DIR := $(MAKESTER__PROJECT_DIR)/resources
 
-help: makester-help docs-help docker-help versioning-help py-help
+help: makester-help
 	@echo "(simple/Makefile)\n\
   init                 Build Makester environment\n\
   tests                Run code test suite\n"

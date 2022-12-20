@@ -3,6 +3,22 @@ site_url: https://loum.github.io/makester/
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Makefiles:
+    - Makester: makefiles/makester.md
+    - Python: makefiles/py.md
+    - Docker: makefiles/docker.md
+    - Docker Compose: makefiles/compose.md
+    - Versioning: makefiles/versioning.md
+    - Documentation: makefiles/docs.md
+    - Kubernetes:
+      - Minikube: makefiles/k8s/k8s.md
+      - Kompose: makefiles/k8s/kompose.md
+  - Extras for macOS: macos.md 
+  - Utilities: utilities.md
+  - Recipes: recipes.md
+  - FAQs: faqs.md
+markdown_extensions:
+  - admonition
 theme:
   name: material
   palette:
@@ -17,3 +33,6 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  features:
+    - navigation.tabs
+    - header.autohide
