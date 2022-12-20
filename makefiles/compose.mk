@@ -2,9 +2,9 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := compose-help
 endif
 
-ifndef MAKESTER__DOCKER
+ifndef MAKESTER__PRIMED
 $(info ### Add the following include statement to your Makefile)
-$(info include makester/makefiles/docker.mk)
+$(info include makester/makefiles/makester.mk)
 $(error ### missing include dependency)
 endif
 

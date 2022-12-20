@@ -2,9 +2,9 @@ ifndef .DEFAULT_GOAL
 .DEFAULT_GOAL := versioning-help
 endif
 
-ifndef MAKESTER__DOCKER
+ifndef MAKESTER__PRIMED
 $(info ### Add the following include statement to your Makefile)
-$(info include makester/makefiles/docker.mk)
+$(info include makester/makefiles/makester.mk)
 $(error ### missing include dependency)
 endif
 
@@ -67,7 +67,7 @@ gitversion-release-ro: _gitversion-release-msg _gitversion-versions-rm _gitversi
 
 _gitversion-release-rm:
 	$(info ### Removing $(MAKESTER__VERSION_FILE))
-	$(shell rm $(MAKESTER__VERSION_FILE) 2>/dev/null))
+	$(shell rm $(MAKESTER__VERSION_FILE) 2>/dev/null)
 
 gitversion-clear: _gitversion-release-rm _gitversion-versions-rm
 
@@ -75,7 +75,9 @@ versioning-help:
 	@echo "(makefiles/versioning.mk)\n\
   gitversion           GitVersion usage message\n\
   gitversion-clear     Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\"\n\
-  gitversion-release   Filtered GitVersion variables against \"$(MAKESTER__GITVERSION_VARIABLE)\"\n\
+  gitversion-release   GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\" to $(MAKESTER__VERSION_FILE)\n\
+  gitversion-release-ro\n\
+                       Read-only dump of GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\"\n\
   gitversion-version   The actual GitVersion version\n"
 
 .PHONY: versioning-help
