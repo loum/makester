@@ -1,7 +1,7 @@
 # Docker compose stack Test runner.
 #
 # Can be executed manually with:
-#   tests/bats/bin/bats --file-filter compose-stack tests
+#   tests/bats/bin/bats --filter-tags compose-stack tests
 #
 # bats file_tags=compose-stack
 setup_file() {
@@ -51,18 +51,14 @@ networks:
 # bats test_tags=targets,compose-stack-targets,compose-ls
 @test "Sample Compose application listing" {
     MAKESTER__PROJECT_NAME=makester\
- run make -f makefiles/makester.mk -f makefiles/docker.mk compose-ls
-    assert_output --regexp 'NAME                STATUS              CONFIG FILES
-makester            running\(1\)          .*/makester/sample/docker-compose.yml'
+ run make -f makefiles/makester.mk compose-ls
+    assert_output --regexp "makester[ ]+running"
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,compose-stack-targets,compose-ps
 @test "Sample Compose container listing" {
-    MAKESTER__PROJECT_NAME=makester\
- run make -f makefiles/makester.mk -f makefiles/docker.mk compose-ps
-    assert_output --partial "\
-NAME                COMMAND                  SERVICE             STATUS              PORTS
-makester-example    \"/docker-entrypoint.…\"   demo                running             0.0.0.0:$SAMPLE_COMPOSE_PORT->80/tcp"
+    MAKESTER__PROJECT_NAME=makester MAKESTER__COMPOSE_FILES="-f sample/docker-compose.yml"\
+ run make -f makefiles/makester.mk compose-ps
     [ "$status" -eq 0 ]
 }

@@ -72,7 +72,7 @@ kube-context kube-context-use kube-apply kube-del kube-get: kubectl-cmd
 kube-apply kube-del: mkdir-k8s-manifests
 
 k8s-help:
-	@echo "(makefiles/k8s.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/k8s.mk)\n\
   kube-apply           Create resource(s) in all manifest files in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
   kube-context         Get all Kubernetes cluster contexts\n\
   kube-context-set     Change Kubernetes cluster context by setting \"MAKESTER__KUBECTL_CONTEXT\" defaults \"minikube\"\n\

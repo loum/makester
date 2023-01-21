@@ -1,7 +1,7 @@
 # Docker compose Test runner.
 #
 # Can be executed manually with:
-#   tests/bats/bin/bats --file-filter compose tests
+#   tests/bats/bin/bats --filter-tags compose tests
 #
 # bats file_tags=compose
 setup() {
@@ -55,7 +55,7 @@ SERVICE_NAME=makester HASH=[0-9a-z]{7} docker compose --project-name makester -f
 
 # Targets.
 # bats test_tags=targets,compose-targets,compose-version
-@test "Default Docker image tag: dry" {
+@test "Compose version" {
     MAKESTER__PROJECT_NAME=makester run make -f makefiles/makester.mk compose-version
     assert_output --regexp '^Docker Compose version [v]{0,1}[0-9]{1}\.[0-9]{1,2}\.[0-9]{1,3}'
     [ "$status" -eq 0 ]

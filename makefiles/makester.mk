@@ -120,7 +120,7 @@ endef
 #   2. Install tip or message to print.
 #   3. (optional) Add "warn/option" symbol to not exit. Symbol can be anything.
 check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)),$(strip $(value 3)))))
-_check-exe = $(if $(shell PATH=$(PATH); which $1),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2),$(if $3,$3)))
+_check-exe = $(if $(shell PATH=$(PATH); which $1 2>/dev/null),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2),$(if $3,$3)))
 define _check-exe-err
 	$(if $3,,$(info ### "$1" not found))
 	$(if $3,,$(info ### Install notes: $2))

@@ -1,5 +1,6 @@
 site_name: Makester
 site_url: https://loum.github.io/makester/
+
 nav:
   - Home: index.md
   - Getting started: getting-started.md
@@ -17,8 +18,16 @@ nav:
   - Utilities: utilities.md
   - Recipes: recipes.md
   - FAQs: faqs.md
+
 markdown_extensions:
   - admonition
+  - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
 theme:
   name: material
   palette:
@@ -36,3 +45,4 @@ theme:
   features:
     - navigation.tabs
     - header.autohide
+    - content.code.copy
