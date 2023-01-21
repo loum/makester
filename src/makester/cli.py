@@ -4,21 +4,12 @@
 import argparse
 import telnetlib
 import json
-import logging
 
+from logga import log, suppress_logging
 import backoff
+
 import makester
 import makester.templater
-
-LOG = logging.getLogger("makester")
-if not LOG.handlers:
-    LOG.propagate = 0
-    CONSOLE = logging.StreamHandler()
-    LOG.addHandler(CONSOLE)
-    FORMATTER = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s: %(message)s")
-    CONSOLE.setFormatter(FORMATTER)
-
-LOG.setLevel(logging.INFO)
 
 DESCRIPTION = """Makester CLI tool"""
 
@@ -37,9 +28,6 @@ def main():
 
     # Add sub-command support.
     subparsers = parser.add_subparsers()
-
-    # 'primer' subcommand.
-    primer_parser = subparsers.add_parser("primer", help="Python project primer")
 
     # 'templater' subcommand.
     templater_parser = subparsers.add_parser("templater", help="Document templater")
@@ -87,7 +75,7 @@ def main():
     try:
         func = args.func
         if args.quiet:
-            logging.disable(logging.ERROR)
+            suppress_logging()
     except AttributeError:
         parser.print_help()
         parser.exit()
@@ -102,7 +90,7 @@ def render_template(args):
     else:
         mappings.update(makester.templater.get_environment_values(token=(args.filter)))
 
-    LOG.info("Template mapping values sourced:\n%s", json.dumps(mappings, indent=2))
+    log.info("Template mapping values sourced:\n%s", json.dumps(mappings, indent=2))
 
     makester.templater.build_from_template(
         mappings, args.template, write_output=args.write
@@ -121,9 +109,9 @@ def port_backoff(args):
     if args.detail is not None:
         msg += f" {args.detail}"
 
-    LOG.info("%s ...", msg)
+    log.info("%s ...", msg)
 
     with telnetlib.Telnet(args.host, int(args.port)) as _tn:
         _tn.set_debuglevel(5)
         _tn.read_until(b" ", 1)
-        LOG.info("Port %s ready", args.port)
+        log.info("Port %s ready", args.port)

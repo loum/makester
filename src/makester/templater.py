@@ -3,22 +3,12 @@
 """
 from typing import Text
 import json
-import logging
 import os
 import shutil
 import tempfile
 
+from logga import log
 import jinja2
-
-LOG = logging.getLogger("templater")
-if not LOG.handlers:
-    LOG.propagate = 0
-    CONSOLE = logging.StreamHandler()
-    LOG.addHandler(CONSOLE)
-    FORMATTER = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s: %(message)s")
-    CONSOLE.setFormatter(FORMATTER)
-
-LOG.setLevel(logging.INFO)
 
 DESCRIPTION = """Set Interpreter values dynamically"""
 
@@ -32,9 +22,9 @@ def get_environment_values(token: Text = None) -> dict:
 
     """
     if not token:
-        LOG.info("Filtering disabled.  All environment variables will be mapped")
+        log.info("Filtering disabled. All environment variables will be mapped")
     else:
-        LOG.info('Filtering environment variables starting with token "%s"', token)
+        log.info('Filtering environment variables starting with token "%s"', token)
 
     env_variables = {}
     for env_variable in os.environ:
@@ -49,14 +39,14 @@ def get_json_values(path_to_json) -> dict:
     Parse JSON file *path_to_json* into a Python dictionary.
 
     """
-    LOG.info('Sourcing JSON values from "%s"', path_to_json)
+    log.info('Sourcing JSON values from "%s"', path_to_json)
 
     json_mapping = {}
     if os.path.exists(path_to_json):
         with open(path_to_json, encoding="utf-8") as _fp:
             json_mapping.update(json.load(_fp))
     else:
-        LOG.error('Path to JSON "%s" does not exist', path_to_json)
+        log.error('Path to JSON "%s" does not exist', path_to_json)
 
     return json_mapping
 
@@ -93,7 +83,7 @@ def build_from_template(env_map, template_file_path, write_output=False):
         return os.getenv(key, value)
 
     target_template_file_path = os.path.splitext(template_file_path)
-    LOG.info('Generating templated file for "%s"', template_file_path)
+    log.info('Generating templated file for "%s"', template_file_path)
 
     if len(target_template_file_path) > 1 and target_template_file_path[1] == ".j2":
         file_loader = jinja2.FileSystemLoader(os.path.dirname(template_file_path))
@@ -110,8 +100,8 @@ def build_from_template(env_map, template_file_path, write_output=False):
                 out_fh.write(output.encode())
                 out_fh.flush()
                 shutil.copy(out_fh.name, target_template_file_path[0])
-                LOG.info('Templated file "%s" generated', target_template_file_path[0])
+                log.info('Templated file "%s" generated', target_template_file_path[0])
     else:
-        LOG.error(
+        log.error(
             'Skipping "%s" templating as it does not end with ".j2"', template_file_path
         )
