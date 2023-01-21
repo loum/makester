@@ -9,8 +9,7 @@ import tempfile
 
 from logga import log
 import jinja2
-
-DESCRIPTION = """Set Interpreter values dynamically"""
+import typer
 
 
 def get_environment_values(token: Text = None) -> dict:

@@ -13,7 +13,7 @@ local-build-up: compose-up backoff
     @./init-script.sh
 ```
 
-## Provide Multiple `docker-compose` `up`/`down` Targets
+## Provide Multiple `docker compose` `up`/`down` Targets
 
 Override `MAKESTER__COMPOSE_FILES` Makester parameter to customise multiple build/destroy environments:
 ```
@@ -25,4 +25,4 @@ dev-compose-up: compose-up
 ```
 
 !!! note
-    Remember to provide the complimentary `docker-compose` `down` targets in your `Makefile`.
+    Remember to provide the complimentary `docker compose` `down` targets in your `Makefile`.
