@@ -8,8 +8,10 @@ $(info include makester/makefiles/makester.mk)
 $(error ### missing include dependency)
 endif
 
+MAKESTER__PYTHONPATH ?= $(MAKESTER__PROJECT_DIR)/src
+
 # Set PYTHONPATH as per "src layout". See https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/
-export PYTHONPATH ?= src
+export PYTHONPATH := $(MAKESTER__PYTHONPATH)
 
 # As Makester sees the system Python.
 MAKESTER__SYSTEM_PYTHON3 ?= $(call check-exe,python3,https://github.com/pyenv/pyenv)
@@ -40,7 +42,7 @@ py-install-extras: py-install
 
 py-install-makester: MAKESTER__PIP_INSTALL := -e makester
 py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
-py-install-makester: MAKESTER__VERSION_FILE := makester/src/makester/VERSION
+py-install-makester: MAKESTER__VERSION_FILE := makester/$(MAKESTER__PYTHONPATH)/makester/VERSION
 py-install-makester: MAKESTER__PROJECT_NAME := makester
 py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
 py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
@@ -69,6 +71,15 @@ include $(MAKESTER__MAKEFILES)/_py-venv.mk
 py-distribution:
 	$(MAKESTER__PYTHON) -m build
 
+py-fmt-all:
+	$(info ### Formatting Python files under "$(MAKESTER__PYTHONPATH)")
+	@black $(MAKESTER__PYTHONPATH)
+
+py-fmt:
+	$(call check-defined, FMT_PATH)
+	$(info ### Formatting Python files under "$(FMT_PATH)")
+	@black $(FMT_PATH)
+
 py-vars: _py-vars py-venv-vars
 _py-vars: 
 	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
@@ -77,9 +88,12 @@ _py-vars:
 py-help: _py-help _py-venv-help
 
 _py-help:
-	@echo "(makefiles/py.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/py.mk)\n\
   py-dep               Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
+  py-fmt               Format Python modules defined by \"FMT_PATH\"\n\
+  py-fmt-all           Format all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
   py-install           Install Python project package dependencies\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\
+  py-pylintrc          Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\"\n\
   py-vars              Display system Python settings\n"

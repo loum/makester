@@ -72,7 +72,7 @@ _gitversion-release-rm:
 gitversion-clear: _gitversion-release-rm _gitversion-versions-rm
 
 versioning-help:
-	@echo "(makefiles/versioning.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/versioning.mk)\n\
   gitversion           GitVersion usage message\n\
   gitversion-clear     Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\"\n\
   gitversion-release   GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\" to $(MAKESTER__VERSION_FILE)\n\

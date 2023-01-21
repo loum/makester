@@ -4,6 +4,9 @@
 #   tests/bats/bin/bats --filter-tags py tests
 #
 # bats file_tags=py
+setup_file() {
+    export MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+}
 setup() {
     load 'test_helper/common-setup'
     _common_setup
@@ -32,13 +35,26 @@ include makester/makefiles/makester.mk'
 # bats test_tags=variables,py-variables,PYTHONPATH
 @test "PYTHONPATH default should be set when calling py.mk" {
     run make -f makefiles/makester.mk print-PYTHONPATH
-    assert_output 'PYTHONPATH=src'
+    assert_output "PYTHONPATH=$MAKESTER__PROJECT_DIR/src"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,py-variables,PYTHONPATH
 @test "PYTHONPATH override" {
     PYTHONPATH=. run make -f makefiles/makester.mk print-PYTHONPATH
     assert_output --regexp 'PYTHONPATH=.'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,py-variables,MAKESTER__PYTHONPATH
+@test "MAKESTER__PYTHONPATH default should be set when calling py.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__PYTHONPATH
+    assert_output "MAKESTER__PYTHONPATH=$MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,py-variables,MAKESTER__PYTHONPATH
+@test "MAKESTER__PYTHONPATH override" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk print-MAKESTER__PYTHONPATH
+    assert_output "MAKESTER__PYTHONPATH=something_else"
     [ "$status" -eq 0 ]
 }
 
@@ -126,21 +142,21 @@ include makester/makefiles/makester.mk'
 @test "MAKESTER__PYLINT_RCFILE override" {
     MAKESTER__PYLINT_RCFILE=pylintrc\
  run make -f makefiles/makester.mk print-MAKESTER__PYLINT_RCFILE
-    assert_output --regexp 'MAKESTER__PYLINT_RCFILE=pylintrc'
+    assert_output 'MAKESTER__PYLINT_RCFILE=pylintrc'
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
 @test "MAKESTER__PIP_INSTALL_EXTRAS default should be set when calling py.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__PIP_INSTALL_EXTRAS
-    assert_output --regexp 'MAKESTER__PIP_INSTALL_EXTRAS=dev'
+    assert_output 'MAKESTER__PIP_INSTALL_EXTRAS=dev'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
 @test "MAKESTER__PIP_INSTALL_EXTRAS override" {
     MAKESTER__PIP_INSTALL_EXTRAS=test\
  run make -f makefiles/makester.mk print-MAKESTER__PIP_INSTALL_EXTRAS
-    assert_output --regexp 'MAKESTER__PIP_INSTALL_EXTRAS=test'
+    assert_output 'MAKESTER__PIP_INSTALL_EXTRAS=test'
     [ "$status" -eq 0 ]
 }
 
@@ -228,5 +244,32 @@ include makester/makefiles/makester.mk'
     run make -f makefiles/makester.mk py-deps --dry-run
     assert_output '### Displaying "makefiles" package dependencies ...
 pipdeptree'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-fmt-all,dry-run
+@test "Python module formatter for all under MAKESTER__PROJECTPATH: dry" {
+    run make -f makefiles/makester.mk py-fmt-all --dry-run
+    assert_output --regexp "black $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-fmt-all,dry-run
+@test "Python module formatter for all MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-fmt-all --dry-run
+    assert_output --regexp "black something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-fmt,dry-run
+@test "Python module formatter FMT_PATH undefined: dry" {
+    run make -f makefiles/makester.mk py-fmt --dry-run
+    assert_output --partial '### "FMT_PATH" undefined'
+    [ "$status" -eq 2 ]
+}
+# bats test_tags=target,py-fmt,dry-run
+@test "Python module formatter FMT_PATH set: dry" {
+    FMT_PATH=src/makester run make -f makefiles/makester.mk py-fmt --dry-run
+    assert_output '### Formatting Python files under "src/makester"
+black src/makester'
     [ "$status" -eq 0 ]
 }

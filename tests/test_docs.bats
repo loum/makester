@@ -1,6 +1,7 @@
 # Docs test runner.
 #
-#   tests/bats/bin/bats --file-filter docs tests
+# Can be executed manually with:
+#   tests/bats/bin/bats --filter-tags docs tests
 #
 # bats file_tags=docs
 setup_file() {

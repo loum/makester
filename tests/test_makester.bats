@@ -1,7 +1,7 @@
 # Makester test runner.
 #
 # Can be executed manually with:
-#   tests/bats/bin/bats --file-filter makester tests
+#   tests/bats/bin/bats --filter-tags makester tests
 #
 # bats file_tags=makester
 setup_file() {
@@ -174,7 +174,7 @@ teardown_file() {
 @test "MAKESTER__PYTHON_PROJECT_ROOT override" {
     MAKESTER__PYTHON_PROJECT_ROOT=$PWD\
  run make -f makefiles/makester.mk print-MAKESTER__PYTHON_PROJECT_ROOT
-    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/makester'
+    assert_output --regexp 'MAKESTER__PYTHON_PROJECT_ROOT=/.*/.*makester'
     [ "$status" -eq 0 ]
 }
 

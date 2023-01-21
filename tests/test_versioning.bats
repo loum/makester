@@ -1,7 +1,7 @@
 # Versioning test runner.
 #
 # Can be executed manually with:
-#   tests/bats/bin/bats --file-filter versioning tests
+#   tests/bats/bin/bats --filter-tags versioning tests
 #
 # bats file_tags=versioning
 setup_file() {

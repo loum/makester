@@ -40,7 +40,7 @@ docs-gh-deploy:
 	cd $(MAKESTER__DOCS_DIR); $(MAKESTER__DOCS) gh-deploy --site-dir $(MAKESTER__DOCS_BUILD_PATH) --force
 
 docs-help:
-	@echo "(makefiles/docs.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/docs.mk)\n\
   docs-bootstrap       Bootstrap the project documentation directory structure\n\
   docs-build           Build the project static site documentation\n\
   docs-gh-deploy       Deploy documentation to GitHub\n\

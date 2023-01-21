@@ -36,7 +36,7 @@ compose-up: COMPOSE_CMD = up -d
 compose-config compose-down compose-ls compose-ps compose-up compose-version: _compose-cmd
 
 compose-help:
-	@echo "(makefiles/compose.mk)\n\
+	@echo "($(MAKESTER__MAKEFILES)/compose.mk)\n\
   compose-config       Compose stack \"$(MAKESTER__PROJECT_NAME)\" config ($(MAKESTER__COMPOSE_FILES))\n\
   compose-down         Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes)\n\
   compose-ls           List running compose projects\n\
