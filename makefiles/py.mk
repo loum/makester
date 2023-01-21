@@ -80,6 +80,15 @@ py-fmt:
 	$(info ### Formatting Python files under "$(FMT_PATH)")
 	@black $(FMT_PATH)
 
+py-lint-all:
+	$(info ### Linting Python files under "$(MAKESTER__PYTHONPATH)")
+	@pylint $(MAKESTER__PYTHONPATH)
+
+py-lint:
+	$(call check-defined, LINT_PATH)
+	$(info ### Linting Python files under "$(LINT_PATH)")
+	@pylint $(LINT_PATH)
+
 py-vars: _py-vars py-venv-vars
 _py-vars: 
 	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
@@ -94,6 +103,8 @@ _py-help:
   py-fmt               Format Python modules defined by \"FMT_PATH\"\n\
   py-fmt-all           Format all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
   py-install           Install Python project package dependencies\n\
+  py-lint              Lint Python modules defined by \"LINT_PATH\"\n\
+  py-lint-all          Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\
   py-pylintrc          Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\"\n\
   py-vars              Display system Python settings\n"

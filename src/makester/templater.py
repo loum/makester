@@ -9,7 +9,6 @@ import tempfile
 
 from logga import log
 import jinja2
-import typer
 
 
 def get_environment_values(token: Text = None) -> dict:

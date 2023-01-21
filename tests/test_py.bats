@@ -273,3 +273,30 @@ pipdeptree'
 black src/makester'
     [ "$status" -eq 0 ]
 }
+
+# bats test_tags=target,py-lint-all,dry-run
+@test "Python module linter for all under MAKESTER__PROJECTPATH: dry" {
+    run make -f makefiles/makester.mk py-lint-all --dry-run
+    assert_output --regexp "pylint $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-lint-all,dry-run
+@test "Python module linter for all MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-all --dry-run
+    assert_output --regexp "pylint something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-lint,dry-run
+@test "Python module formatter LINT_PATH undefined: dry" {
+    run make -f makefiles/makester.mk py-lint --dry-run
+    assert_output --partial '### "LINT_PATH" undefined'
+    [ "$status" -eq 2 ]
+}
+# bats test_tags=target,py-lint,dry-run
+@test "Python module formatter LINT_PATH set: dry" {
+    LINT_PATH=src/makester run make -f makefiles/makester.mk py-lint --dry-run
+    assert_output '### Linting Python files under "src/makester"
+pylint src/makester'
+    [ "$status" -eq 0 ]
+}

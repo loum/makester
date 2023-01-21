@@ -142,13 +142,13 @@ All done! ✨ 🍰 ✨
 4 files left unchanged.
 ```
 
-It is possible to change the `SRC` path to `black` by overriding `MAKESTER__PYTHONPATH`:
+Change the `SRC` path to `black` by overriding `MAKESTER__PYTHONPATH`:
 
 ``` sh
 MAKESTER__PYTHONPATH=tests make py-fmt-all
 ```
 
-It is possible to target a subset of your project, or even individual files with the `py-fmt`
+To target a subset of your project, or even individual files with the `py-fmt`
 target:
 
 ``` sh
@@ -183,6 +183,71 @@ FMT_PATH=src/makester make py-fmt
 ### Formatting Python files under "src/makester"
 All done! ✨ 🍰 ✨
 4 files left unchanged.
+```
+
+### Lint your Python modules
+
+!!! tag "[Makester v0.2.1](https://github.com/loum/makester/releases/tag/0.2.1)"
+
+Use the [pylint](https://pypi.org/project/pylint/) code linter across all of your Python modules
+under `$MAKESTER__PROJECT_DIR/src`.
+
+``` sh
+make py-lint-all
+```
+
+``` sh title="Sample linter output."
+### Linting Python files under "<$MAKESTER__PROJECT_DIR>/src"
+
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
+```
+
+Change the path to `pylint` by overriding `MAKESTER__PYTHONPATH`:
+
+``` sh
+MAKESTER__PYTHONPATH=src/makester make py-lint-all
+```
+
+To target a subset of your project, or even individual files with the `py-lint`
+target:
+
+``` sh
+make py-fmt
+```
+
+Without providing a `LINT_PATH`, the command will error:
+
+``` sh title="Linting error without setting a path."
+### "LINT_PATH" undefined
+###
+makefiles/py.mk:88: *** ###.  Stop.
+```
+
+The following example demonstrates how to set `LINT_PATH` for a single Python module:
+
+``` sh title="Linting a Python module."
+LINT_PATH=src/makester/templater.py make py-lint
+```
+
+``` sh title="Sample linter output when setting LINT_PATH."
+### Linting Python files under "src/makester/templater.py"
+
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
+```
+
+Directory paths to Python modules are also supported:
+
+``` sh title="Linting Python modules under a given path."
+LINT_PATH=src/makester make py-lint
+```
+
+``` sh title="Sample linter output when setting LINT_PATH with a path to Python modules."
+### Linting Python files under "src/makester"
+
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 ```
 
 ## Variables
