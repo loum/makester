@@ -94,6 +94,29 @@ image-push:
 image-rm-dangling rm-dangling-images:
 	-$(shell $(MAKESTER__DOCKER) rmi $(shell $(MAKESTER__DOCKER) images -f "dangling=true" -q))
 
+MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
+MAKESTER__LOCAL_REGISTRY_IP ?= 15000
+MAKESTER__LOCAL_REGISTRY := $(MAKESTER__LOCAL_IP):$(MAKESTER__LOCAL_REGISTRY_IP)
+
+_LOCAL_REGISTRY_IS_ACTIVE ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
+image-registry-start:
+ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+	$(info ### makester-registry is running. Run "make image-registry-stop" to terminate.)
+else
+	$(info ### Starting local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
+	$(MAKESTER__DOCKER) run --rm -d -p $(MAKESTER__LOCAL_REGISTRY_IP):5000\
+ --name makester-registry\
+ $(MAKESTER__LOCAL_REGISTRY_IMAGE)
+endif
+
+image-registry-stop:
+ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+	$(info ### Stopping local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
+	$(MAKESTER__DOCKER) container stop makester-registry
+else
+	$(info ### makester-registry is not running. Run "make image-registry-start" to start.)
+endif
+
 # 20221027: Introduced target grouping for "container" related items.
 #
 # Symbol to be deprecated in Makester 0.3.0
@@ -171,6 +194,8 @@ docker-help:
   image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
   image-rm             Delete docker image \"$(MAKESTER__IMAGE_TAG_ALIAS)\" (alias rmi)\n\
   image-rm-dangling    Remove all dangling images\n\
+  image-registry-start Deploy a local image registry server\n\
+  image-registry-stop  Stop the local image registry server\n\
   image-search         List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
   image-tag            Tag image $(MAKESTER__SERVICE_NAME) \"$(HASH)\" (as per default build)\n\
   image-tag-latest     Tag image $(MAKESTER__SERVICE_NAME) \"latest\"\n\

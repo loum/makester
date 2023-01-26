@@ -175,6 +175,43 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=targets,docker-targets,image-registry-start,dry-run
+@test "Local Docker image registry start: dry" {
+    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk image-registry-start --dry-run
+    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:15000
+docker run --rm -d -p 15000:5000\\
+ --name makester-registry\\
+ registry:2'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-registry-start,dry-run
+@test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_IP override: dry" {
+    MAKESTER__LOCAL_REGISTRY_IP=5001 MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk image-registry-start --dry-run
+    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:5001
+docker run --rm -d -p 5001:5000\\
+ --name makester-registry\\
+ registry:2'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-registry-start,dry-run
+@test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_IMAGE override: dry" {
+    MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3 MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk image-registry-start --dry-run
+    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:15000
+docker run --rm -d -p 15000:5000\\
+ --name makester-registry\\
+ registry:3'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-registry-start,dry-run
+@test "Local Docker image registry start with _LOCAL_REGISTRY_IS_ACTIVE set: dry" {
+    _LOCAL_REGISTRY_IS_ACTIVE=makester-registry MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk image-registry-start --dry-run
+    assert_output '### makester-registry is running. Run "make image-registry-stop" to terminate.'
+    [ "$status" -eq 0 ]
+}
+
 # Symbol deprecation.
 #
 # bats test_tags=deprecated,dry-run

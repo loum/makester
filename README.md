@@ -3,6 +3,7 @@
 - [Prerequisites](#prerequisites)
 - [Extras for macOS](#extras-for-macos)
 - [Getting Started](#getting-started)
+- [Running the Test Harness](#running-the-test-harness)
 
 ## Overview
 Makester is a [GNU make](https://www.gnu.org/software/make/manual/make.html) based Integrated Developer Platform that brings common tooling and techniques to your coding projects. Note that there is a heavy bias towards Linux, containerisation and Kubernetes to promote cloud-native capability. No, not cloud-native that locks you into cloud provider's services ...
@@ -44,9 +45,15 @@ For first-time setup, prime the [Makester project](https://github.com/loum/makes
 git submodule update --init
 ```
 
-Next, prepare the Makester environment:
+Prepare the Makester environment:
 ```
 make init
+```
+
+## Running the Test Harness
+We use [bats-core](https://bats-core.readthedocs.io/en/stable/). To run the tests:
+```
+make tests
 ```
 
 ---
