@@ -21,6 +21,7 @@ nav:
 
 markdown_extensions:
   - admonition
+  - attr_list
   - codehilite
   - pymdownx.highlight:
       anchor_linenums: true
