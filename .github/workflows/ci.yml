@@ -42,7 +42,7 @@ jobs:
           commit_message: "VERSION auto-increment: ${{ steps.release_version.outputs.RELEASE_VERSION }}"
   docs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.head_ref == 'main'
+    if: github.head_ref == 'main'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
