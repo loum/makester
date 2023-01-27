@@ -25,9 +25,11 @@ teardown_file() {
 }
 # bats test_tags=targets,docker-targets,image-build,dry-run
 @test "hello-world Docker image build with Dockerfile PATH override: dry" {
-    MAKESTER__BUILD_PATH=sample MAKESTER__DOCKER=docker MAKESTER__REPO_NAME=supa-cool-repo MAKESTER__PROJECT_NAME=my-project\
- run make -f makefiles/makester.mk -f makefiles/docker.mk image-buildx --dry-run
-    assert_output --regexp 'docker buildx build -t supa-cool-repo/my-project:[0-9a-z]{7} sample'
+    MAKESTER__BUILD_PATH=sample MAKESTER__DOCKER=docker MAKESTER__REPO_NAME=supa-cool-repo\
+ MAKESTER__PROJECT_NAME=my-project MAKESTER__DOCKER_PLATFORM=linux/amd64\
+ MAKESTER__DOCKER_DRIVER_OUTPUT=push\
+ run make -f makefiles/makester.mk image-buildx --dry-run
+    assert_output --regexp 'docker buildx build --platform linux/amd64 --push -t supa-cool-repo/my-project:[0-9a-z]{7} sample'
     [ "$status" -eq 0 ]
 }
 

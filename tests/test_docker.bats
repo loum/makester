@@ -86,16 +86,52 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=variables,docker-variables,MAKESTER__IMAGE_TAG_ALIAS
 @test "MAKESTER__IMAGE_TAG_ALIAS default should be set when calling docker.mk" {
-    MAKESTER__PROJECT_NAME=makester\
+    MAKESTER__PROJECT_NAME=makester _LOCAL_REGISTRY_IS_ACTIVE=""\
  run make -f makefiles/makester.mk print-MAKESTER__IMAGE_TAG_ALIAS
     assert_output --regexp '^MAKESTER__IMAGE_TAG_ALIAS=makester:[0-9a-z]{7}$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,docker-variables,MAKESTER__IMAGE_TAG_ALIAS
 @test "MAKESTER__IMAGE_TAG_ALIAS override" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
+    MAKESTER__PROJECT_NAME=makester _LOCAL_REGISTRY_IS_ACTIVE=""\
+ MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
  run make -f makefiles/makester.mk print-MAKESTER__IMAGE_TAG_ALIAS
     assert_output 'MAKESTER__IMAGE_TAG_ALIAS=makester:0.0.0-1'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,docker-variables,MAKESTER__IMAGE_TAG_ALIAS
+@test "MAKESTER__IMAGE_TAG_ALIAS with local registry active default should be set when calling docker.mk" {
+    MAKESTER__PROJECT_NAME=makester _LOCAL_REGISTRY_IS_ACTIVE=makester-registry\
+ run make -f makefiles/makester.mk print-MAKESTER__IMAGE_TAG_ALIAS
+    assert_output --regexp '^MAKESTER__IMAGE_TAG_ALIAS=localhost:15000/makester:[0-9a-z]{7}$'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,docker-variables,MAKESTER__LOCAL_REGISTRY
+@test "MAKESTER__LOCAL_REGISTRY default should be set when calling docker.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__LOCAL_REGISTRY
+    assert_output 'MAKESTER__LOCAL_REGISTRY=0.0.0.0:5000'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,docker-variables,MAKESTER__LOCAL_REGISTRY
+@test "MAKESTER__LOCAL_REGISTRY override MAKESTER__LOCAL_REGISTRY" {
+    MAKESTER__LOCAL_REGISTRY=localhost:5001\
+ run make -f makefiles/makester.mk print-MAKESTER__LOCAL_REGISTRY
+    assert_output --regexp '^MAKESTER__LOCAL_REGISTRY=localhost:5001$'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=variables,docker-variables,MAKESTER__LOCAL_REGISTRY_IMAGE
+@test "MAKESTER__LOCAL_REGISTRY_IMAGE default should be set when calling docker.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__LOCAL_REGISTRY_IMAGE
+    assert_output 'MAKESTER__LOCAL_REGISTRY_IMAGE=registry:2'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,docker-variables,MAKESTER__LOCAL_REGISTRY_IMAGE
+@test "MAKESTER__LOCAL_REGISTRY_IMAGE override" {
+    MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3\
+ run make -f makefiles/makester.mk print-MAKESTER__LOCAL_REGISTRY_IMAGE
+    assert_output 'MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3'
     [ "$status" -eq 0 ]
 }
 
@@ -119,17 +155,24 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=targets,docker-targets,image,image-buildx,dry-run
 @test "Default Docker image buildx: dry" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64 MAKESTER__DOCKER=docker\
  run make -f makefiles/makester.mk image-buildx --dry-run
-    assert_output --regexp 'docker buildx build -t makester:[0-9a-z]{7} .'
+    assert_output --regexp 'docker buildx build --platform linux/amd64 --load -t makester:[0-9a-z]{7} .'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image,image-buildx,dry-run
+@test "Default Docker image buildx MAKESTER__DOCKER_PLATFORM override: dry" {
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk image-buildx --dry-run
+    assert_output --regexp 'docker buildx build --platform linux/arm64,linux/amd64 --load -t makester:[0-9a-z]{7} .'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image,image-buildx,dry-run
 @test "Docker image buildx overridden tag: dry" {
-    MAKESTER__PROJECT_NAME=makester\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64\
  MAKESTER__DOCKER=docker MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
  run make -f makefiles/makester.mk image-buildx --dry-run
-    assert_output 'docker buildx build -t makester:0.0.0-1 .'
+    assert_output 'docker buildx build --platform linux/amd64 --load -t makester:0.0.0-1 .'
     [ "$status" -eq 0 ]
 }
 
@@ -178,19 +221,23 @@ include makester/makefiles/makester.mk'
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
 @test "Local Docker image registry start: dry" {
     MAKESTER__DOCKER=docker run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:15000
-docker run --rm -d -p 15000:5000\\
- --name makester-registry\\
+    assert_output '### Starting local Docker image registry ...
+docker run --rm -d\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
+ -p 15000:5000\
+ --name makester-registry\
  registry:2'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
-@test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_IP override: dry" {
-    MAKESTER__LOCAL_REGISTRY_IP=5001 MAKESTER__DOCKER=docker\
+@test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_PORT override: dry" {
+    MAKESTER__LOCAL_REGISTRY_PORT=5001 MAKESTER__DOCKER=docker\
  run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:5001
-docker run --rm -d -p 5001:5000\\
- --name makester-registry\\
+    assert_output '### Starting local Docker image registry ...
+docker run --rm -d\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
+ -p 5001:5000\
+ --name makester-registry\
  registry:2'
     [ "$status" -eq 0 ]
 }
@@ -198,9 +245,11 @@ docker run --rm -d -p 5001:5000\\
 @test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_IMAGE override: dry" {
     MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3 MAKESTER__DOCKER=docker\
  run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output --regexp '### Starting local Docker image registry at [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:15000
-docker run --rm -d -p 15000:5000\\
- --name makester-registry\\
+    assert_output '### Starting local Docker image registry ...
+docker run --rm -d\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
+ -p 15000:5000\
+ --name makester-registry\
  registry:3'
     [ "$status" -eq 0 ]
 }
@@ -209,6 +258,23 @@ docker run --rm -d -p 15000:5000\\
     _LOCAL_REGISTRY_IS_ACTIVE=makester-registry MAKESTER__DOCKER=docker\
  run make -f makefiles/makester.mk image-registry-start --dry-run
     assert_output '### makester-registry is running. Run "make image-registry-stop" to terminate.'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=targets,docker-targets,container,container-status,dry-run
+@test "Container bash with container-status not running: dry" {
+    MAKESTER__DOCKER=docker MAKESTER__CONTAINER_NAME=supa-container\
+ run make -f makefiles/makester.mk container-status --dry-run
+    assert_output '### "supa-container" image container is not running.
+### Run "make container-run" to start.'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,container,container-status,dry-run
+@test "Container bash with container-status running: dry" {
+    MAKESTER__DOCKER=docker MAKESTER__CONTAINER_NAME=supa-container _RUNNING_CONTAINER=supa-container\
+ run make -f makefiles/makester.mk container-status --dry-run
+    assert_output '### "supa-container" image container is running.
+### Run "make container-stop" to terminate.'
     [ "$status" -eq 0 ]
 }
 
