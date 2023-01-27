@@ -16,10 +16,6 @@ MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
 
 MAKESTER__RUN_COMMAND ?= $(MAKESTER__DOCKER) run --rm --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
-MAKESTER__BUILD_CONTEXT ?= build
-MAKESTER__BUILD_PATH ?= .
-MAKESTER__BUILD_COMMAND ?= -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) $(MAKESTER__BUILD_PATH)
-
 # 20221027: Introduced target grouping for "image" related items.
 #
 # Symbol to be deprecated in Makester 0.3.0
@@ -35,10 +31,73 @@ build-image: _build-image-warn image-build
 _build-image-warn:
 	$(call deprecated,build-image,0.3.0,image-build)
 
+#
+# Best guess-timate at the type of platform to build the container image against.
+#
+ifndef MAKESTER__DOCKER_PLATFORM
+  ifeq ($(MAKESTER__ARCH), arm64)
+    MAKESTER__DOCKER_PLATFORM ?= linux/arm64
+  else
+    MAKESTER__DOCKER_PLATFORM ?= linux/amd64
+  endif
+endif
+
+#
+# Deploy local registry server for container images.
+#
+_LOCAL_REGISTRY_IS_ACTIVE ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
+
+MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
+MAKESTER__LOCAL_REGISTRY_PORT ?= 15000
+ifndef MAKESTER__LOCAL_REGISTRY
+	MAKESTER__LOCAL_REGISTRY ?= 0.0.0.0:5000
+endif
+
+image-registry-start:
+ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+	$(info ### makester-registry is running. Run "make image-registry-stop" to terminate.)
+else
+	$(info ### Starting local Docker image registry ...)
+	$(MAKESTER__DOCKER) run --rm -d\
+ -e REGISTRY_HTTP_ADDR=$(MAKESTER__LOCAL_REGISTRY)\
+ -p $(MAKESTER__LOCAL_REGISTRY_PORT):5000\
+ --name makester-registry\
+ $(MAKESTER__LOCAL_REGISTRY_IMAGE)
+endif
+
+image-registry-stop:
+ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+	$(info ### Stopping local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
+	$(MAKESTER__DOCKER) container stop makester-registry
+else
+	$(info ### makester-registry is not running. Run "make image-registry-start" to start.)
+endif
+
+#
+# Docker builder driver output type based on whether local server registry is running.
+#
+ifndef MAKESTER__DOCKER_DRIVER_OUTPUT
+  ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),) # Local image registry is running.
+    MAKESTER__DOCKER_DRIVER_OUTPUT ?= push
+  else
+    MAKESTER__DOCKER_DRIVER_OUTPUT ?= load
+  endif
+endif
+
+ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),) # Local image registry is running.
+  MAKESTER__SERVICE_NAME := localhost:$(MAKESTER__LOCAL_REGISTRY_PORT)/$(MAKESTER__SERVICE_NAME)
+endif
+
+MAKESTER__IMAGE_TAG_ALIAS ?= $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)
+
+MAKESTER__BUILD_CONTEXT ?= build
+MAKESTER__BUILD_PATH ?= .
+MAKESTER__BUILD_COMMAND ?= -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) $(MAKESTER__BUILD_PATH)
+
 ib image-build bi:
 	$(MAKESTER__DOCKER) $(MAKESTER__BUILD_CONTEXT) $(MAKESTER__BUILD_COMMAND)
 
-ibx image-buildx: MAKESTER__BUILD_CONTEXT := buildx build
+ibx image-buildx: MAKESTER__BUILD_CONTEXT := buildx build --platform $(MAKESTER__DOCKER_PLATFORM) --$(MAKESTER__DOCKER_DRIVER_OUTPUT)
 ibx image-buildx: image-build
 
 irm image-rm rmi rm-image:
@@ -50,7 +109,7 @@ _tag-image-warn:
 	$(call deprecated,tag-image,0.3.0,image-tag)
 
 IMAGE_TAG_ID := $(shell $(MAKESTER__DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
-MAKESTER__IMAGE_TAG_ALIAS ?= $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)
+
 image-tag tag:
 	-$(MAKESTER__DOCKER) tag $(IMAGE_TAG_ID) $(MAKESTER__IMAGE_TAG_ALIAS)
 
@@ -93,29 +152,6 @@ image-push:
 
 image-rm-dangling rm-dangling-images:
 	-$(shell $(MAKESTER__DOCKER) rmi $(shell $(MAKESTER__DOCKER) images -f "dangling=true" -q))
-
-MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
-MAKESTER__LOCAL_REGISTRY_IP ?= 15000
-MAKESTER__LOCAL_REGISTRY := $(MAKESTER__LOCAL_IP):$(MAKESTER__LOCAL_REGISTRY_IP)
-
-_LOCAL_REGISTRY_IS_ACTIVE ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
-image-registry-start:
-ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
-	$(info ### makester-registry is running. Run "make image-registry-stop" to terminate.)
-else
-	$(info ### Starting local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
-	$(MAKESTER__DOCKER) run --rm -d -p $(MAKESTER__LOCAL_REGISTRY_IP):5000\
- --name makester-registry\
- $(MAKESTER__LOCAL_REGISTRY_IMAGE)
-endif
-
-image-registry-stop:
-ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
-	$(info ### Stopping local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
-	$(MAKESTER__DOCKER) container stop makester-registry
-else
-	$(info ### makester-registry is not running. Run "make image-registry-start" to start.)
-endif
 
 # 20221027: Introduced target grouping for "container" related items.
 #
@@ -172,12 +208,14 @@ status: _status-warn container-status
 _status-warn:
 	$(call deprecated,status,0.3.0,container-status)
 
-RUNNING_CONTAINER := $($(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
+_RUNNING_CONTAINER ?= $(shell $(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 container-status:
-ifneq ($(RUNNING_CONTAINER),)
-	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container is running.  Run \"make stop\" to terminate
+ifneq ($(_RUNNING_CONTAINER),)
+	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is running.)
+	$(info ### Run "make container-stop" to terminate.)
 else
-	@echo \"$(MAKESTER__CONTAINER_NAME)\" Docker container not running. Run \"make run\" to start
+	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is not running.)
+	$(info ### Run "make container-run" to start.)
 endif
 
 docker-help:
