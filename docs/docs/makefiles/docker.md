@@ -100,7 +100,7 @@ docker buildx build --platform linux/arm64 --load -t supa-cool-repo/my-project:5
 ```
 
 ### Support for multi-architecture builds
-!!! tag "[Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4){target="_blank"}"
+!!! tag "[Makester v0.2.2](https://github.com/loum/makester/releases/tag/0.2.2){target="_blank"}"
 
 Makester can now [Leverage multi-CPU architecture support](https://docs.docker.com.xy2401.com/docker-for-mac/multi-arch/){target="_blank"}. However, there are some manual steps that need to be performed.
 
@@ -109,7 +109,7 @@ To build an image that supports multiple architectures, you can define these by 
 `MAKESTER__DOCKER_PLATFORM` Makester variable. For example:
 
 ``` sh
-MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 m -f sample/Makefile image-buildx
+MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f sample/Makefile image-buildx
 ```
 
 However, in the default docker image build system you may see this error:

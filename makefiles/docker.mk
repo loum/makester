@@ -67,7 +67,7 @@ endif
 
 image-registry-stop:
 ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
-	$(info ### Stopping local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
+	$(info ### Stopping local Docker image registry.)
 	$(MAKESTER__DOCKER) container stop makester-registry
 else
 	$(info ### makester-registry is not running. Run "make image-registry-start" to start.)
