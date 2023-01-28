@@ -20,7 +20,7 @@ ignore:
 merge-message-formats: {}
 branches:
   feature:
-    regex: ^feature[/-]
+    regex: ^(\d+|feature)[/-]
     mode: ContinuousDeployment
     tag: a
     increment: Patch
@@ -28,7 +28,7 @@ branches:
     track-merge-target: false
     tracks-release-branches: false
     is-release-branch: false
-    source-branches: ['main', 'develop', 'hotfix', 'support']
+    source-branches: ['main', 'develop', 'defect']
   task:
     regex: ^task[/-]
     mode: ContinuousDeployment
@@ -38,7 +38,7 @@ branches:
     track-merge-target: false
     tracks-release-branches: false
     is-release-branch: false
-    source-branches: ['main', 'develop', 'feature', 'hotfix', 'support']
+    source-branches: ['main', 'develop', 'feature', 'defect']
   develop:
     regex: ^develop$
     mode: ContinuousDeployment
@@ -53,6 +53,16 @@ branches:
     regex: ^defect[/-]
     mode: ContinuousDeployment
     tag: a
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
+    source-branches: ['main']
+  pre-release:
+    regex: ^pre-release$
+    mode: ContinuousDeployment
+    tag: rc
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
