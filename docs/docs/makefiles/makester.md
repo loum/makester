@@ -2,19 +2,22 @@
 
 The Makester Makefile, `makester/makefiles/makester.mk` is the core interface to Makester
 capabilities. To start using Makester, add the following `include` into your `Makefile`:
-```
+``` sh
 include makester/makefiles/makester.mk
 ```
 
 To validate Makester, run the `makester-help` target and ensure there are no errors:
-```
+``` sh
 make makester-help
 ```
 
 ## Command Reference
 
 ### Display the Makester Variables
-```
+Makester context is driven by environment variables. Most of these variables can be overriden to
+suit your particular use cases.
+
+``` sh title="Display the state of the Makester variables."
 make vars
 ```
 
@@ -22,7 +25,7 @@ make vars
 Adds a `.gitignore` under `<MAKESTER__PROJECT_DIR>`. Uses the
 [Makester sample `.gitignore`](https://github.com/loum/makester/blob/main/resources/project.gitignore)
 as a starting point.
-```
+``` sh
 make makester-gitignore
 ```
 
@@ -30,12 +33,12 @@ make makester-gitignore
 Add an [MIT License](https://github.com/loum/makester/blob/main/resources/mit.md)
 under `<MAKESTER__PROJECT_DIR>`. You will need to manually adjust the `<year>`
 and `<copyright holders>`:
-```
+``` sh
 make mit-license
 ```
 
 ### Update your existing Git Submodules
-```
+``` sh
 make submodule-update
 ```
 
@@ -46,7 +49,7 @@ convention is adhered to within the project. Makester introduces special purpose
 is recommended that you override these values in your own project's Makefile to provide more informative context.
 
 Makester special purpose variable values can be viewed any time with the `vars` target:
-```
+``` sh
 make vars
 ```
 
@@ -59,7 +62,7 @@ A service identifier that defaults to `MAKESTER__PROJECT_NAME`. This can be used
 repository and identify your image.
 
 `MAKESTER__SERVICE_NAME` can be overridden at the top of your `Makefile` as follows:
-```
+``` sh
 # Include overrides (must occur before include statements).
 MAKESTER__SERVICE_NAME := supa-cool-service-name
 ```
@@ -67,10 +70,19 @@ MAKESTER__SERVICE_NAME := supa-cool-service-name
 !!! note
     If `MAKESTER__REPO_NAME` is defined in your `Makefile` then `MAKESTER__SERVICE_NAME` becomes
     `MAKESTER__REPO_NAME/MAKESTER__PROJECT_NAME`. For example `supa-cool-repo/my-project` is achieved with the following:
-    ```
+    ``` sh
     MAKESTER__REPO_NAME := supa-cool-repo
     MAKESTER__PROJECT_NAME := my-project
     ```
+
+### `MAKESTER__STATIC_SERVICE_NAME`
+Same as [MAKESTER__SERVICE_NAME](#makester__service_name) but guaranteed not to change. With the
+introduction of the [local registry server](../docker/#deploy-a-local-registry-server),
+`MAKESTER__SERVICE_NAME` could be altered to incorporate the name of the local registry server.
+
+!!! note
+    `MAKESTER__STATIC_SERVICE_NAME` is the static equivalent of the initialised
+    `MAKESTER__SERVICE_NAME` and cannot be overridden.
 
 ### `HASH`
 As per `git rev-parse --help`. The `HASH` value of your `git` branch allows you to uniquely
@@ -87,7 +99,7 @@ Manually managed release number control when `MAKESTER__VERSION` is unchanged (d
 Advanced versioning control that provides a hook into an autonomous versioning facility
 (for example, [GitVersion](https://gitversion.net/docs/)).
 
-###`MAKESTER__LOCAL_IP`
+### `MAKESTER__LOCAL_IP`
 Platform independent way to get the local host's IP address.
 
 ### `MAKESTER__WORK_DIR`

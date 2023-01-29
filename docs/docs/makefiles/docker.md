@@ -100,7 +100,7 @@ docker buildx build --platform linux/arm64 --load -t supa-cool-repo/my-project:5
 ```
 
 ### Support for multi-architecture builds
-!!! tag "[Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4){target="_blank"}"
+!!! tag "[Makester v0.2.2](https://github.com/loum/makester/releases/tag/0.2.2){target="_blank"}"
 
 Makester can now [Leverage multi-CPU architecture support](https://docs.docker.com.xy2401.com/docker-for-mac/multi-arch/){target="_blank"}. However, there are some manual steps that need to be performed.
 
@@ -109,7 +109,7 @@ To build an image that supports multiple architectures, you can define these by 
 `MAKESTER__DOCKER_PLATFORM` Makester variable. For example:
 
 ``` sh
-MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 m -f sample/Makefile image-buildx
+MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f sample/Makefile image-buildx
 ```
 
 However, in the default docker image build system you may see this error:
@@ -261,6 +261,21 @@ Alternatively, leverage the features provided by
 make image-buildx
 ```
 
+### Create a `buildx` builder
+As per [docker buildx create](https://docs.docker.com/engine/reference/commandline/buildx_create/), 
+create a `buildx` builder instance to leverage capabilities provided by BuildKit. Such as
+multi-arch image builds:
+
+``` sh
+make image-buildx-builder
+```
+
+Override `MAKESTER__BUILDKIT_BUILDER_NAME` to set the name of the buildx builder instance:
+
+``` sh
+MAKESTER__BUILDKIT_BUILDER_NAME=my-builder make image-buildx-builder
+```
+
 ### Run your Docker images as a container
 ``` sh
 make container-run
@@ -345,17 +360,21 @@ Override the `--platform` switch to `docker buildx`.
 [Multi-architecture builds](#support-for-multi-architecture-builds) are supported.
 
 ### `MAKESTER__LOCAL_REGISTRY`
-The host and IP of the local Docker image registry server.
+The host and IP of the local Docker image registry server which is used to configure
+[REGISTRY_HTTP_ADDR](https://docs.docker.com/registry/deploying/#customize-the-published-port).
+The default is `0.0.0.0:5000`. Although it is possible to override this variable, it only controls the
+settings that the registry listens on within the container.
 
-Makester provides a default value based on your system's IP address and the port `15000`. For
-example, `192.168.1.211:15000`. These values can be overridden by providing values for
-`MAKESTER__LOCAL_IP` and `MAKESTER__LOCAL_REGISTRY_IP`. Or, `MAKESTER__LOCAL_REGISTRY` can be
-overridden directly. For example:
+### `MAKESTER__LOCAL_REGISTRY_PORT`
+`MAKESTER__LOCAL_REGISTRY_PORT` controls the local registry server host port that you can connect
+to. The default is `15000`. You can override this setting if you detect a clash on port `15000` or
+you want to run multiple local registry servers.
 
-``` sh
-MAKESTER__LOCAL_REGISTRY=localhost:5001 make print-MAKESTER__LOCAL_REGISTRY
+``` sh title="Overriding MAKESTER__LOCAL_REGISTRY_PORT."
+MAKESTER__LOCAL_REGISTRY_PORT=15001
 ```
 
-``` sh title="Overriding MAKESTER__LOCAL_REGISTRY."
-MAKESTER__LOCAL_REGISTRY=localhost:5001
-```
+### `MAKESTER__BUILDKIT_BUILDER_NAME`
+The name to give to the
+[docker buildx create](https://docs.docker.com/engine/reference/commandline/buildx_create/)
+builder. Defaults to `multiarch`.

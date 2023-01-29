@@ -53,7 +53,10 @@ ifndef MAKESTER__LOCAL_REGISTRY
 	MAKESTER__LOCAL_REGISTRY ?= 0.0.0.0:5000
 endif
 
-image-registry-start:
+_image-registry-backoff:
+	@venv/bin/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__LOCAL_REGISTRY_PORT) --detail "Local registry server"
+
+_image-registry-start:
 ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
 	$(info ### makester-registry is running. Run "make image-registry-stop" to terminate.)
 else
@@ -65,9 +68,16 @@ else
  $(MAKESTER__LOCAL_REGISTRY_IMAGE)
 endif
 
+MAKESTER__BUILDKIT_BUILDER_NAME ?= multiarch
+image-buildx-builder:
+	$(info ### Creating BuildKit builder "$(MAKESTER__BUILDKIT_BUILDER_NAME)" (if required) ...)
+	-$(MAKESTER__DOCKER) buildx create --driver-opt network=host --name $(MAKESTER__BUILDKIT_BUILDER_NAME) --use
+
+image-registry-start: _image-registry-start _image-registry-backoff
+
 image-registry-stop:
 ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
-	$(info ### Stopping local Docker image registry at $(MAKESTER__LOCAL_REGISTRY))
+	$(info ### Stopping local Docker image registry.)
 	$(MAKESTER__DOCKER) container stop makester-registry
 else
 	$(info ### makester-registry is not running. Run "make image-registry-start" to start.)

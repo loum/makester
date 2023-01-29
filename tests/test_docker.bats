@@ -58,7 +58,7 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=variables,docker-variables,MAKESTER__RUN_COMMAND
 @test "MAKESTER__RUN_COMMAND default should be set when calling docker.mk" {
-    run make -f makefiles/makester.mk print-MAKESTER__RUN_COMMAND
+    _LOCAL_REGISTRY_IS_ACTIVE= run make -f makefiles/makester.mk print-MAKESTER__RUN_COMMAND
     assert_output --regexp '^MAKESTER__RUN_COMMAND=.*/docker run --rm --name my-container makefiles:[0-9a-z]{7}$'
     [ "$status" -eq 0 ]
 }
@@ -72,13 +72,13 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=variables,docker-variables,MAKESTER__BUILD_COMMAND
 @test "MAKESTER__BUILD_COMMAND default should be set when calling docker.mk" {
-    run make -f makefiles/makester.mk print-MAKESTER__BUILD_COMMAND
+    _LOCAL_REGISTRY_IS_ACTIVE= run make -f makefiles/makester.mk print-MAKESTER__BUILD_COMMAND
     assert_output --regexp '^MAKESTER__BUILD_COMMAND=-t makefiles:[0-9a-z]{7} \.$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,docker-variables,MAKESTER__BUILD_COMMAND
 @test "MAKESTER__BUILD_COMMAND override" {
-    MAKESTER__BUILD_COMMAND="--no-cache -t \$(MAKESTER__IMAGE_TAG_ALIAS) ."\
+    _LOCAL_REGISTRY_IS_ACTIVE= MAKESTER__BUILD_COMMAND="--no-cache -t \$(MAKESTER__IMAGE_TAG_ALIAS) ."\
  run make -f makefiles/makester.mk print-MAKESTER__BUILD_COMMAND
     assert_output --regexp '^MAKESTER__BUILD_COMMAND=--no-cache -t makefiles:[0-9a-z]{7} \.$'
     [ "$status" -eq 0 ]
@@ -135,19 +135,33 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,docker-variables,MAKESTER__BUILDKIT_BUILDER_NAME
+@test "MAKESTER__BUILDKIT_BUILDER_NAME default should be set when calling docker.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__BUILDKIT_BUILDER_NAME
+    assert_output 'MAKESTER__BUILDKIT_BUILDER_NAME=multiarch'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,docker-variables,MAKESTER__BUILDKIT_BUILDER_NAME
+@test "MAKESTER__BUILDKIT_BUILDER_NAME override" {
+    MAKESTER__BUILDKIT_BUILDER_NAME=supa-builder\
+ run make -f makefiles/makester.mk print-MAKESTER__BUILDKIT_BUILDER_NAME
+    assert_output 'MAKESTER__BUILDKIT_BUILDER_NAME=supa-builder'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=targets,docker-targets,image,image-tag,dry-run
 @test "Default Docker image tag: dry" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
  run make -f makefiles/makester.mk image-tag --dry-run
     assert_output --regexp '^docker tag  makester:[0-9a-z]{7}$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image,image-tag,dry-run
 @test "Default Docker image tag override: dry" {
-    MAKESTER__PROJECT_NAME=makester\
- MAKESTER__DOCKER=docker MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
  run make -f makefiles/makester.mk image-tag --dry-run
     assert_output 'docker tag  makester:0.0.0-1'
     [ "$status" -eq 0 ]
@@ -155,21 +169,23 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=targets,docker-targets,image,image-buildx,dry-run
 @test "Default Docker image buildx: dry" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64 MAKESTER__DOCKER=docker\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64\
+ MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
  run make -f makefiles/makester.mk image-buildx --dry-run
     assert_output --regexp 'docker buildx build --platform linux/amd64 --load -t makester:[0-9a-z]{7} .'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image,image-buildx,dry-run
 @test "Default Docker image buildx MAKESTER__DOCKER_PLATFORM override: dry" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 MAKESTER__DOCKER=docker\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64\
+ MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
  run make -f makefiles/makester.mk image-buildx --dry-run
     assert_output --regexp 'docker buildx build --platform linux/arm64,linux/amd64 --load -t makester:[0-9a-z]{7} .'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image,image-buildx,dry-run
 @test "Docker image buildx overridden tag: dry" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER_PLATFORM=linux/amd64 _LOCAL_REGISTRY_IS_ACTIVE=\
  MAKESTER__DOCKER=docker MAKESTER__IMAGE_TARGET_TAG="\$(MAKESTER__VERSION)-\$(MAKESTER__RELEASE_NUMBER)"\
  run make -f makefiles/makester.mk image-buildx --dry-run
     assert_output 'docker buildx build --platform linux/amd64 --load -t makester:0.0.0-1 .'
@@ -178,7 +194,8 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=targets,docker-targets,container,container-run,dry-run
 @test "Container run with container-run: dry" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk container-run --dry-run
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk container-run --dry-run
     assert_output --regexp 'docker run --rm --name my-container makefiles:[0-9a-z]{7}'
     [ "$status" -eq 0 ]
 }
@@ -220,44 +237,65 @@ include makester/makefiles/makester.mk'
 
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
 @test "Local Docker image registry start: dry" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output '### Starting local Docker image registry ...
-docker run --rm -d\
- -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
- -p 15000:5000\
- --name makester-registry\
- registry:2'
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk image-registry-start --dry-run
+    assert_output --regexp '### Starting local Docker image registry ...
+docker run --rm -d\\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\\
+ -p 15000:5000\\
+ --name makester-registry\\
+ registry:2
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
 @test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_PORT override: dry" {
-    MAKESTER__LOCAL_REGISTRY_PORT=5001 MAKESTER__DOCKER=docker\
+    MAKESTER__LOCAL_REGISTRY_PORT=5001 MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
  run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output '### Starting local Docker image registry ...
-docker run --rm -d\
- -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
- -p 5001:5000\
- --name makester-registry\
- registry:2'
+    assert_output --regexp '### Starting local Docker image registry ...
+docker run --rm -d\\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\\
+ -p 5001:5000\\
+ --name makester-registry\\
+ registry:2
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 5001 --detail "Local registry server"'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
 @test "Local Docker image registry start MAKESTER__LOCAL_REGISTRY_IMAGE override: dry" {
-    MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3 MAKESTER__DOCKER=docker\
+    MAKESTER__LOCAL_REGISTRY_IMAGE=registry:3 MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
  run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output '### Starting local Docker image registry ...
-docker run --rm -d\
- -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\
- -p 15000:5000\
- --name makester-registry\
- registry:3'
+    assert_output --regexp '### Starting local Docker image registry ...
+docker run --rm -d\\
+ -e REGISTRY_HTTP_ADDR=0.0.0.0:5000\\
+ -p 15000:5000\\
+ --name makester-registry\\
+ registry:3
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=targets,docker-targets,image-registry-start,dry-run
 @test "Local Docker image registry start with _LOCAL_REGISTRY_IS_ACTIVE set: dry" {
     _LOCAL_REGISTRY_IS_ACTIVE=makester-registry MAKESTER__DOCKER=docker\
  run make -f makefiles/makester.mk image-registry-start --dry-run
-    assert_output '### makester-registry is running. Run "make image-registry-stop" to terminate.'
+    assert_output --regexp '### makester-registry is running. Run "make image-registry-stop" to terminate.
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=targets,docker-targets,image-buildx-builder,dry-run
+@test "BuildKit builder create and use: dry" {
+    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk image-buildx-builder --dry-run
+    assert_output '### Creating BuildKit builder "multiarch" (if required) ...
+docker buildx create --driver-opt network=host --name multiarch --use'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,docker-targets,image-buildx-builder,dry-run
+@test "BuildKit builder create and use with MAKESTER__BUILDKIT_BUILDER_NAME override: dry" {
+    MAKESTER__BUILDKIT_BUILDER_NAME=supa-builder MAKESTER__DOCKER=docker\
+ run make -f makefiles/makester.mk image-buildx-builder --dry-run
+    assert_output '### Creating BuildKit builder "supa-builder" (if required) ...
+docker buildx create --driver-opt network=host --name supa-builder --use'
     [ "$status" -eq 0 ]
 }
 
@@ -282,7 +320,8 @@ docker run --rm -d\
 #
 # bats test_tags=deprecated,dry-run
 @test "Warning for deprecated symbol target search-image" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk search-image --dry-run
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk search-image --dry-run
     assert_output '### "search-image" will be deprecated in Makester: 0.3.0
 ### Replace "search-image" with "image-search"
 docker images "makefiles*"'
@@ -291,7 +330,8 @@ docker images "makefiles*"'
 
 # bats test_tags=deprecated,dry-run
 @test "Warning for deprecated symbol target build-image" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk build-image --dry-run
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk build-image --dry-run
     assert_output --regexp '### "build-image" will be deprecated in Makester: 0.3.0
 ### Replace "build-image" with "image-build"
 docker build -t makefiles:[0-9a-z]{7}'
@@ -300,7 +340,8 @@ docker build -t makefiles:[0-9a-z]{7}'
 
 # bats test_tags=deprecated,dry-run
 @test "Warning for deprecated symbol target tag-image" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk tag-image --dry-run
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk tag-image --dry-run
     assert_output --regexp '### "tag-image" will be deprecated in Makester: 0.3.0
 ### Replace "tag-image" with "image-tag"
 docker tag .* makefiles:[0-9a-z]{7}'
@@ -309,7 +350,8 @@ docker tag .* makefiles:[0-9a-z]{7}'
 
 # bats test_tags=deprecated,dry-run
 @test "Warning for deprecated symbol target run" {
-    MAKESTER__DOCKER=docker run make -f makefiles/makester.mk run --dry-run
+    MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+ run make -f makefiles/makester.mk run --dry-run
     assert_output --regexp '### "run" will be deprecated in Makester: 0.3.0
 ### Replace "run" with "container-run"
 docker run --rm --name my-container makefiles:[0-9a-z]{7}'

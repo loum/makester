@@ -22,24 +22,32 @@ jobs:
           make init
           make tests
       - run: echo "🍏 ${{ job.status }}"
-  version:
+  pre-release:
     needs: tests
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 0
-      - name: Generate new distribution package release version
-        id: release_version
-        run: |
-          make init
-          echo "RELEASE_VERSION=$(make gitversion-release | grep RELEASE_VERSION | cut -d' ' -f3)" >> $GITHUB_OUTPUT
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Check if the VERSION file has changed
+        id: changed_version_file
+        uses: tj-actions/changed-files@v35
         with:
-          commit_message: "VERSION auto-increment: ${{ steps.release_version.outputs.RELEASE_VERSION }}"
+          files: src/makester/VERSION
+      - name: Read VERSION file
+        if: steps.changed_version_file.outputs.any_changed == 'true'
+        id: get_version
+        run: echo "VERSION=$(cat src/makester/VERSION)" >> $GITHUB_OUTPUT
+      - name: Create pre-release
+        if: steps.changed_version_file.outputs.any_changed == 'true'
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          title: ${{ steps.get_version.outputs.version }}
+          automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
+          prerelease: true
   docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
