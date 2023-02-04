@@ -65,3 +65,62 @@ dev-compose-up: compose-up
 
 !!! note
     Remember to provide the complimentary `docker compose` `down` targets in your `Makefile`.
+
+## Versioning
+
+### Release branch and tagging
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3){target="_blank"}"
+
+The [sample GitVersion.yml](https://github.com/loum/makester/blob/main/sample/GitVersion.yml){target="_blank"}
+now includes a dedicated `release` section that caters for `release` branches. This allows you to
+version increment main-line releases independent from your main-line branch. This mitigates the need to make
+changes directly to your `main` branch. For example:
+
+``` sh title="Preparing for release."
+git checkout main
+git checkout -b release
+make gitversion-release
+```
+
+The `gitversion release` will update your `VERSION` file in accordance with your main-line version
+incremental rules.
+
+Here is a samle GitHub action that creates a tag and pre-release when the `VERSION` file change
+has been detected. It is based on `makester`'s versioning strategy and the excellent
+[marvinpinto/action-automatic-releases](https://github.com/marvinpinto/action-automatic-releases){target="_blank"}
+action:
+
+``` sh title="VERSION file action for automatic releases"
+name: Makester CI
+run-name: ${{ github.actor }} ${{ github.event_name }} event Makester CI 🚀
+on: push
+permissions:
+  contents: write
+
+jobs:
+  pre-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Check if the VERSION file has changed
+        id: changed_version_file
+        uses: tj-actions/changed-files@v35
+        with:
+          files: src/makester/VERSION
+      - name: Read VERSION file
+        if: steps.changed_version_file.outputs.any_changed == 'true'
+        id: get_version
+        run: echo "VERSION=$(cat src/makester/VERSION)" >> $GITHUB_OUTPUT
+      - name: Create pre-release
+        if: steps.changed_version_file.outputs.any_changed == 'true'
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          title: ${{ steps.get_version.outputs.version }}
+          automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
+          prerelease: true
+```
