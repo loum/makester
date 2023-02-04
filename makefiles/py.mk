@@ -9,6 +9,7 @@ $(error ### missing include dependency)
 endif
 
 MAKESTER__PYTHONPATH ?= $(MAKESTER__PROJECT_DIR)/src
+MAKESTER__TESTS_PYTHONPATH ?= $(MAKESTER__PROJECT_DIR)/tests
 
 # Set PYTHONPATH as per "src layout". See https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/
 export PYTHONPATH := $(MAKESTER__PYTHONPATH)
@@ -71,23 +72,51 @@ include $(MAKESTER__MAKEFILES)/_py-venv.mk
 py-distribution:
 	$(MAKESTER__PYTHON) -m build
 
-py-fmt-all:
+py-fmt-src:
 	$(info ### Formatting Python files under "$(MAKESTER__PYTHONPATH)")
 	@black $(MAKESTER__PYTHONPATH)
+
+py-fmt-tests:
+	$(info ### Formatting Python files under "$(MAKESTER__TESTS_PYTHONPATH)")
+	@black $(MAKESTER__TESTS_PYTHONPATH)
+
+py-fmt-all: py-fmt-src py-fmt-tests
 
 py-fmt:
 	$(call check-defined, FMT_PATH)
 	$(info ### Formatting Python files under "$(FMT_PATH)")
 	@black $(FMT_PATH)
 
-py-lint-all:
+py-lint-src:
 	$(info ### Linting Python files under "$(MAKESTER__PYTHONPATH)")
 	@pylint $(MAKESTER__PYTHONPATH)
+
+py-lint-tests:
+	$(info ### Linting Python files under "$(MAKESTER__TESTS_PYTHONPATH)")
+	@pylint $(MAKESTER__TESTS_PYTHONPATH)
+
+py-lint-all: py-lint-src py-lint-tests
 
 py-lint:
 	$(call check-defined, LINT_PATH)
 	$(info ### Linting Python files under "$(LINT_PATH)")
 	@pylint $(LINT_PATH)
+
+MAKESTER__MYPY_OPTIONS ?= --disallow-untyped-defs
+py-type-src:
+	$(info ### Type annotating Python files under "$(MAKESTER__PYTHONPATH)")
+	@mypy $(MAKESTER__MYPY_OPTIONS) $(MAKESTER__PYTHONPATH)
+
+py-type-tests:
+	$(info ### Type annotating Python files under "$(MAKESTER__TESTS_PYTHONPATH)")
+	@mypy $(MAKESTER__MYPY_OPTIONS) $(MAKESTER__TESTS_PYTHONPATH)
+
+py-type-all: py-type-src py-type-tests
+
+py-type:
+	$(call check-defined, TYPE_PATH)
+	$(info ### Type annotating Python files under "$(TYPE_PATH)")
+	@mypy $(MAKESTER__MYPY_OPTIONS) $(TYPE_PATH)
 
 py-vars: _py-vars py-venv-vars
 _py-vars: 

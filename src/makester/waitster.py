@@ -14,7 +14,7 @@ import backoff
     max_time=300,
     interval=5,
 )
-def port_backoff(host: Text, port: int, detail: Text):
+def port_backoff(host: Text, port: int, detail: Text) -> None:
     """Service backoff until ready."""
     msg = f"Checking host:port {host}:{port}"
     if detail is not None:

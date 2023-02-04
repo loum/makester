@@ -1,7 +1,7 @@
 """Template environment variables.
 
 """
-from typing import Text
+from typing import Dict, Optional, Text
 import json
 import os
 import shutil
@@ -11,12 +11,12 @@ from logga import log
 import jinja2
 
 
-def get_environment_values(token: Text = None) -> dict:
+def get_environment_values(token: Optional[Text] = None) -> dict:
     """
     Returns a dictionary structure of all environment values.
 
-    The optional *token* argument filters environment variables to only those that
-    start with *token*.
+    The optional `token` argument filters environment variables to only those that
+    start with `token`.
 
     """
     if not token:
@@ -32,9 +32,9 @@ def get_environment_values(token: Text = None) -> dict:
     return env_variables
 
 
-def get_json_values(path_to_json) -> dict:
+def get_json_values(path_to_json: Text) -> Dict:
     """
-    Parse JSON file *path_to_json* into a Python dictionary.
+    Parse JSON file `path_to_json` into a Python dictionary.
 
     """
     log.info('Sourcing JSON values from "%s"', path_to_json)
@@ -49,17 +49,19 @@ def get_json_values(path_to_json) -> dict:
     return json_mapping
 
 
-def build_from_template(env_map, template_file_path, write_output=False):
+def build_from_template(
+    env_map: Dict, template_file_path: Text, write_output: bool = False
+) -> None:
     """
-    Take *template_file_path* and template against variables
-    defined by *env_map*.
+    Take `template_file_path` and template against variables
+    defined by `env_map`.
 
-    *template_file_path* needs to end with a ``.j2`` extension as the generated
-    content will be output to the *template_file_path* less the ``.j2``.
+    `template_file_path` needs to end with a `.j2` extension as the generated
+    content will be output to the `template_file_path` less the `.j2`.
 
-    A special custom filter ``env_override`` is available to bypass *env_map* and
-    source the environment for variable substitution.  Use the custom filter
-    ``env_override`` in your template as follows::
+    A special custom filter `env_override` is available to bypass `env_map` and
+    source the environment for variable substitution. Use the custom filter
+    `env_override` in your template as follows::
 
         "test" : {{ "default" | env_override('CUSTOM') }}
 
@@ -67,17 +69,11 @@ def build_from_template(env_map, template_file_path, write_output=False):
 
         export CUSTOM=some_value
 
-    The template will render::
-
-        ``some_value``
-
-    Otherwise::
-
-        ``default``
+    The template will render `some_value`. Otherwise, `default`.
 
     """
 
-    def env_override(value, key):
+    def env_override(value: Text, key: Text) -> Text:
         return os.getenv(key, value)
 
     target_template_file_path = os.path.splitext(template_file_path)
