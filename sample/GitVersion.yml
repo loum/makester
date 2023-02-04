@@ -80,3 +80,14 @@ branches:
     is-release-branch: true
     pre-release-weight: 1000
     source-branches: ['main']
+  release:
+    regex: ^release(|s)?[/-]
+    mode: ContinuousDelivery
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: [ 'develop', 'main', 'release' ]
+    tracks-release-branches: false
+    is-release-branch: true
+    is-mainline: false
