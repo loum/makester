@@ -193,7 +193,7 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=target,py-install-extras,dry-run
-@test "Python package extras install +MAKESTER__PIP_INSTALL_EXTRAS override: dry" {
+@test "Python package extras install MAKESTER__PIP_INSTALL_EXTRAS override: dry" {
     MAKESTER__PIP_INSTALL_EXTRAS=test\
  run make -f makefiles/makester.mk py-install-extras --dry-run
     assert_output --regexp '### Installing project dependencies into .*/venv ...
@@ -247,16 +247,61 @@ pipdeptree'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=target,py-fmt-src,dry-run
+@test "Python src modules formatter: dry" {
+    run make -f makefiles/makester.mk py-fmt-src --dry-run
+    assert_output "### Formatting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+black $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-fmt-src,dry-run
+@test "Python src modules formatter with MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-fmt-src --dry-run
+    assert_output "### Formatting Python files under \"something_else\"
+black something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-fmt-tests,dry-run
+@test "Python tests modules formatter: dry" {
+    run make -f makefiles/makester.mk py-fmt-tests --dry-run
+    assert_output "### Formatting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+black $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-fmt-tests,dry-run
+@test "Python tests modules formatter with MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-fmt-tests --dry-run
+    assert_output "### Formatting Python files under \"something_else\"
+black something_else"
+    [ "$status" -eq 0 ]
+}
+
 # bats test_tags=target,py-fmt-all,dry-run
-@test "Python module formatter for all under MAKESTER__PROJECTPATH: dry" {
+@test "Python module formatter for all modules: dry" {
     run make -f makefiles/makester.mk py-fmt-all --dry-run
-    assert_output --regexp "black $MAKESTER__PROJECT_DIR/src"
+    assert_output "### Formatting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+black $MAKESTER__PROJECT_DIR/src
+### Formatting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+black $MAKESTER__PROJECT_DIR/tests"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=target,py-fmt-all,dry-run
 @test "Python module formatter for all MAKESTER__PYTHONPATH override: dry" {
     MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-fmt-all --dry-run
-    assert_output --regexp "black something_else"
+    assert_output "### Formatting Python files under \"something_else\"
+black something_else
+### Formatting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+black $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-fmt-all,dry-run
+@test "Python module formatter for all MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-fmt-all --dry-run
+    assert_output "### Formatting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+black $MAKESTER__PROJECT_DIR/src
+### Formatting Python files under \"something_else\"
+black something_else"
     [ "$status" -eq 0 ]
 }
 
@@ -274,29 +319,169 @@ black src/makester'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=target,py-lint-src,dry-run
+@test "Python src modules linter: dry" {
+    run make -f makefiles/makester.mk py-lint-src --dry-run
+    assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+pylint $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-lint-src,dry-run
+@test "Python src modules linter with MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-src --dry-run
+    assert_output "### Linting Python files under \"something_else\"
+pylint something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-lint-tests,dry-run
+@test "Python tests modules linter: dry" {
+    run make -f makefiles/makester.mk py-lint-tests --dry-run
+    assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+pylint $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-lint-tests,dry-run
+@test "Python tests modules linter with MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-tests --dry-run
+    assert_output "### Linting Python files under \"something_else\"
+pylint something_else"
+    [ "$status" -eq 0 ]
+}
+
 # bats test_tags=target,py-lint-all,dry-run
 @test "Python module linter for all under MAKESTER__PROJECTPATH: dry" {
     run make -f makefiles/makester.mk py-lint-all --dry-run
-    assert_output --regexp "pylint $MAKESTER__PROJECT_DIR/src"
+    assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+pylint $MAKESTER__PROJECT_DIR/src
+### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+pylint $MAKESTER__PROJECT_DIR/tests"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=target,py-lint-all,dry-run
 @test "Python module linter for all MAKESTER__PYTHONPATH override: dry" {
     MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-all --dry-run
-    assert_output --regexp "pylint something_else"
+    assert_output "### Linting Python files under \"something_else\"
+pylint something_else
+### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+pylint $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-lint-all,dry-run
+@test "Python module linter for all MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-all --dry-run
+    assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+pylint $MAKESTER__PROJECT_DIR/src
+### Linting Python files under \"something_else\"
+pylint something_else"
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=target,py-lint,dry-run
-@test "Python module formatter LINT_PATH undefined: dry" {
+@test "Python module linter LINT_PATH undefined: dry" {
     run make -f makefiles/makester.mk py-lint --dry-run
     assert_output --partial '### "LINT_PATH" undefined'
     [ "$status" -eq 2 ]
 }
 # bats test_tags=target,py-lint,dry-run
-@test "Python module formatter LINT_PATH set: dry" {
+@test "Python module linter LINT_PATH set: dry" {
     LINT_PATH=src/makester run make -f makefiles/makester.mk py-lint --dry-run
     assert_output '### Linting Python files under "src/makester"
 pylint src/makester'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-type-src,dry-run
+@test "Python src modules type annotation: dry" {
+    run make -f makefiles/makester.mk py-type-src --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-src,dry-run
+@test "Python src modules type annotation MAKESTER__MYPY_OPTIONS override: dry" {
+    MAKESTER__MYPY_OPTIONS=--check-untyped-defs run make -f makefiles/makester.mk py-type-src --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --check-untyped-defs $MAKESTER__PROJECT_DIR/src"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-src,dry-run
+@test "Python src modules type annotation with MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-type-src --dry-run
+    assert_output "### Type annotating Python files under \"something_else\"
+mypy --disallow-untyped-defs something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-type-tests,dry-run
+@test "Python tests modules type annotation: dry" {
+    run make -f makefiles/makester.mk py-type-tests --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-tests,dry-run
+@test "Python tests modules type annotation MAKESTER__MYPY_OPTIONS override: dry" {
+    MAKESTER__MYPY_OPTIONS=--check-untyped-defs run make -f makefiles/makester.mk py-type-tests --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --check-untyped-defs $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-tests,dry-run
+@test "Python tests modules type annotation with MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-type-tests --dry-run
+    assert_output "### Type annotating Python files under \"something_else\"
+mypy --disallow-untyped-defs something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-type-all,dry-run
+@test "Python module type annotation for all under MAKESTER__PROJECTPATH: dry" {
+    run make -f makefiles/makester.mk py-type-all --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src
+### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-all,dry-run
+@test "Python module type annotation for all under MAKESTER__PROJECTPATH MAKESTER__MYPY_OPTIONS override: dry" {
+    MAKESTER__MYPY_OPTIONS=--check-untyped-defs run make -f makefiles/makester.mk py-type-all --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --check-untyped-defs $MAKESTER__PROJECT_DIR/src
+### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --check-untyped-defs $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-all,dry-run
+@test "Python module type annotation for all MAKESTER__PYTHONPATH override: dry" {
+    MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-type-all --dry-run
+    assert_output "### Type annotating Python files under \"something_else\"
+mypy --disallow-untyped-defs something_else
+### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/tests"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-type-all,dry-run
+@test "Python module type annotation for all MAKESTER__TESTS_PYTHONPATH override: dry" {
+    MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-type-all --dry-run
+    assert_output "### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src
+### Type annotating Python files under \"something_else\"
+mypy --disallow-untyped-defs something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-type,dry-run
+@test "Python module type annotation formatter TYPE_PATH undefined: dry" {
+    run make -f makefiles/makester.mk py-type --dry-run
+    assert_output --partial '### "TYPE_PATH" undefined'
+    [ "$status" -eq 2 ]
+}
+# bats test_tags=target,py-type,dry-run
+@test "Python module type annotation TYPE_PATH set: dry" {
+    TYPE_PATH=src/makester run make -f makefiles/makester.mk py-type --dry-run
+    assert_output '### Type annotating Python files under "src/makester"
+mypy --disallow-untyped-defs src/makester'
     [ "$status" -eq 0 ]
 }

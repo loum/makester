@@ -129,8 +129,7 @@ make py-deps
 
 !!! tag "[Makester v0.2.1](https://github.com/loum/makester/releases/tag/0.2.1)"
 
-Use the [black](https://pypi.org/project/black/) code formatter across all of your Python modules
-under `$MAKESTER__PROJECT_DIR/src`.
+Use [black](https://pypi.org/project/black/) for code formatting.
 
 ``` sh
 make py-fmt-all
@@ -142,10 +141,16 @@ All done! ✨ 🍰 ✨
 4 files left unchanged.
 ```
 
-Change the `SRC` path to `black` by overriding `MAKESTER__PYTHONPATH`:
+To target Python modules under `MAKESTER__PYTHONPATH`:
 
 ``` sh
-MAKESTER__PYTHONPATH=tests make py-fmt-all
+make py-fmt-src
+```
+
+Similarly for test modules, to target Python modules under `MAKESTER__TESTS_PYTHONPATH`:
+
+``` sh
+make py-fmt-tests
 ```
 
 To target a subset of your project, or even individual files with the `py-fmt`
@@ -189,8 +194,7 @@ All done! ✨ 🍰 ✨
 
 !!! tag "[Makester v0.2.1](https://github.com/loum/makester/releases/tag/0.2.1)"
 
-Use the [pylint](https://pypi.org/project/pylint/) code linter across all of your Python modules
-under `$MAKESTER__PROJECT_DIR/src`.
+Use [pylint](https://pypi.org/project/pylint/) for code linting.
 
 ``` sh
 make py-lint-all
@@ -203,17 +207,23 @@ make py-lint-all
 Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 ```
 
-Change the path to `pylint` by overriding `MAKESTER__PYTHONPATH`:
+To target Python modules under `MAKESTER__PYTHONPATH`:
 
 ``` sh
-MAKESTER__PYTHONPATH=src/makester make py-lint-all
+make py-lint-src
+```
+
+Similarly for test modules, to target Python modules under MAKESTER__TESTS_PYTHONPATH:
+
+``` sh
+make py-lint-tests
 ```
 
 To target a subset of your project, or even individual files with the `py-lint`
 target:
 
 ``` sh
-make py-fmt
+make py-lint
 ```
 
 Without providing a `LINT_PATH`, the command will error:
@@ -250,6 +260,71 @@ LINT_PATH=src/makester make py-lint
 Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 ```
 
+### Type annotating your Python modules
+
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3)"
+
+Use [mypy](https://mypy-lang.org/) for code type annotation.
+
+!!! note
+    Makester defaults to a more strict interpretation of type annotation checks with the
+    `--disallow-untyped-defs` switch. This can be overridden with `MAKESTER__MYPY_OPTIONS`.
+
+``` sh
+make py-type-all
+```
+
+``` sh title="Sample type annotation output."
+### Type annotating Python files under "/Users/lomarkovski/dev/makester/src"
+Success: no issues found in 4 source files
+```
+
+To target Python modules under `MAKESTER__PYTHONPATH`:
+
+``` sh
+make py-type-src
+```
+
+Similarly for test modules, to target Python modules under `MAKESTER__TESTS_PYTHONPATH`:
+
+``` sh
+make py-type-tests
+```
+
+To target a subset of your project, or even individual files with the `py-type` target:
+
+``` sh
+make py-type
+```
+
+Without providing a `TYPE_PATH`, the command will error:
+
+``` sh title="Formatting error without setting a path."
+### "TYPE_PATH" undefined
+###
+makefiles/py.mk:117: *** ###.  Stop.
+```
+
+The following example demonstrates how to set `TYPE_PATH` for a single Python module:
+``` sh title="Type annotating a Python module."
+TYPE_PATH=src/makester/templater.py make py-type
+```
+
+``` sh title="Sample type annotating output when setting LINT_PATH."
+### Type annotating Python files under "src/makester/templater.py"
+Success: no issues found in 1 source file
+```
+
+Directory paths to Python modules are also supported:
+``` sh title="Type annotating Python modules under a given path."
+TYPE_PATH=src/makester make py-type
+```
+
+``` sh title="Sample type annotation output when setting LINT_PATH with a path to Python modules."
+### Type annotating Python files under "src/makester"
+Success: no issues found in 4 source files
+```
+
 ## Variables
 ### `MAKESTER__SYSTEM_PYTHON`
 Path to the current system-wide `python` executable. In Makester context, this
@@ -283,3 +358,10 @@ Makester Python project directory structure follows the `src` layout. However, t
 overridden with `MAKESTER__PYTHONPATH` (default to `$MAKESTER__PROJECT_DIR/src`)
 
 `MAKESTER__PYTHONPATH` also acts as the default value for `PYTHONPATH` in your environment.
+
+### `MAKESTER__TESTS_PYTHONPATH`
+Python project `src` layout's `tests` directory location compliment (default to `$MAKESTER__PROJECT_DIR/tests`).
+
+### `MAKESTER__MYPY_OPTIONS`
+Control the switch settings to `mypy` when running type annotation across the code base (default
+`--disallow-untyped-defs`).

@@ -51,7 +51,7 @@ def templater(
         "-w",
         help="Write out templated file alongside Jinja2 template",
     ),
-):
+) -> None:
     """Template against environment variables or optional JSON values."""
     mappings = {}
     if mapping:
@@ -73,7 +73,7 @@ def backoff(
     detail: Text = typer.Option(
         "Service", "--detail", "-d", help="Meaningful description for backoff port"
     ),
-):
+) -> None:
     """Wait until dependent service is ready."""
     makester.waitster.port_backoff(host, port, detail)
 
@@ -84,7 +84,7 @@ def common(
     quiet: bool = typer.Option(
         False, "--quiet", help='Disable logs to screen (to log level "ERROR")'
     ),
-):
+) -> None:
     """Define the common arguments."""
     ctx.obj = Common(quiet)
 
@@ -92,7 +92,7 @@ def common(
         suppress_logging()
 
 
-def main():
+def main() -> None:
     """Script entry point."""
     app()
 
