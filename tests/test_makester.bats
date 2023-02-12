@@ -95,7 +95,7 @@ teardown_file() {
 @test "MAKESTER__RELEASE_VERSION with dynamic versioning" {
     MAKESTER__VERSION_FILE=$PWD/src/makester/VERSION\
  run make -f makefiles/makester.mk print-MAKESTER__RELEASE_VERSION
-    assert_output --regexp '^MAKESTER__RELEASE_VERSION=[0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}$'
+    assert_output --regexp '^MAKESTER__RELEASE_VERSION=[0-9]+\.[0-9]+\.[0-9]+([ab]{0,1}|rc)[0-9]{0,3}$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__RELEASE_VERSION
