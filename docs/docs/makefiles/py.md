@@ -365,3 +365,6 @@ Python project `src` layout's `tests` directory location compliment (default to 
 ### `MAKESTER__MYPY_OPTIONS`
 Control the switch settings to `mypy` when running type annotation across the code base (default
 `--disallow-untyped-defs`).
+
+---
+[top](#python)

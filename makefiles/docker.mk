@@ -8,8 +8,13 @@ $(info include makester/makefiles/makester.mk)
 $(error ### missing include dependency)
 endif
 
-# Docker is needed.
-MAKESTER__DOCKER ?= $(call check-exe,docker,https://docs.docker.com/get-docker/)
+# Defaults that can be overridden.
+MAKESTER__DOCKER_EXE_NAME ?= docker
+MAKESTER__DOCKER_EXE_INSTALL ?= https://docs.docker.com/get-docker
+
+ifndef MAKESTER__DOCKER
+  MAKESTER__DOCKER ?= $(call check-exe,$(MAKESTER__DOCKER_EXE_NAME),$(MAKESTER__DOCKER_EXE_INSTALL),optional)
+endif
 
 MAKESTER__CONTAINER_NAME ?= my-container
 MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
@@ -45,7 +50,11 @@ endif
 #
 # Deploy local registry server for container images.
 #
-_LOCAL_REGISTRY_IS_ACTIVE ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
+define _local-registry-is-active
+$($(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
+endef
+
+_LOCAL_REGISTRY_IS_ACTIVE ?= $(eval $(call _local-registry-is-active))
 
 MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
 MAKESTER__LOCAL_REGISTRY_PORT ?= 15000
@@ -95,7 +104,7 @@ ifndef MAKESTER__DOCKER_DRIVER_OUTPUT
 endif
 
 ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),) # Local image registry is running.
-  MAKESTER__SERVICE_NAME := localhost:$(MAKESTER__LOCAL_REGISTRY_PORT)/$(MAKESTER__SERVICE_NAME)
+  MAKESTER__SERVICE_NAME := localhost:$(value MAKESTER__LOCAL_REGISTRY_PORT)/$(MAKESTER__SERVICE_NAME)
 endif
 
 MAKESTER__IMAGE_TAG_ALIAS ?= $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG)
@@ -118,10 +127,12 @@ tag-image: _tag-image-warn image-tag
 _tag-image-warn:
 	$(call deprecated,tag-image,0.3.0,image-tag)
 
-IMAGE_TAG_ID := $(shell $(MAKESTER__DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
+define _image-tag-id
+$(shell $(MAKESTER__DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
+endef
 
 image-tag tag:
-	-$(MAKESTER__DOCKER) tag $(IMAGE_TAG_ID) $(MAKESTER__IMAGE_TAG_ALIAS)
+	-$(MAKESTER__DOCKER) tag $(call _image-tag-id) $(MAKESTER__IMAGE_TAG_ALIAS)
 
 _image-tag-msg:
 	$(info ### Tagging container image "$(MAKESTER__SERVICE_NAME)" as "$(MAKESTER__IMAGE_TARGET_TAG)")
@@ -218,9 +229,14 @@ status: _status-warn container-status
 _status-warn:
 	$(call deprecated,status,0.3.0,container-status)
 
-_RUNNING_CONTAINER ?= $(shell $(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
+define _running-container
+$($(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
+endef
+
+_RUNNING_CONTAINER ?= $(eval $(call _running-container))
+
 container-status:
-ifneq ($(_RUNNING_CONTAINER),)
+ifneq ($(value _RUNNING_CONTAINER),)
 	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is running.)
 	$(info ### Run "make container-stop" to terminate.)
 else

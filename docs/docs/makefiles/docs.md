@@ -62,3 +62,6 @@ The documentation preview server's port (default `8000`).
 
 ### `MAKESTER__DOCS_BUILD_PATH`
 The directory to output the result of the documentation build (default `<MAKESTER__DOCS_DIR>/out`).
+
+---
+[top](#documentation)

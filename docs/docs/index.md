@@ -21,6 +21,8 @@ If you use Python, Docker or Kubernetes daily then Makester can help you.
   tests`, which I further alias to `mt` as I run it a million times a day ...
 - Makester does not intend to tell you **_how_** you should to things. It's just there to help you
   work common tasks. If something you like is missing, then feel free to create a `Makefile` and
-  share
+  share.
 
 ---
+
+[top](#makester)

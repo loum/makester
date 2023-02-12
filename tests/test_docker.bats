@@ -301,7 +301,7 @@ docker buildx create --driver-opt network=host --name supa-builder --use'
 
 # bats test_tags=targets,docker-targets,container,container-status,dry-run
 @test "Container bash with container-status not running: dry" {
-    MAKESTER__DOCKER=docker MAKESTER__CONTAINER_NAME=supa-container\
+    MAKESTER__DOCKER=docker MAKESTER__CONTAINER_NAME=supa-container _RUNNING_CONTAINER=\
  run make -f makefiles/makester.mk container-status --dry-run
     assert_output '### "supa-container" image container is not running.
 ### Run "make container-run" to start.'
