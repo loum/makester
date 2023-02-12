@@ -326,9 +326,11 @@ Success: no issues found in 4 source files
 ```
 
 ## Variables
-### `MAKESTER__SYSTEM_PYTHON`
+### `MAKESTER__SYSTEM_PYTHON3`
 Path to the current system-wide `python` executable. In Makester context, this
 should only be used to create a Python virtual environment for your project.
+Makester will attempt to identify the Python interpreter from your environment path. However,
+`MAKESTER__SYSTEM_PYTHON3` can also be used to override the system-wide Python.
 
 ### `MAKESTER__PYTHON`
 Path to the Python virtual environment `python` executable. You can reference

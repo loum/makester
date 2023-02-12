@@ -81,7 +81,7 @@ branches:
     pre-release-weight: 1000
     source-branches: ['main']
   release:
-    regex: ^release(|s)?[/-]
+    regex: ^release(|s)$
     mode: ContinuousDelivery
     tag: ''
     increment: Patch

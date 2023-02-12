@@ -95,7 +95,7 @@ teardown_file() {
 @test "MAKESTER__RELEASE_VERSION with dynamic versioning" {
     MAKESTER__VERSION_FILE=$PWD/src/makester/VERSION\
  run make -f makefiles/makester.mk print-MAKESTER__RELEASE_VERSION
-    assert_output --regexp '^MAKESTER__RELEASE_VERSION=[0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}$'
+    assert_output --regexp '^MAKESTER__RELEASE_VERSION=[0-9]+\.[0-9]+\.[0-9]+([ab]{0,1}|rc)[0-9]{0,3}$'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__RELEASE_VERSION
@@ -200,27 +200,27 @@ teardown_file() {
 
 # bats test_tags=variables,makester-variables,MAKESTER__SERVICE_NAME
 @test "MAKESTER__SERVICE_NAME default should be set when calling py.mk" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" run make -f makefiles/makester.mk print-MAKESTER__SERVICE_NAME
+    MAKESTER__LOCAL_REGISTRY_RUNNING= run make -f makefiles/makester.mk print-MAKESTER__SERVICE_NAME
     assert_output 'MAKESTER__SERVICE_NAME=makefiles'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__SERVICE_NAME
 @test "MAKESTER__SERVICE_NAME override" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__SERVICE_NAME="whatever"\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__SERVICE_NAME="whatever"\
  run make -f makefiles/makester.mk print-MAKESTER__SERVICE_NAME
     assert_output 'MAKESTER__SERVICE_NAME=whatever'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__SERVICE_NAME
 @test "MAKESTER__SERVICE_NAME with MAKESTER__REPO_NAME value" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__REPO_NAME=supa-repo\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__REPO_NAME=supa-repo\
  run make -f makefiles/makester.mk print-MAKESTER__SERVICE_NAME
     assert_output 'MAKESTER__SERVICE_NAME=supa-repo/makefiles'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__SERVICE_NAME
 @test "MAKESTER__SERVICE_NAME override with MAKESTER__REPO_NAME value" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__SERVICE_NAME="whatever" MAKESTER__REPO_NAME=supa-repo\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__SERVICE_NAME="whatever" MAKESTER__REPO_NAME=supa-repo\
  run make -f makefiles/makester.mk print-MAKESTER__SERVICE_NAME
     assert_output 'MAKESTER__SERVICE_NAME=whatever'
     [ "$status" -eq 0 ]
@@ -228,34 +228,34 @@ teardown_file() {
 
 # bats test_tags=variables,makester-variables,MAKESTER__STATIC_SERVICE_NAME
 @test "MAKESTER__STATIC_SERVICE_NAME default should be set when calling py.mk" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
+    MAKESTER__LOCAL_REGISTRY_RUNNING= run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
     assert_output 'MAKESTER__STATIC_SERVICE_NAME=makefiles'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__STATIC_SERVICE_NAME
 @test "MAKESTER__STATIC_SERVICE_NAME with MAKESTER__SERVICE_NAME override" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__SERVICE_NAME="whatever"\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__SERVICE_NAME="whatever"\
  run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
     assert_output 'MAKESTER__STATIC_SERVICE_NAME=whatever'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__STATIC_SERVICE_NAME
 @test "MAKESTER__STATIC_SERVICE_NAME with MAKESTER__REPO_NAME value" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__REPO_NAME=supa-repo\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__REPO_NAME=supa-repo\
  run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
     assert_output 'MAKESTER__STATIC_SERVICE_NAME=supa-repo/makefiles'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__STATIC_SERVICE_NAME
 @test "MAKESTER__STATIC_SERVICE_NAME override with MAKESTER__REPO_NAME value" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__SERVICE_NAME="whatever" MAKESTER__REPO_NAME=supa-repo\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__SERVICE_NAME="whatever" MAKESTER__REPO_NAME=supa-repo\
  run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
     assert_output 'MAKESTER__STATIC_SERVICE_NAME=whatever'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__STATIC_SERVICE_NAME
 @test "MAKESTER__STATIC_SERVICE_NAME override but clobbered by MAKESTER__SERVICE_NAME" {
-    _LOCAL_REGISTRY_IS_ACTIVE="" MAKESTER__STATIC_SERVICE_NAME="whatever"\
+    MAKESTER__LOCAL_REGISTRY_RUNNING= MAKESTER__STATIC_SERVICE_NAME="whatever"\
  run make -f makefiles/makester.mk print-MAKESTER__STATIC_SERVICE_NAME
     assert_output 'MAKESTER__STATIC_SERVICE_NAME=makefiles'
     [ "$status" -eq 0 ]
