@@ -119,3 +119,11 @@ project's `.git` directory can be found).
 The name to use for the package distribution. Defaults to the `MAKESTER__PROJECT_NAME`
 but available if a distinction is required. `MAKESTER__PACKAGE_NAME` is also used to
 build the `MAKESTER__PYTHON_PROJECT_ROOT`  directory.
+
+### `MAKESTER__INCLUDES`
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3)"
+Control the Makester includes (defaults to all Makester `Makefile`s `py docker compose k8s kompose
+versioning docs`).
+
+---
+[top](#makester)

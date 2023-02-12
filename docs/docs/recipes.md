@@ -124,3 +124,6 @@ jobs:
           automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
           prerelease: true
 ```
+
+---
+[top](#recipes)

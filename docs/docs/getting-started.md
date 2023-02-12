@@ -23,7 +23,7 @@ Not sure what that means? Then add this snippet to your own `Makefile` to get yo
 .SILENT:
 .DEFAULT_GOAL := help
 
-include makester/makefiles/makester.mk
+include makefiles/makester.mk
 
 help: makester-help
     @echo "(Makefile)\n"
@@ -53,3 +53,33 @@ Or, let Makester do the update for you:
 ``` sh
 make submodule-update
 ```
+
+## Minimal mode
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.1.4)"
+
+In certain circumstances, you may only need a limited subset of Makester capability. It is
+possible to include only the Makester `Makefile`s that you need with the `MAKESTER__INCLUDES`
+environment variable. For example, to selectively include Python only tooling, set `MAKESTER__INCLUDES`
+as follows:
+
+``` sh title="Makester minimal mode."
+MAKESTER__INCLUDES=py make help
+```
+
+To make the settings persist, add the expression to your project's Makefile before the
+`include makefiles/makester.mk` call:
+
+``` sh title="Project Makefile in minimal mode."
+.SILENT:
+.DEFAULT_GOAL := help
+
+MAKESTER__INCLUDES := py docs
+
+include makefiles/makester.mk
+
+help: makester-help
+    @echo "(Makefile)\n"
+```
+
+---
+[top](#getting-started)

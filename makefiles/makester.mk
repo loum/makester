@@ -149,8 +149,14 @@ _version_val = $(if $(wildcard $(MAKESTER__VERSION_FILE)),$(shell cat $(MAKESTER
 MAKESTER__RELEASE_VERSION ?= $(call _version_val)
 
 # Makester includes happen here.
-_makefiles := py docker compose k8s kompose versioning docs
-_includes = $(foreach _m,$(_makefiles),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
+ifndef MAKESTER__INCLUDES
+  ifeq ($(strip $(MAKESTER__MINIMAL)),true)
+    MAKESTER__INCLUDES ?= py docs
+  else
+    MAKESTER__INCLUDES ?= py docker compose k8s kompose versioning docs
+  endif
+endif
+_includes ?= $(foreach _m,$(MAKESTER__INCLUDES),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
 include $(call _includes)
 
 vars:
@@ -172,8 +178,7 @@ vars:
   MAKESTER__STATIC_SERVICE_NAME:     $(MAKESTER__STATIC_SERVICE_NAME)\n\
   MAKESTER__VERSION_FILE:            $(MAKESTER__VERSION_FILE)\n"
 
-makester-help: _makester-help py-help docker-help compose-help k8s-help kompose-help versioning-help docs-help
-_makester-help:
+makester-help: $(patsubst %,%-help,$(value MAKESTER__INCLUDES))
 	@echo "\
 --------------------------------------------------------------------------------------------\n\
 Targets\n\

@@ -57,6 +57,26 @@ teardown_file() {
     [ "$status" -eq 0 ]
 }
 
+# MAKESTER__INCLUDES
+# bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
+@test "MAKESTER__INCLUDES should be set when calling makester.mk" {
+    run make -f makefiles/makester.mk print-MAKESTER__INCLUDES
+    assert_output 'MAKESTER__INCLUDES=py docker compose k8s kompose versioning docs'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
+@test "MAKESTER__INCLUDES override" {
+    MAKESTER__INCLUDES=py run make -f makefiles/makester.mk print-MAKESTER__INCLUDES
+    assert_output 'MAKESTER__INCLUDES=py'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
+@test "MAKESTER__INCLUDES with MAKESTER__MINIMAL set to 'true'" {
+    MAKESTER__MINIMAL=true run make -f makefiles/makester.mk print-MAKESTER__INCLUDES
+    assert_output 'MAKESTER__INCLUDES=py docs'
+    [ "$status" -eq 0 ]
+}
+
 # MAKESTER__LOCAL_IP
 # bats test_tags=variables,makester-variables,MAKESTER__LOCAL_IP
 @test "Override MAKESTER__LOCAL_IP override" {

@@ -80,3 +80,6 @@ GitVersion release variable value filter (defaults to `AssemblySemFileVer`).
 
 ### `MAKESTER__GITVERSION_VERSION`
 GitVersion docker image version (defaults to `latest`).
+
+---
+[top](#versioning)
