@@ -50,11 +50,8 @@ endif
 #
 # Deploy local registry server for container images.
 #
-define _local-registry-is-active
-$($(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
-endef
-
-_LOCAL_REGISTRY_IS_ACTIVE ?= $(eval $(call _local-registry-is-active))
+MAKESTER__LOCAL_REGISTRY_RUNNING ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
+#$(info ### MAKESTER__LOCAL_REGISTRY_RUNNING $(MAKESTER__LOCAL_REGISTRY_RUNNING))
 
 MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
 MAKESTER__LOCAL_REGISTRY_PORT ?= 15000
@@ -66,7 +63,7 @@ _image-registry-backoff:
 	@venv/bin/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__LOCAL_REGISTRY_PORT) --detail "Local registry server"
 
 _image-registry-start:
-ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+ifeq ($(call MAKESTER__LOCAL_REGISTRY_RUNNING),makester-registry)
 	$(info ### makester-registry is running. Run "make image-registry-stop" to terminate.)
 else
 	$(info ### Starting local Docker image registry ...)
@@ -85,7 +82,7 @@ image-buildx-builder:
 image-registry-start: _image-registry-start _image-registry-backoff
 
 image-registry-stop:
-ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),)
+ifeq ($(call MAKESTER__LOCAL_REGISTRY_RUNNING),makester-registry)
 	$(info ### Stopping local Docker image registry.)
 	$(MAKESTER__DOCKER) container stop makester-registry
 else
@@ -96,14 +93,14 @@ endif
 # Docker builder driver output type based on whether local server registry is running.
 #
 ifndef MAKESTER__DOCKER_DRIVER_OUTPUT
-  ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),) # Local image registry is running.
+  ifeq ($(call MAKESTER__LOCAL_REGISTRY_RUNNING),makester-registry) # Local image registry is running.
     MAKESTER__DOCKER_DRIVER_OUTPUT ?= push
   else
     MAKESTER__DOCKER_DRIVER_OUTPUT ?= load
   endif
 endif
 
-ifneq ($(_LOCAL_REGISTRY_IS_ACTIVE),) # Local image registry is running.
+ifeq ($(call MAKESTER__LOCAL_REGISTRY_RUNNING),makester-registry) # Local image registry is running.
   MAKESTER__SERVICE_NAME := localhost:$(value MAKESTER__LOCAL_REGISTRY_PORT)/$(MAKESTER__SERVICE_NAME)
 endif
 
@@ -229,19 +226,15 @@ status: _status-warn container-status
 _status-warn:
 	$(call deprecated,status,0.3.0,container-status)
 
-define _running-container
-$($(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
-endef
-
-_RUNNING_CONTAINER ?= $(eval $(call _running-container))
+MAKESTER__RUNNING_CONTAINER ?= $(shell $(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 
 container-status:
-ifneq ($(value _RUNNING_CONTAINER),)
-	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is running.)
-	$(info ### Run "make container-stop" to terminate.)
-else
+ifeq ($(call MAKESTER__RUNNING_CONTAINER),)
 	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is not running.)
 	$(info ### Run "make container-run" to start.)
+else
+	$(info ### "$(MAKESTER__CONTAINER_NAME)" image container is running.)
+	$(info ### Run "make container-stop" to terminate.)
 endif
 
 docker-help:

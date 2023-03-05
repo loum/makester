@@ -8,6 +8,7 @@ setup_file() {
     export MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
 }
 setup() {
+    unset MAKESTER__SYSTEM_PYTHON3
     load 'test_helper/common-setup'
     _common_setup
 }

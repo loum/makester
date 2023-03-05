@@ -189,6 +189,11 @@ To access the new image from the local registry server:
 docker pull localhost:15000/supa-cool-repo/my-project:52c13b1
 ```
 
+The local registry server can now be terminated:
+``` sh
+make image-registry-stop
+```
+
 Create a tag to align with the project's naming convention:
 ``` sh
 docker tag localhost:15000/supa-cool-repo/my-project:52c13b1 supa-cool-repo/my-project:52c13b1
@@ -322,7 +327,7 @@ Unique identifier used to distinguish container image builds. Defaults to
 
 ### `MAKESTER__IMAGE_TAG_ALIAS`
 Convenience variable that is made up of the 
-[Hello](../makester/#makester__service_name) and `MAKESTER__IMAGE_TARGET_TAG`. For example:
+[MAKESTER__SERVICE_NAME](../makester/#makester__service_name) and `MAKESTER__IMAGE_TARGET_TAG`. For example:
 
 ``` sh title="MAKESTER__SERVICE_NAME sample value"
 MAKESTER__SERVICE_NAME=supa-cool-repo/my-project
