@@ -46,7 +46,7 @@ include makester/makefiles/makester.mk'
 # MAKESTER__COMPOSE_RUN_CMD
 # bats test_tags=variables,compose-variables,MAKESTER__COMPOSE_RUN_CMD
 @test "MAKESTER__COMPOSE_RUN_CMD default should be set when calling compose.mk" {
-    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker _LOCAL_REGISTRY_IS_ACTIVE=\
+    MAKESTER__PROJECT_NAME=makester MAKESTER__DOCKER=docker MAKESTER__LOCAL_REGISTRY_RUNNING=\
  run make -f makefiles/makester.mk print-MAKESTER__COMPOSE_RUN_CMD
     assert_output --regexp "MAKESTER__COMPOSE_RUN_CMD=\
 SERVICE_NAME=makester HASH=[0-9a-z]{7} docker compose --project-name makester -f docker-compose.yml version"
