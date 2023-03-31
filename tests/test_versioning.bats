@@ -69,13 +69,13 @@ include makester/makefiles/makester.mk'
 # bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
 @test "MAKESTER__GITVERSION_VERSION when MAKESTER__ARCH is arm64" {
     MAKESTER__ARCH=arm64 run make -f makefiles/makester.mk print-MAKESTER__GITVERSION_VERSION
-    assert_output "MAKESTER__GITVERSION_VERSION=5.11.1-ubuntu.20.04-6.0-arm64"
+    assert_output "MAKESTER__GITVERSION_VERSION=5.12.0-ubuntu.20.04-6.0-arm64"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION
 @test "MAKESTER__GITVERSION_VERSION when MAKESTER__ARCH is other than arm64" {
     MAKESTER__ARCH=anything_else run make -f makefiles/makester.mk print-MAKESTER__GITVERSION_VERSION
-    assert_output "MAKESTER__GITVERSION_VERSION=5.11.1-alpine.3.13-6.0"
+    assert_output "MAKESTER__GITVERSION_VERSION=5.12.0-alpine.3.14-6.0"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,versioning-variables,MAKESTER__GITVERSION_VERSION

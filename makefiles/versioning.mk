@@ -13,34 +13,48 @@ MAKESTER__GITVERSION_CONFIG ?= makester/sample/GitVersion.yml
 MAKESTER__GITVERSION_VARIABLE ?= AssemblySemFileVer
 ifndef MAKESTER__GITVERSION_VERSION
   ifeq ($(MAKESTER__ARCH), arm64)
-    MAKESTER__GITVERSION_VERSION ?= 5.11.1-ubuntu.20.04-6.0-arm64
+    MAKESTER__GITVERSION_VERSION ?= 5.12.0-ubuntu.20.04-6.0-arm64
   else 
-    MAKESTER__GITVERSION_VERSION ?= 5.11.1-alpine.3.13-6.0
+    MAKESTER__GITVERSION_VERSION ?= 5.12.0-alpine.3.14-6.0
   endif
 endif
 
 _dump_versioning:
 	$(shell which cat) $(MAKESTER__WORK_DIR)/versioning
 
-# GitVersion help (default).
-CMD ?= /h
-_gitversion-cmd: makester-work-dir
-	@$(MAKESTER__DOCKER) run --rm\
- -v "$(MAKESTER__GIT_DIR):/$(MAKESTER__PROJECT_NAME)"\
- gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(CMD) > $(MAKESTER__WORK_DIR)/versioning 2>/dev/null
+# Run GitVersion.
+#
+# Params:
+#   1. GitVersion sub-command.
+define _gitversion-cmd
+	$(MAKE) makester-work-dir
+	$(call _gitversion-exe,$(value 1))
+endef
 
-gitversion: _gitversion-cmd _dump_versioning
+define _gitversion-exe
+	@$(MAKESTER__DOCKER) run --rm -v "$(MAKESTER__GIT_DIR):/$(MAKESTER__PROJECT_NAME)"\
+ gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(1)
+endef
+
+# | tee $(MAKESTER__WORK_DIR)/versioning
+
+# GitVersion help (default).
+gitversion:
+	$(call _gitversion-cmd,/h)
+	$(MAKE) _dump_versioning
 
 # GitVersion executable's version.
-gitversion-version: _gitversion-version-msg _gitversion-version _dump_versioning
-_gitversion-version-msg:
+gitversion-version:
 	$(info ### Current GitVersion version ...)
-_gitversion-version: CMD := /version
+	$(call _gitversion-cmd,/version)
 
 # GitVersion version variables.
-_gitversion-versions: CMD = /$(MAKESTER__PROJECT_NAME) /config $(MAKESTER__GITVERSION_CONFIG)
+_gitversion-versions:
+	$(call _gitversion-cmd,/$(MAKESTER__PROJECT_NAME) /config $(MAKESTER__GITVERSION_CONFIG)) > $(MAKESTER__WORK_DIR)/versioning
 
-_gitversion-version _gitversion-versions: _gitversion-cmd
+# GitVersion raw output.
+gitversion-debug:
+	$(call _gitversion-cmd,/$(MAKESTER__PROJECT_NAME) /config $(MAKESTER__GITVERSION_CONFIG))
 
 _gitversion-versions-rm: MAKESTER__WORK_DIR := $(MAKESTER__WORK_DIR)
 _gitversion-versions-rm:
@@ -75,6 +89,7 @@ versioning-help:
 	@echo "($(MAKESTER__MAKEFILES)/versioning.mk)\n\
   gitversion           GitVersion usage message\n\
   gitversion-clear     Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\"\n\
+  gitversion-debug     Display the GitVersion project release values unfiltered\n\
   gitversion-release   GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\" to $(MAKESTER__VERSION_FILE)\n\
   gitversion-release-ro\n\
                        Read-only dump of GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\"\n\
