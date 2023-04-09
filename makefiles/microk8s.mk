@@ -10,13 +10,13 @@ endif
 
 MAKESTER__MICROK8S_EXE_NAME ?= microk8s
 MAKESTER__MICROK8S_EXE_INSTALL ?= https://microk8s.io/docs/getting-started
-MAKESTER__MICROK8S ?= $(call check-exe,$(MAKESTER__MICROK8S_EXE_NAME),$(MAKESTER__MICROK8s_EXE_INSTALL),optional)
+MAKESTER__MICROK8S ?= $(call check-exe,$(MAKESTER__MICROK8S_EXE_NAME),$(MAKESTER__MICROK8S_EXE_INSTALL),optional)
 
 # MicroK8s command runner.
 #
 _uk8s-cmd:
 	$(if $(MAKESTER__MICROK8S),,$(call _microk8s-cmd-err))
-	$(MAKESTER__MICROK8S) $(UK8S_CMD)
+	-$(MAKESTER__MICROK8S) $(UK8S_CMD)
 
 define _microk8s-cmd-err
 	$(info ### MAKESTER__MICROK8S: <undefined>)
@@ -34,13 +34,19 @@ _microk8s-status: UK8S_CMD = status
 # MicroK8s install.
 _microk8s-install-msg:
 	$(info ### Installing MicroK8s ...)
-microk8s-install: _microk8s-install-msg _microk8s-install
+microk8s-install:
+ifeq ($(MAKESTER__UNAME),Darwin)
+	$(MAKE) _microk8s-install-msg _microk8s-install
+endif
 _microk8s-install: UK8S_CMD = install
 
 # MicroK8s uninstall.
 _microk8s-uninstall-msg:
 	$(info ### Uninstalling MicroK8s ...)
-microk8s-uninstall: _microk8s-uninstall-msg _microk8s-uninstall
+microk8s-uninstall:
+ifeq ($(MAKESTER__UNAME),Darwin)
+	$(MAKE) _microk8s-uninstall-msg _microk8s-uninstall
+endif
 _microk8s-uninstall: UK8S_CMD = uninstall
 
 # MicroK8s wait until running status.
@@ -72,7 +78,10 @@ _microk8s-stop: UK8S_CMD = stop
 #
 _microk8s-reset-msg:
 	$(info ### Resetting MicroK8s ...)
-microk8s-reset: _microk8s-reset-msg _microk8s-reset
+microk8s-reset:
+ifeq ($(MAKESTER__UNAME),Darwin)
+	$(MAKE) _microk8s-reset-msg _microk8s-reset
+endif
 _microk8s-reset: UK8S_CMD = reset
 
 # MicroK8s enable the DNS addon.
@@ -89,6 +98,24 @@ _microk8s-namespaces-msg:
 	$(info ### Display all active namespaces in MicroK8s ...)
 microk8s-namespaces: _microk8s-namespaces-msg _microk8s-namespaces
 _microk8s-namespaces: UK8S_CMD = kubectl get namespace
+
+# Add a namespace to the MicroK8s cluster.
+#
+_microk8s-namespaces-add-msg:
+	$(info ### Create namespace "$(value K8S_NAMESPACE)" in MicroK8s ...)
+microk8s-namespace-add:
+	$(call check-defined,K8S_NAMESPACE)
+	@$(MAKE) _microk8s-namespaces-add-msg _microk8s-namespace-add
+_microk8s-namespace-add: UK8S_CMD = kubectl create namespace "$(K8S_NAMESPACE)"
+
+# Delete a namespace from the MicroK8s cluster.
+#
+_microk8s-namespaces-del-msg:
+	$(info ### Deleting namespace "$(value K8S_NAMESPACE)" in MicroK8s ...)
+microk8s-namespace-del:
+	$(call check-defined,K8S_NAMESPACE)
+	$(MAKE) _microk8s-namespaces-del-msg _microk8s-namespace-del
+_microk8s-namespace-del: UK8S_CMD = kubectl delete namespace "$(K8S_NAMESPACE)"
 
 # Deploy and Access the Kubernetes dashboard.
 #
@@ -130,7 +157,7 @@ _microk8s-dashboard: UK8S_CMD = kubectl port-forward svc/kubernetes-dashboard\
  --address="0.0.0.0" > $(MAKESTER__WORK_DIR)/microk8s-dashboard.out 2>&1 &
 
 _microk8s-reset-dashboard:
-	-$(shell which pkill) -f "kubectl port-forward svc/kubernetes-dashboard"
+	-$(shell which pkill) -f "port-forward svc/kubernetes-dashboard"
 
 _microk8s-addon-dashboard-wait:
 	$(info ### Waiting for Kubernetes dashboard service ...)
@@ -140,7 +167,7 @@ define _microk8s-addon-dashboard-wait-cmd
 	until [ $$($(MAKESTER__MICROK8S) status --addon dashboard) = enabled ]; do sleep 2; done
 endef
 
-# Wait for the pods in the kube-system:kubernetes-dashboard pod be to in the ready state.
+# Wait for the kubernetes-dashboard pod in the kube-system namespace be to in the ready state.
 #
 microk8s-pod-wait:
 	$(info ### Waiting for Kubernetes pods in kube-system namespace to be ready ...)
@@ -170,12 +197,11 @@ microk8s-up:
 # All-in-one helper to reset MicroK8s and stop services.
 microk8s-down:
 	@$(MAKE) microk8s-dashboard-stop
+ifeq ($(MAKESTER__UNAME),Darwin)
 	@$(MAKE) microk8s-reset
+endif
 	@$(MAKE) microk8s-stop
 	@$(MAKE) microk8s-uninstall
-
-requires-sudo:
-	$(info ### This MicroK8s command requires elevated privileges to run)
 
 _microk8s-addon-dashboard\
  _microk8s-addon-dns\
@@ -184,6 +210,8 @@ _microk8s-addon-dashboard\
  _microk8s-dashboard-proxy\
  _microk8s-install\
  _microk8s-namespaces\
+ _microk8s-namespace-add\
+ _microk8s-namespace-del\
  _microk8s-reset\
  _microk8s-start\
  _microk8s-status\
@@ -198,10 +226,17 @@ microk8s-help:
                        Enable the MicroK8s DNS addon\n\
   microk8s-addon-dns   Enable the MicroK8s DNS addon\n\
   microk8s-dashboard   MicroK8s Kubernetes dashboard as a background service\n\
+  microk8s-dashboard-creds\n\
+                       Display the MicroK8s Kubernetes dashboard auth token\n\
   microk8s-dashboard-proxy\n\
                        MicroK8s CLI-blocking Kubernetes dashboard\n\
   microk8s-down        All-in-one helper to stop and release MicroK8s service resources\n\
   microk8s-install     Setup MicroK8s VM with default options\n\
+  microk8s-namespaces  List the namespaces in the MicroK8s cluster\n\
+  microk8s-namespace-add\n\
+                       Create namespace defined by \"K8S_NAMESPACES\" in MicroK8s cluster\n\
+  microk8s-namespace-del\n\
+                       Delete namespace defined by \"K8S_NAMESPACES\" from MicroK8s cluster\n\
   microk8s-start       Starts the kubernetes cluster\n\
   microk8s-status      Displays the status of the cluster\n\
   microk8s-stop        Stop Kubernetes\n\

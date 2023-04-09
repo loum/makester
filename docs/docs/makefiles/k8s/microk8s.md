@@ -1,5 +1,7 @@
 # MicroK8s
 
+!!! tag "[Makester v0.2.4](https://github.com/loum/makester/releases/tag/0.2.4)"
+
 [MicroK8s](https://microk8s.io/){target="_blank"} is an alternate, lightweight Kubernetes implementation
 that is ideal for localised testing, experimentation and shaking out production deployments.
 
@@ -67,14 +69,14 @@ make microk8s-down
 A convenience target to start the most essential Kubernetes services, such as DNS, and
 provide access to the Kubernetes dashboard:
 
-``` sh title="Kubernetes service start helper."
+``` sh
 make microk8s-up
 ```
 
 ### All-in-one Kubernetes service stopper
 Restore the MicroK8s to original state and release all resources:
 
-``` sh title="Kubernetes service stop helper."
+``` sh
 make microk8s-down
 ```
 
@@ -84,7 +86,7 @@ make microk8s-down
 ### Start MicroK8s
 Start a local, lightweight Kubernetes:
 
-``` sh title="Start Kubernetes."
+``` sh
 make microk8s-start
 ```
 
@@ -92,14 +94,14 @@ make microk8s-start
 In addition to the `microk8s status` target, this alternate status target will wait until all of
 the Kubernetes targets are ready:
 
-``` sh title="Wait for Kubernetes."
+``` sh
 make microk8s-wait
 ```
 
 ### MicroK8s version
 Print the installed MicroK8s version and revision number:
 
-``` sh title="MicroK8s version."
+``` sh
 make microk8s-version
 ```
 
@@ -113,7 +115,7 @@ Server Version: v1.26.3
 This MicroK8s Kubernetes dashboard variant is non-blocking and can be used in pipelines and
 scripts. It will automatically enable the dashboard addon:
 
-``` sh title="MicroK8s Kubernetes dashboard."
+``` sh
 make microk8s-dashboard
 ```
 
@@ -136,27 +138,39 @@ Enter the token at the Kubernetes dashboard login screen:
 ### Enable the Kubernetes dashboard addon
 See for [Addon: dashboard](https://microk8s.io/docs/addon-dashboard){target="_blank"} for more information:
 
-``` sh title="Enable the Kubernetes dashboard addon."
+``` sh
 make microk8s-addon-dashboard
 ```
 
+### Regenerate the MicroK8s Kubernetes dashboard authentication token
+The MicroK8s Kubernetes dashboard will timeout the login after a period of inactivity. Regenerate
+the token with:
+
+``` sh
+make microk8s-dashboard-creds
+```
+
 ### Start the MicroK8s Kubernetes dashboard proxy
+This is a CLI-blocking variant of `make microk8s-dashboard`. Use `Ctrl-C` to terminate.
+
 See [microk8s dashboard-proxy](https://microk8s.io/docs/command-reference#heading--microk8s-dashboard-proxy){target="_blank"}
 for more information:
 
-``` sh title="MicroK8s Kubernetes dashboard proxy."
+``` sh
 make microk8s-dashboard-proxy
 ```
-This is a CLI-blocking variant of `make microk8s-dashboard`. Use `Ctrl-C` to terminate.
 
 ### List active namespaces in the Kubernetes cluster
 This `kubectl` command lists the current active namespaces:
 
-``` sh title="kubectl: list Kubernetes namespaces."
+``` sh
 make microk8s-namespaces
 ```
 
 ## Variables
+
+### `MICROK8S_DASHBOARD_PORT`
+The MicroK8s Kubernetes dashboard port (default `<19443>`).
 
 ---
 [top](#microk8s)

@@ -56,6 +56,20 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,microk8s-variables,MICROK8S_DASHBOARD_PORT
+@test "MICROK8S_DASHBOARD_PORT default should be set when calling k8s.mk" {
+    run make -f makefiles/makester.mk print-MICROK8S_DASHBOARD_PORT
+    assert_output 'MICROK8S_DASHBOARD_PORT=19443'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,microk8s-variables,MICROK8S_DASHBOARD_PORT
+@test "MICROK8S_DASHBOARD_PORT override" {
+    MICROK8S_DASHBOARD_PORT=19449\
+ run make -f makefiles/makester.mk print-MICROK8S_DASHBOARD_PORT
+    assert_output 'MICROK8S_DASHBOARD_PORT=19449'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=targets,microk8s-targets,microk8s-status,dry-run
@@ -78,18 +92,36 @@ microk8s status'
 }
 
 # bats test_tags=targets,microk8s-targets,microk8s-install,dry-run
-@test "Microk8s install: dry" {
-    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-install --dry-run
-    assert_output '### Installing MicroK8s ...
+@test "Microk8s install for Darwin: dry" {
+    MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-install --dry-run
+    assert_output --partial 'make _microk8s-install-msg _microk8s-install
+### Installing MicroK8s ...
 microk8s install'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-install,dry-run
+@test "Microk8s install for Linux: dry" {
+    MAKESTER__UNAME=Linux MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-install --dry-run
+    assert_output ''
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,microk8s-targets,microk8s-uninstall,dry-run
-@test "Microk8s uninstall: dry" {
-    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-uninstall --dry-run
-    assert_output '### Uninstalling MicroK8s ...
+@test "Microk8s uninstall for Darwin: dry" {
+    MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-uninstall --dry-run
+    assert_output --partial 'make _microk8s-uninstall-msg _microk8s-uninstall
+### Uninstalling MicroK8s ...
 microk8s uninstall'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-uninstall,dry-run
+@test "Microk8s uninstall for Linux: dry" {
+    MAKESTER__UNAME=Linux MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-uninstall --dry-run
+    assert_output ''
     [ "$status" -eq 0 ]
 }
 
@@ -120,6 +152,62 @@ microk8s dashboard-proxy'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=targets,microk8s-targets,microk8s-dashboard-creds,dry-run
+@test "Microk8s dashboard authorisation token: dry" {
+    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-dashboard-creds --dry-run
+    assert_output '### Login to the MicroK8s Kubernetes dashboard with following token:
+microk8s kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="{.data.token}" | base64 -d; echo'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=targets,microk8s-targets,microk8s-dashboard,dry-run
+@test "Makester Microk8s dashboard: dry" {
+    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-dashboard --dry-run
+    assert_output --regexp 'pkill -f "port-forward svc/kubernetes-dashboard"
+.*make _microk8s-addon-dashboard
+### Enabling the MicroK8s dashboard addon ...
+microk8s enable dashboard
+.*make _microk8s-addon-dashboard-wait
+### Waiting for Kubernetes dashboard service ...
+until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
+.*make microk8s-pod-wait
+### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
+### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
+### Kubernetes dashboard log output can be found at /.*/.makester/microk8s-dashboard.out
+.*make _microk8s-dashboard _microk8s-dashboard-backoff
+microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 --address="0.0.0.0" > /.*/.makester/microk8s-dashboard.out 2>&1 &
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
+.*make microk8s-dashboard-creds
+### Login to the MicroK8s Kubernetes dashboard with following token:
+microk8s kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="\{.data.token\}" \| base64 -d; echo$'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-dashboard,dry-run
+@test "Makester Microk8s dashboard override MICROK8S_DASHBOARD_PORT: dry" {
+    MAKESTER__MICROK8S=microk8s MICROK8S_DASHBOARD_PORT=19999\
+ run make -f makefiles/makester.mk microk8s-dashboard --dry-run
+    assert_output --regexp 'pkill -f "port-forward svc/kubernetes-dashboard"
+.*make _microk8s-addon-dashboard
+### Enabling the MicroK8s dashboard addon ...
+microk8s enable dashboard
+.*make _microk8s-addon-dashboard-wait
+### Waiting for Kubernetes dashboard service ...
+until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
+.*make microk8s-pod-wait
+### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
+### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19999
+### Kubernetes dashboard log output can be found at /.*/.makester/microk8s-dashboard.out
+.*make _microk8s-dashboard _microk8s-dashboard-backoff
+microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19999:443 --address="0.0.0.0" > /.*/.makester/microk8s-dashboard.out 2>&1 &
+venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19999 --detail "MicroK8s Kubernetes dashboard"
+.*make microk8s-dashboard-creds
+### Login to the MicroK8s Kubernetes dashboard with following token:
+microk8s kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="\{.data.token\}" \| base64 -d; echo$'
+    [ "$status" -eq 0 ]
+}
+
 # bats test_tags=targets,microk8s-targets,microk8s-addon-dashboard,dry-run
 @test "Microk8s addon for dashboard: dry" {
     MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-addon-dashboard --dry-run
@@ -131,7 +219,7 @@ microk8s enable dashboard
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
 .*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
-until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null | grep kubernetes-dashboard | cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done'
+until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done'
     [ "$status" -eq 0 ]
 }
 
@@ -152,11 +240,58 @@ microk8s kubectl get namespace'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=targets,microk8s-targets,microk8s-namespace-add,dry-run
+@test "Microk8s namespace add with missing K8S_NAMESPACE: dry" {
+    MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-namespace-add --dry-run
+    assert_output --regexp '### "K8S_NAMESPACE" undefined
+### 
+makefiles/microk8s.mk:[0-9]+: \*\*\* ###.  Stop.'
+    [ "$status" -eq 2 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-namespace-add,dry-run
+@test "Microk8s namespace add with K8S_NAMESPACE set: dry" {
+    MAKESTER__MICROK8S=microk8s K8S_NAMESPACE=argocd\
+ run make -f makefiles/makester.mk microk8s-namespace-add --dry-run
+    assert_output --regexp 'make _microk8s-namespaces-add-msg _microk8s-namespace-add
+### Create namespace "argocd" in MicroK8s ...
+microk8s kubectl create namespace "argocd"'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=targets,microk8s-targets,microk8s-namespace-del,dry-run
+@test "Microk8s namespace delete with missing K8S_NAMESPACE: dry" {
+    MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-namespace-del --dry-run
+    assert_output --regexp '### "K8S_NAMESPACE" undefined
+### 
+makefiles/microk8s.mk:[0-9]+: \*\*\* ###.  Stop.'
+    [ "$status" -eq 2 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-namespace-del,dry-run
+@test "Microk8s namespace delete with K8S_NAMESPACE set: dry" {
+    MAKESTER__MICROK8S=microk8s K8S_NAMESPACE=argocd\
+ run make -f makefiles/makester.mk microk8s-namespace-del --dry-run
+    assert_output --regexp 'make _microk8s-namespaces-del-msg _microk8s-namespace-del
+### Deleting namespace "argocd" in MicroK8s ...
+microk8s kubectl delete namespace "argocd"'
+    [ "$status" -eq 0 ]
+}
+
 # bats test_tags=targets,microk8s-targets,microk8s-reset,dry-run
-@test "Microk8s reset to original settings: dry" {
-    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-reset --dry-run
-    assert_output '### Resetting MicroK8s ...
+@test "Microk8s reset to original settings for Darwin: dry" {
+    MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-reset --dry-run
+    assert_output --partial 'make _microk8s-reset-msg _microk8s-reset
+### Resetting MicroK8s ...
 microk8s reset'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-reset,dry-run
+@test "Microk8s reset to original settings for Linux: dry" {
+    MAKESTER__UNAME=Linux MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-reset --dry-run
+    assert_output ''
     [ "$status" -eq 0 ]
 }
 
@@ -164,8 +299,6 @@ microk8s reset'
 @test "Microk8s all-in-one starter: dry" {
     MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-up --dry-run
     assert_output --regexp 'make microk8s-install
-### Installing MicroK8s ...
-microk8s install
 .*make microk8s-start
 ### Starting MicroK8s ...
 microk8s start
@@ -177,7 +310,7 @@ microk8s status --wait-ready
 microk8s enable dns
 ### Checking MicroK8s status ...
 .*make microk8s-dashboard
-/.*/pkill -f "kubectl port-forward svc/kubernetes-dashboard"
+/.*/pkill -f "port-forward svc/kubernetes-dashboard"
 .*make _microk8s-addon-dashboard
 ### Enabling the MicroK8s dashboard addon ...
 microk8s enable dashboard
@@ -186,7 +319,7 @@ microk8s enable dashboard
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
 .*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
-until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null | grep kubernetes-dashboard | cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
+until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
 ### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
 ### Kubernetes dashboard log output can be found at /.*/.makester/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
@@ -194,26 +327,43 @@ microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 
 venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
-microk8s kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="\{.data.token\}" | base64 -d; echo$'
+microk8s kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="\{.data.token\}" \| base64 -d; echo$'
 
     [ "$status" -eq 0 ]
 }
 
 # bats test_tags=targets,microk8s-targets,microk8s-down,dry-run
-@test "Microk8s all-in-one stopper: dry" {
-    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-down --dry-run
+@test "Microk8s all-in-one stopper for Darwin: dry" {
+    MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-down --dry-run
     assert_output --regexp 'make microk8s-dashboard-stop
 ### Closing MicroK8s dashboard port-forward at https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
 .*make _microk8s-reset-dashboard
-/.*/pkill -f "kubectl port-forward svc/kubernetes-dashboard"
+/.*/pkill -f "port-forward svc/kubernetes-dashboard"
 .*make microk8s-reset
+.*make _microk8s-reset-msg _microk8s-reset
 ### Resetting MicroK8s ...
 microk8s reset
 .*make microk8s-stop
 ### Stopping MicroK8s ...
 microk8s stop
 .*make microk8s-uninstall
+.*make _microk8s-uninstall-msg _microk8s-uninstall
 ### Uninstalling MicroK8s ...
 microk8s uninstall$'
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=targets,microk8s-targets,microk8s-down,dry-run
+@test "Microk8s all-in-one stopper for Linux: dry" {
+    MAKESTER__UNAME=Linux MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-down --dry-run
+    assert_output --regexp 'make microk8s-dashboard-stop
+### Closing MicroK8s dashboard port-forward at https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
+.*make _microk8s-reset-dashboard
+/.*/pkill -f "port-forward svc/kubernetes-dashboard"
+.*make microk8s-stop
+### Stopping MicroK8s ...
+microk8s stop
+.*make microk8s-uninstall$'
     [ "$status" -eq 0 ]
 }

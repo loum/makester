@@ -61,7 +61,7 @@ teardown_file() {
 # bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
 @test "MAKESTER__INCLUDES should be set when calling makester.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__INCLUDES
-    assert_output 'MAKESTER__INCLUDES=py docker compose k8s microk8s kompose versioning docs'
+    assert_output 'MAKESTER__INCLUDES=py docker compose k8s microk8s argocd kompose versioning docs'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
