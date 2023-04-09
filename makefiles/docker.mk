@@ -140,19 +140,19 @@ image-tag-latest tag-latest: MAKESTER__IMAGE_TARGET_TAG = latest
 image-tag-latest tag-latest: _image-tag-msg tag
 
 image-tag-latest-rm tag-rm-latest: MAKESTER__IMAGE_TARGET_TAG = latest
-image-tag-latest-rm tag-rm-latest: _image-tag-rm-msg rmi
+image-tag-latest-rm tag-rm-latest: _image-tag-rm-msg image-rm
 
 image-tag-version tag-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 image-tag-version tag-version: _image-tag-msg tag
 
 image-tag-version-rm tag-rm-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
-image-tag-version-rm tag-rm-version: _image-tag-rm-msg rmi
+image-tag-version-rm tag-rm-version: _image-tag-rm-msg image-rm
 
 image-tag-main tag-main: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)
 image-tag-main tag-main: _image-tag-msg tag
 
 image-tag-main-rm tag-rm-main: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)
-image-tag-main-rm tag-rm-main: _image-tag-rm-msg rmi
+image-tag-main-rm tag-rm-main: _image-tag-rm-msg image-rm
 
 image-tag-suite: image-tag-latest image-tag-main image-tag-version
 	$(info ### Container image tag create suite ...)

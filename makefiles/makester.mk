@@ -153,7 +153,7 @@ ifndef MAKESTER__INCLUDES
   ifeq ($(strip $(MAKESTER__MINIMAL)),true)
     MAKESTER__INCLUDES ?= py docs
   else
-    MAKESTER__INCLUDES ?= py docker compose k8s kompose versioning docs
+    MAKESTER__INCLUDES ?= py docker compose k8s microk8s kompose versioning docs
   endif
 endif
 _includes ?= $(foreach _m,$(MAKESTER__INCLUDES),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))

@@ -3,6 +3,7 @@ docs/site
 
 # Makester
 .makester
+/inspection-report*
 
 *.py[cod]
 *.swp
