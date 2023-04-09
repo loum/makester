@@ -14,7 +14,7 @@ The Makester minikube subsystem is an optional facility as it requires binaries 
 to install yourself. In the case of Kubernetes minikube, you can get the link to the installation
 notes to `minikube` with:
 ```
-make print-print-MAKESTER__MINIKUBE_EXE_INSTALL
+make print-MAKESTER__MINIKUBE_EXE_INSTALL
 ```
 ```
 print-MAKESTER__MINIKUBE_EXE_INSTALL=https://kubernetes.io/docs/tasks/tools/#minikube

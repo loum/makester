@@ -55,11 +55,11 @@ make submodule-update
 ```
 
 ## Minimal mode
-!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.1.4)"
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3)"
 
 In certain circumstances, you may only need a limited subset of Makester capability. It is
 possible to include only the Makester `Makefile`s that you need with the `MAKESTER__INCLUDES`
-environment variable. For example, to selectively include Python only tooling, set `MAKESTER__INCLUDES`
+environment variable. For example, to limit Makester to Python tooling, set `MAKESTER__INCLUDES`
 as follows:
 
 ``` sh title="Makester minimal mode."
@@ -73,7 +73,7 @@ To make the settings persist, add the expression to your project's Makefile befo
 .SILENT:
 .DEFAULT_GOAL := help
 
-MAKESTER__INCLUDES := py docs
+MAKESTER__INCLUDES := py
 
 include makefiles/makester.mk
 
