@@ -15,6 +15,7 @@ nav:
       - MicroK8s: makefiles/k8s/microk8s.md
       - Minikube: makefiles/k8s/k8s.md
       - Kompose: makefiles/k8s/kompose.md
+    - Argo CD: makefiles/argocd.md
   - Extras for macOS: macos.md 
   - Utilities: utilities.md
   - Recipes: recipes.md

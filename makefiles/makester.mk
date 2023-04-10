@@ -132,12 +132,12 @@ define _check-exe-err
 endef
 
 MAKESTER__ARCH ?= $(shell uname -m)
+MAKESTER__UNAME ?= $(shell uname)
 
 ifndef MAKESTER__LOCAL_IP
-  UNAME ?= $(shell uname)
-  ifeq ($(UNAME), Darwin)
+  ifeq ($(MAKESTER__UNAME), Darwin)
     MAKESTER__LOCAL_IP := $(shell ipconfig getifaddr en0)
-  else ifeq ($(UNAME), Linux)
+  else ifeq ($(MAKESTER__UNAME), Linux)
     MAKESTER__LOCAL_IP := $(shell hostname -I | awk '{print $$1}')
   endif
 endif
@@ -153,7 +153,7 @@ ifndef MAKESTER__INCLUDES
   ifeq ($(strip $(MAKESTER__MINIMAL)),true)
     MAKESTER__INCLUDES ?= py docs
   else
-    MAKESTER__INCLUDES ?= py docker compose k8s microk8s kompose versioning docs
+    MAKESTER__INCLUDES ?= py docker compose k8s microk8s argocd kompose versioning docs
   endif
 endif
 _includes ?= $(foreach _m,$(MAKESTER__INCLUDES),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
