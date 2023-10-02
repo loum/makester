@@ -5,6 +5,14 @@ docs/site
 .makester
 /inspection-report*
 
+# Terraform
+# Taken from https://github.com/github/gitignore/blob/main/Terraform.gitignore
+# Local .terraform directories
+**/.terraform/*
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
 *.py[cod]
 *.swp
 *.swo

@@ -12,7 +12,8 @@ setup() {
     _common_setup
 }
 teardown_file() {
-    MAKESTER__PROJECT_DIR=$PWD make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-clear
+    MAKESTER__PROJECT_DIR=$MAKESTER__WORK_DIR \
+ make -f makefiles/makester.mk -f makefiles/docker.mk -f makefiles/versioning.mk gitversion-clear
     MAKESTER__WORK_DIR=$MAKESTER__WORK_DIR make -f makefiles/makester.mk makester-work-dir-rm
 }
 
@@ -61,7 +62,7 @@ teardown_file() {
 # bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
 @test "MAKESTER__INCLUDES should be set when calling makester.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__INCLUDES
-    assert_output 'MAKESTER__INCLUDES=py docker compose k8s microk8s argocd kompose versioning docs'
+    assert_output 'MAKESTER__INCLUDES=py docker compose k8s microk8s argocd kompose versioning docs terraform'
     [ "$status" -eq 0 ]
 }
 # bats test_tags=variables,makester-variables,MAKESTER__INCLUDES
@@ -165,8 +166,7 @@ teardown_file() {
 }
 # bats test_tags=variables,makester-variables,MAKESTER__PACKAGE_NAME
 @test "MAKESTER__PACKAGE_NAME override" {
-    MAKESTER__PACKAGE_NAME=makester\
- run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
+    MAKESTER__PACKAGE_NAME=makester run make -f makefiles/makester.mk print-MAKESTER__PACKAGE_NAME
     assert_output 'MAKESTER__PACKAGE_NAME=makester'
     [ "$status" -eq 0 ]
 }
@@ -287,7 +287,7 @@ teardown_file() {
 # bats test_tags=target,makester-mit-license,dry-run
 @test "Project level MIT license copy: dry" {
     MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-mit-license --dry-run
-    assert_output --regexp "/.*/cp /.*/makester/resources/mit.md $PWD/LICENSE"
+    assert_output --regexp "/.*/cp /.*/makester/resources/mit.md $PWD/LICENSE.md$"
     [ "$status" -eq 0 ]
 }
 # bats test_tags=target,makester-mit-license,dry-run
@@ -295,5 +295,33 @@ teardown_file() {
     MAKESTER__PROJECT_DIR=$PWD MAKESTER__RESOURCES_DIR=$PWD/resources\
  run make -f makefiles/makester.mk makester-mit-license --dry-run
     assert_output --regexp "/.*/cp /.*/resources/mit.md $PWD/LICENSE"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-readme,dry-run
+@test "Project level README.md create: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-readme --dry-run
+    assert_output --regexp "### Adding README.md stub to \"$PWD\"
+/.*/echo \"# makefiles\" > $PWD/README.md"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,makester-readme,dry-run
+@test "Project level README.md create with override: dry" {
+    MAKESTER__PROJECT_DIR=$PWD MAKESTER__PROJECT_NAME=banana\
+ run make -f makefiles/makester.mk makester-readme --dry-run
+    assert_output --regexp "### Adding README.md stub to \"$PWD\"
+/.*/echo \"# banana\" > $PWD/README.md"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,makester-repo-ceremony,dry-run
+@test "Project level all-in-one repo ceremony helper: dry" {
+    MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-repo-ceremony --dry-run
+    assert_output --regexp "### Adding a sane .gitignore to \"$PWD\"
+/.*/cp /.*/resources/project.gitignore $PWD/.gitignore
+### Adding MIT license to \"$PWD\"
+/.*/cp /.*/makester/resources/mit.md $PWD/LICENSE.md
+### Adding README.md stub to \"$PWD\"
+/.*/echo \"# makefiles\" > $PWD/README.md"
     [ "$status" -eq 0 ]
 }

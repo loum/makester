@@ -12,6 +12,11 @@ setup() {
     load 'test_helper/common-setup'
     _common_setup
 }
+teardown_file() {
+    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-setup-cfg-rm
+    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-cli-rm
+    rmdir $MAKESTER__PROJECT_DIR
+}
 
 # Python include dependencies.
 #
@@ -32,7 +37,6 @@ include makester/makefiles/makester.mk'
 
 # Python variables.
 #
-# PYTHONPATH
 # bats test_tags=variables,py-variables,PYTHONPATH
 @test "PYTHONPATH default should be set when calling py.mk" {
     run make -f makefiles/makester.mk print-PYTHONPATH
@@ -45,6 +49,7 @@ include makester/makefiles/makester.mk'
     assert_output --regexp 'PYTHONPATH=.'
     [ "$status" -eq 0 ]
 }
+#
 
 # bats test_tags=variables,py-variables,MAKESTER__PYTHONPATH
 @test "MAKESTER__PYTHONPATH default should be set when calling py.mk" {
@@ -161,6 +166,20 @@ include makester/makefiles/makester.mk'
     [ "$status" -eq 0 ]
 }
 
+# bats test_tags=variables,py-variables,MAKESTER__SETUP_CFG
+@test "MAKESTER__SETUP_CFG default should be set when calling py.mk" {
+    MAKESTER__PROJECT_DIR=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk print-MAKESTER__SETUP_CFG
+    assert_output "MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=variables,py-variables,MAKESTER__SETUP_CFG
+@test "MAKESTER__SETUP_CFG override" {
+    MAKESTER__SETUP_CFG=test\
+ run make -f makefiles/makester.mk print-MAKESTER__SETUP_CFG
+    assert_output 'MAKESTER__SETUP_CFG=test'
+    [ "$status" -eq 0 ]
+}
+
 # Targets.
 #
 # bats test_tags=target,py-vars
@@ -227,10 +246,10 @@ include makester/makefiles/makester.mk'
 @test "Python project scaffolding: dry" {
     MAKESTER__RESOURCES_DIR=resources MAKESTER__PROJECT_DIR=/var/tmp/fruit MAKESTER__PACKAGE_NAME=banana\
  run make -f makefiles/makester.mk py-project-create --dry-run
-    assert_output --regexp '### Adding a sane .gitignore to "/var/tmp/fruit"
-/.*/cp resources/project.gitignore /var/tmp/fruit/.gitignore
-### Adding MIT license to "/var/tmp/fruit"
-/.*/cp resources/mit.md /var/tmp/fruit/LICENSE.md
+    assert_output --regexp '### Generating project pylint configuration to /var/tmp/fruit/pylintrc ...
+pylint --generate-rcfile > /var/tmp/fruit/pylintrc
+### Writing setup.cfg to "/var/tmp/fruit/setup.cfg" ...
+eval "\$_setup_cfg_script"
 ### Creating a Python project directory structure under /var/tmp/fruit/src/banana
 /.*/mkdir -pv /var/tmp/fruit/src/banana
 /.*/touch /var/tmp/fruit/src/banana/__init__.py
@@ -245,6 +264,52 @@ include makester/makefiles/makester.mk'
     run make -f makefiles/makester.mk py-deps --dry-run
     assert_output '### Displaying "makefiles" package dependencies ...
 pipdeptree'
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-setup-cfg
+@test "Python setup.cfg primer" {
+    MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg \
+ run make -f makefiles/makester.mk py-setup-cfg
+    diff $MAKESTER__PROJECT_DIR/setup.cfg tests/files/out/py/default-setup.cfg
+    assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-setup-cfg
+@test "Python setup.cfg primer MAKESTER__PACKAGE_NAME override" {
+    MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg MAKESTER__PACKAGE_NAME=banana\
+ run make -f makefiles/makester.mk py-setup-cfg
+    diff $MAKESTER__PROJECT_DIR/setup.cfg tests/files/out/py/package-name-override-setup.cfg
+    assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,_py-cli-init
+@test "Python CLI __init__ primer" {
+    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-init
+    diff $MAKESTER__PROJECT_DIR/__init__.py tests/files/out/py/cli-init.py
+    assert_output "### Writing CLI __init__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,_py-cli-main
+@test "Python CLI __main__ primer" {
+    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-main
+    diff $MAKESTER__PROJECT_DIR/__main__.py tests/files/out/py/cli-main.py
+    assert_output "### Writing CLI __main__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-distribution,dry-run
+@test "Python package builder: dry" {
+    run make -f makefiles/makester.mk py-distribution --dry-run
+    assert_output --regexp "/.*/python -m build"
+    [ "$status" -eq 0 ]
+}
+# bats test_tags=target,py-distribution,dry-run
+@test "Python package builder with MAKESTER__PYTHON override: dry" {
+    MAKESTER__PYTHON=something_else run make -f makefiles/makester.mk py-distribution --dry-run
+    assert_output --regexp "something_else -m build"
     [ "$status" -eq 0 ]
 }
 
@@ -470,6 +535,24 @@ mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/tests"
 mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src
 ### Type annotating Python files under \"something_else\"
 mypy --disallow-untyped-defs something_else"
+    [ "$status" -eq 0 ]
+}
+
+# bats test_tags=target,py-check,dry-run
+@test "Python module all-in-one code validator: dry" {
+    run make -f makefiles/makester.mk py-check --dry-run
+    assert_output "### Formatting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+black $MAKESTER__PROJECT_DIR/src
+### Formatting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+black $MAKESTER__PROJECT_DIR/tests
+### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
+pylint $MAKESTER__PROJECT_DIR/src
+### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+pylint $MAKESTER__PROJECT_DIR/tests
+### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src
+### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"
+mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/tests"
     [ "$status" -eq 0 ]
 }
 

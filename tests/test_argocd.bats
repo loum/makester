@@ -48,7 +48,7 @@ include makester/makefiles/makester.mk'
     assert_output 'MAKESTER__ARGOCD_EXE_INSTALL=https://argo-cd.readthedocs.io/en/stable/cli_installation/'
     [ "$status" -eq 0 ]
 }
-# bats test_tags=variables,ARGOCD-variables,MAKESTER__ARGOCD_EXE_INSTALL
+# bats test_tags=variables,argocd-variables,MAKESTER__ARGOCD_EXE_INSTALL
 @test "MAKESTER__ARGOCD_EXE_INSTALL override" {
     MAKESTER__ARGOCD_EXE_INSTALL=http://localhost:8000\
  run make -f makefiles/makester.mk print-MAKESTER__ARGOCD_EXE_INSTALL
