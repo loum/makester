@@ -9,7 +9,7 @@ $(error ### missing include dependency)
 endif
 
 # Defaults.
-MAKESTER__GITVERSION_CONFIG ?= makester/sample/GitVersion.yml
+MAKESTER__GITVERSION_CONFIG ?= makester/resources/sample/GitVersion.yml
 MAKESTER__GITVERSION_VARIABLE ?= AssemblySemFileVer
 ifndef MAKESTER__GITVERSION_VERSION
   ifeq ($(MAKESTER__ARCH), arm64)
@@ -35,8 +35,6 @@ define _gitversion-exe
 	@$(MAKESTER__DOCKER) run --rm -v "$(MAKESTER__GIT_DIR):/$(MAKESTER__PROJECT_NAME)"\
  gittools/gitversion:$(MAKESTER__GITVERSION_VERSION) $(1)
 endef
-
-# | tee $(MAKESTER__WORK_DIR)/versioning
 
 # GitVersion help (default).
 gitversion:
@@ -65,8 +63,6 @@ _gitversion-versions-rm:
 release-version: _release-version-warn gitversion-release
 _release-version-warn:
 	$(call deprecated,release-version,0.3.0,gitversion-release)
-
-MAKESTER__VERSION_FILE ?= $(MAKESTER__WORK_DIR)/VERSION
 
 _GITVERSION_FILTER := sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"'
 

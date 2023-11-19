@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 
 MAKESTER__PROJECT_NAME := makester
-MAKESTER__GITVERSION_CONFIG := sample/GitVersion.yml
+MAKESTER__GITVERSION_CONFIG := resources/sample/GitVersion.yml
 
 include makefiles/makester.mk
 

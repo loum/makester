@@ -22,14 +22,13 @@ MAKESTER__DOCS_IP ?= $(MAKESTER__LOCAL_IP)
 MAKESTER__DOCS_PORT ?= 8000
 MAKESTER__DOCS_BUILD_PATH ?= $(MAKESTER__DOCS_DIR)/site
 
-docs-bootstrap:
+docs-bootstrap docs-project-create: docs-dir
 	$(info ### Bootstrapping project documentation at "$(MAKESTER__DOCS_DIR)")
 	$(MAKESTER__DOCS) new $(MAKESTER__DOCS_DIR)
 
 docs-preview:
 	$(info ### Starting the live preview server at "$(MAKESTER__DOCS_IP):$(MAKESTER__DOCS_PORT)" (Ctrl-C to stop))
-	cd $(MAKESTER__DOCS_DIR);\
- $(MAKESTER__DOCS) serve --dev-addr $(MAKESTER__DOCS_IP):$(MAKESTER__DOCS_PORT) --watch $(MAKESTER__DOCS_DIR)
+	cd $(MAKESTER__DOCS_DIR); $(MAKESTER__DOCS) serve --dev-addr $(MAKESTER__DOCS_IP):$(MAKESTER__DOCS_PORT) --watch $(MAKESTER__DOCS_DIR)
 
 docs-build:
 	$(info ### Building static project documentation at "$(MAKESTER__DOCS_BUILD_PATH)")
@@ -41,7 +40,7 @@ docs-gh-deploy:
 
 docs-help:
 	@echo "($(MAKESTER__MAKEFILES)/docs.mk)\n\
-  docs-bootstrap       Bootstrap the project documentation directory structure\n\
+  docs-project-create  Create the project documentation directory structure\n\
   docs-build           Build the project static site documentation\n\
   docs-gh-deploy       Deploy documentation to GitHub\n\
   docs-preview         Site documentation live preview\n"

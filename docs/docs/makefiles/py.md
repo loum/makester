@@ -5,17 +5,31 @@ Handy Python tooling.
 !!! tag "[Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)"
     Renamed from `makefiles/python-venv.mk`
 
+## Getting started
+Ensure a Python 3 interpreter is available in your path
+[(we recommend installing pyenv)](https://github.com/pyenv/pyenv){target="_blank"}.
+
+The Makester Python subsystem aims to be a light-weight, pure-Python implementation of your
+project's Python project environment management with basic tooling. Unlike
+[Conda](https://docs.conda.io/en/latest/){target="_blank"} and [Poetry](https://python-poetry.org/){target="_blank"},
+or the like, no additional software installs or new learnings are required. But again, that is not
+the real problem Makester is trying to solve and does not care if you insist on using a third-party tool for your
+Python packaging and dependency management. Simply abstract those commands behind a `make` target.
+This allows you to swap out and/or implement a hybrid Python packaging and dependency management
+system, if that is what you really want to do.
+
 ## Command reference
 ### Create a Simple Python Project Directory Layout
 !!! tag "[Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)"
 
-Quick start Python project based on [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
+Quick start Python project based on
+[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/){target="_blank"}.
 ``` sh
 make py-project-create
 ```
 
 !!! note
-    Defaults to [src-layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/).
+    Defaults to [src-layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/){target="_blank"}.
 
 For example, given `MAKESTER__PROJECT_DIR=/var/tmp/fruit`:
 ``` sh
@@ -32,6 +46,14 @@ Makester will produce the following directory layout:
 │       └── __init__.py
 └── tests
     └── banana
+```
+
+### Create a Pylint configuration
+
+[As per Pylint configuration](https://pylint.pycqa.org/en/latest/user_guide/configuration/index.html){target="_blank"}
+
+``` sh
+make py-pylintrc
 ```
 
 ### Create a Python distribution package
@@ -323,6 +345,13 @@ TYPE_PATH=src/makester make py-type
 ``` sh title="Sample type annotation output when setting LINT_PATH with a path to Python modules."
 ### Type annotating Python files under "src/makester"
 Success: no issues found in 4 source files
+```
+
+### All-in-one code checker
+Special convenience target that runs all code check commands together.
+
+``` sh title="Lint, format and annotate in one step"
+make py-check
 ```
 
 ## Variables

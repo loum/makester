@@ -2,7 +2,7 @@
 
 !!! tag "[Makester v0.2.4](https://github.com/loum/makester/releases/tag/0.2.4)"
 
-[Argo CD](https://argo-cd.readthedocs.io/en/stable/){target="_blank"} Argo CD is a
+[Argo CD](https://argo-cd.readthedocs.io/en/stable/){target="_blank"} is a
 declarative, GitOps continuous delivery tool for Kubernetes.
 
 ## Getting started

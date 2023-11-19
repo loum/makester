@@ -76,6 +76,12 @@ makester-mit-license:
 	$(info ### Adding MIT license to "$(MAKESTER__PROJECT_DIR)")
 	$(shell which cp) $(MAKESTER__RESOURCES_DIR)/mit.md $(MAKESTER__PROJECT_DIR)/LICENSE.md
 
+makester-readme:
+	$(info ### Adding README.md stub to "$(MAKESTER__PROJECT_DIR)")
+	$(shell which echo) "# $(MAKESTER__PROJECT_NAME)" > $(MAKESTER__PROJECT_DIR)/README.md
+
+makester-repo-ceremony: makester-gitignore makester-mit-license makester-readme
+
 GIT ?= $(call check-exe,git,https://git-scm.com/downloads)
 HASH ?= $(shell $(GIT) rev-parse --short HEAD)
 
@@ -153,7 +159,7 @@ ifndef MAKESTER__INCLUDES
   ifeq ($(strip $(MAKESTER__MINIMAL)),true)
     MAKESTER__INCLUDES ?= py docs
   else
-    MAKESTER__INCLUDES ?= py docker compose k8s microk8s argocd kompose versioning docs
+    MAKESTER__INCLUDES ?= py docker compose k8s microk8s argocd kompose versioning docs terraform
   endif
 endif
 _includes ?= $(foreach _m,$(MAKESTER__INCLUDES),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
@@ -185,8 +191,11 @@ Targets\n\
 --------------------------------------------------------------------------------------------\n"
 	@echo "($(MAKESTER__MAKEFILES)/makester.mk)\n\
   clean                Remove all files not tracked by Git\n\
+  makester-repo-ceremony\n\
+	                   All-in-one repository ancillary files helper\n\
   makester-gitignore   Adding a sane .gitignore to \"$(MAKESTER__PROJECT_DIR)\"\n\
   makester-mit-license Add an MIT license to \"$(MAKESTER__PROJECT_DIR)\"\n\
+  makester-readme      Add an simple README to \"$(MAKESTER__PROJECT_DIR)\"\n\
   print-<var>          Display the Makefile global variable '<var>' value\n\
   submodule-update     Update your existing Git submodules\n\
   vars                 Display all Makester global variable values\n"

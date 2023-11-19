@@ -1,4 +1,4 @@
-# Makester: Common Project Build and Management Tooling
+# Makester
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 - [Extras for macOS](#extras-for-macos)
@@ -6,7 +6,7 @@
 - [Running the Test Harness](#running-the-test-harness)
 
 ## Overview
-Makester is a [GNU make](https://www.gnu.org/software/make/manual/make.html) based Integrated Developer Platform that brings common tooling and techniques to your coding projects. Note that there is a heavy bias towards Linux, containerisation and Kubernetes to promote cloud-native capability. No, not cloud-native that locks you into cloud provider's services ...
+Makester is a [GNU make](https://www.gnu.org/software/make/manual/make.html) based integrated developer platform that brings common tooling and techniques to your coding projects. Note that there is a heavy bias towards Linux, containerisation and Kubernetes to promote cloud-native capability. No, not cloud-native that locks you into cloud provider's services ...
 
 Refer to [Makester's documentation](https://loum.github.io/makester/) for detailed instructions.
 
@@ -19,9 +19,13 @@ If using [Kubernetes Minikube](https://kubernetes.io/docs/setup/learning-environ
 - [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
+If using [Terraform](https://developer.hashicorp.com/terraform):
+- [(we recommend installing tfenv)](https://github.com/tfutils/tfenv)
+
 Optionally, install [kompose](https://kompose.io/installation/) if you would like to convert existing Docker Compose files into Kubernetes manifests.
 
 ## Extras for macOS
+
 ### Dependencies
 To develop Makester on macOS you will need to install these additional packages with [brew](https://brew.sh/):
 ```

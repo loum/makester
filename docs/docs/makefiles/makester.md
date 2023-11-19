@@ -30,7 +30,7 @@ make makester-gitignore
 ```
 
 ### Add an MIT Licence to your Project
-Add an [MIT License](https://github.com/loum/makester/blob/main/resources/mit.md)
+Add an [MIT license](https://en.wikipedia.org/wiki/MIT_License){target="_blank"}
 under `<MAKESTER__PROJECT_DIR>`. You will need to manually adjust the `<year>`
 and `<copyright holders>`:
 ``` sh

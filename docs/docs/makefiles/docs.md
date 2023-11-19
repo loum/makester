@@ -13,9 +13,10 @@ make help-docs
 ## Command Reference
 
 ### Site Documentation Scaffolding
-Create the site documentation directory structure [based on this](https://squidfunk.github.io/mkdocs-material/creating-your-site/).
+Create the site documentation directory structure
+[based on Material for MkDocs: Creating your site](https://squidfunk.github.io/mkdocs-material/creating-your-site/).
 ```
-make docs-bootstrap
+make docs-project-create
 ```
 
 If the default settings are accepted, this will create a `docs` directory under the top level of you project code repository. The minimal content is:

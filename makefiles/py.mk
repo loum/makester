@@ -46,10 +46,10 @@ py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
 py-install-makester: MAKESTER__VERSION_FILE := makester/$(MAKESTER__PYTHONPATH)/makester/VERSION
 py-install-makester: MAKESTER__PROJECT_NAME := makester
 py-install-makester: MAKESTER__GIT_DIR := $(PWD)/.git/modules/makester
-py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/sample/GitVersion.yml
+py-install-makester: MAKESTER__GITVERSION_CONFIG := $(PWD)/makester/resources/sample/GitVersion.yml
 py-install-makester: py-install
 
-py-project-create: makester-gitignore makester-mit-license
+py-project-create: py-pylintrc py-setup-cfg
 	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))
 	@$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
 	@$(shell which touch) $(MAKESTER__PYTHON_PROJECT_ROOT)/__init__.py
@@ -68,6 +68,133 @@ py-deps:
 
 # Private Makefile includes that leverage capabilities in this Makefile.
 include $(MAKESTER__MAKEFILES)/_py-venv.mk
+
+define _setup_cfg_heredoc
+cat <<EOF > $1
+[metadata]
+name = $2
+version = file: src/$2/VERSION
+description = <CHANGE_ME>
+long_description = file: README.md
+long_description_content_type = text/markdown; charset=UTF-8
+url = <CHANGE_ME>
+author = <CHANGE_ME>
+license = MIT
+license_files = LICENSE.md
+classifier =
+    Development Status :: 5 - Production/Stable
+    Environment :: Console
+    Environment :: MacOS X
+    Intended Audience :: Developers
+    Topic :: Software Development :: Build Tools
+    License :: OSI Approved :: MIT License
+    Natural Language :: English
+    Operating System :: POSIX :: Linux
+    Operating System :: MacOS :: MacOS X
+    Programming Language :: Python :: 3
+
+[options]
+python_requires = >=3
+packages = find:
+package_dir =
+    =src
+install_requires =
+
+[options.extras_require]
+dev =
+    mkdocstrings-python
+    pytest
+    pytest-cov
+    pytest-sugar
+    twine
+
+[options.packages.find]
+where = src
+
+[options.package_data]
+$2 =
+    VERSION
+
+[options.entry_points]
+console_scripts =
+    $2 = $2.__main__:main
+EOF
+endef
+
+export _setup_cfg_script = $(call _setup_cfg_heredoc,$(MAKESTER__SETUP_CFG),$(MAKESTER__PACKAGE_NAME))
+
+MAKESTER__SETUP_CFG ?= $(MAKESTER__PROJECT_DIR)/setup.cfg
+
+py-setup-cfg:
+	$(info ### Writing setup.cfg to "$(MAKESTER__SETUP_CFG)" ...)
+	@eval "$$_setup_cfg_script"
+
+py-setup-cfg-rm:
+	$(info ### Deleting setup.cfg to "$(MAKESTER__SETUP_CFG)" ...)
+	$(shell which rm) $(MAKESTER__SETUP_CFG)
+
+define _setup_cli_init_heredoc
+cat <<EOF > $1/__init__.py
+"""$2.
+
+"""
+__app_name__ = "$2"
+EOF
+endef
+
+export _setup_cli_init_script = $(call _setup_cli_init_heredoc,$(MAKESTER__PYTHON_PROJECT_ROOT),$(MAKESTER__PACKAGE_NAME))
+
+_py-cli-init:
+	$(info ### Writing CLI __init__.py scaffolding under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	@eval "$$_setup_cli_init_script"
+
+_py-cli-init-rm:
+	$(info ### Deleting CLI __init__.py scaffolding under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	$(shell which rm) $(MAKESTER__PYTHON_PROJECT_ROOT)/__init__.py
+
+define _setup_cli_main_heredoc
+cat <<EOF > $1/__main__.py
+"""$2 CLI.
+
+"""
+import typer
+
+
+app = typer.Typer(
+    add_completion=False,
+    help="makefiles CLI tool",
+)
+
+
+@app.command()
+
+
+def main() -> None:
+    """Script entry point."""
+    app()
+
+
+if __name__ == "__main__":
+    main()
+EOF
+endef
+
+export _setup_cli_main_script = $(call _setup_cli_main_heredoc,$(MAKESTER__PYTHON_PROJECT_ROOT),$(MAKESTER__PACKAGE_NAME))
+
+_py-cli-main:
+	$(info ### Writing CLI __main__.py scaffolding under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	@eval "$$_setup_cli_main_script"
+
+_py-cli-main-rm:
+	$(info ### Deleting CLI __main__.py scaffolding under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	$(shell which rm) $(MAKESTER__PYTHON_PROJECT_ROOT)/__main__.py
+
+py-cli:
+	$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
+	$(MAKE) _py-cli-init _py-cli-main
+
+py-cli-rm:
+	$(MAKE) _py-cli-init-rm _py-cli-main-rm
 
 py-distribution:
 	$(MAKESTER__PYTHON) -m build
@@ -123,10 +250,13 @@ _py-vars:
 	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
 	$(info ### System python3 version: $(MAKESTER__PY3_VERSION))
 
+py-check: py-fmt-all py-lint-all py-type-all
+
 py-help: _py-help _py-venv-help
 
 _py-help:
 	@echo "($(MAKESTER__MAKEFILES)/py.mk)\n\
+  py-check             All-in-one code validator\n\
   py-dep               Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
   py-fmt               Format Python modules defined by \"FMT_PATH\"\n\
@@ -136,4 +266,6 @@ _py-help:
   py-lint-all          Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\
   py-pylintrc          Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\"\n\
+  py-setup-cfg         Add new setup.cfg configuration to \"$(MAKESTER__SETUP_CFG)\"\n\
+  py-cli               Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-vars              Display system Python settings\n"

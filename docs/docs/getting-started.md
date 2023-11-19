@@ -1,8 +1,22 @@
 # Getting started
 
-## Add `Makester` to your project's Git repository
+## Brand new (Python) project
 
-- Add `Makester` as a submodule in your `git` project repository:
+Makester tooling can provide scaffolding for common components of a coding project. Begin by assigning
+your new project name to the [MAKESTER__PROJECT_NAME](../makefiles/makester/#makester__project_name)
+environment variable. The following example uses the project name `supa-idea`:
+
+``` sh
+export MAKESTER__PROJECT_NAME=supa-idea
+```
+
+Prime your new project repository:
+
+``` sh
+mkdir $MAKESTER__PROJECT_NAME && cd $_ && git init && git commit -m "initial commit" --allow-empty
+```
+
+Add `Makester` as a submodule in your `git` project repository:
 
 ``` sh
 git submodule add https://github.com/loum/makester.git
@@ -11,26 +25,37 @@ git submodule add https://github.com/loum/makester.git
 !!! note
     Some versions of `git submodule add` will only `fetch` the submodule folder without any content.
     For first time initialisation (`pull` the submodule):
+    
+    ``` sh
+    git submodule update --init --recursive
+    ```
 
-``` sh
-git submodule update --init --recursive
+The `-i` switch will also install the Makester tooling that will be used in the following steps.
+
+### Create the Python project directory layout
+Let Makester prepare your Python project boilerplate, by initialising with the `-a` switch:
+
+``` sh title="Initialise Python project boilerplate."
+makester/resources/scripts/primer.sh -a
 ```
 
-- Create a `Makefile` at the top-level of your `git` project repository.
-Not sure what that means? Then add this snippet to your own `Makefile` to get you started:
+### What just happened?
+Makester takes care of the of the Python project scaffolding for you. You now have the basic boilerplate for a
+new Python coding project and can start work immediately on your problem domain. This includes:
 
-``` sh
-.SILENT:
-.DEFAULT_GOAL := help
+- [src-layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/){target="_blank"}
+based on [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/){target="_blank"}.
+- A sane, `.gitignore`, [MIT license](https://en.wikipedia.org/wiki/MIT_License){target="_blank"}
+coverage and a basic `README.md`.
+- Documentation scaffolding. [More details on how to evolve the documentation suite](../makefiles/docs/#site-documentation-scaffolding).
+- Pylint configuration. [More targetted configuration options for linting](../makefiles/docs/#create-a-pylint-configuration).
+- [mypy](https://mypy-lang.org/) for code type annotation and [black](https://pypi.org/project/black/)
+for code formatting are ready to go. See [make py-check](../makefiles/docs/#all-in-one-code-checker).
+- Placeholder for a project CLI that defaults to the `MAKESTER__PROJECT_NAME`. This can be invoked
+  with `venv/bin/<MAKESTER__PROJECT_NAME>`
+- Makester tooling that is ephemeral and does not polute your project code base.
 
-include makefiles/makester.mk
-
-help: makester-help
-    @echo "(Makefile)\n"
-```
-
-!!! warning
-    Make sure you have a `<tab>` character before the `@echo`.
+## Existing project
 
 If you already have a `Makefile`, then just include Makester:
 
@@ -38,9 +63,13 @@ If you already have a `Makefile`, then just include Makester:
 include makester/makefiles/makester.mk
 ```
 
-!!! info
-    To ensure consistency in your project, pin to a Makester release by changing into the `makester`
-    directory and checking out a [Makester release](https://github.com/loum/makester/releases).
+Run the primer script to build a minimal `Makefile`:
+
+``` sh
+makester/resources/scripts/primer.sh -i
+```
+
+## Maintenance
 
 Remember to regularly get the latest `Makester` updates:
 
