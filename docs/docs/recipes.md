@@ -22,7 +22,7 @@ local-build-up: compose-up backoff
 
 ### Multi-arch builds
 
-As you may have noticed, [multi-architecture builds](#makefiles/docker/support-for-multi-architecture-builds)
+As you may have noticed, [multi-architecture builds](../makefiles/docker/#support-for-multi-architecture-builds)
 can be somewhat of a grind. This recipe creates a new target called `multi-arch-build` that will:
 
 - creates a new `buildx builder` called `multiarch` and selects that for use

@@ -92,7 +92,7 @@ environment variable. For example, to limit Makester to Python tooling, set `MAK
 as follows:
 
 ``` sh title="Makester minimal mode."
-MAKESTER__INCLUDES=py make help
+MAKESTER__INCLUDES=py
 ```
 
 To make the settings persist, add the expression to your project's Makefile before the
