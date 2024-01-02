@@ -12,21 +12,21 @@ make docker-help
 ```
 
 ## Example
-A [sample Dockerfile](https://github.com/loum/makester/blob/main/sample/Dockerfile){target="_blank"}
+A [sample Dockerfile](https://github.com/loum/makester/blob/main/resources/sample/Dockerfile){target="_blank"}
 is provided by [Makester](https://github.com/loum/makester.git){target="_blank"} to demonstrate basic capability.
 
 !!! note
     If you are running the following commands from Makester which has been setup within your
-    project repository, then replace `sample/Makefile` with `makester/sample/Makefile`.
+    project repository, then replace `resources/sample/Makefile` with `makester/resources/sample/Makefile`.
 
 To get help at any time:
 ``` sh
-make -f sample/Makefile help
+make -f resources/sample/Makefile help
 ```
 
 Build a Docker image based off the "Hello World" image:
 ``` sh
-make -f sample/Makefile image-build
+make -f resources/sample/Makefile image-build
 ```
 
 ``` sh title="Hello World image container runtime output."
@@ -40,7 +40,7 @@ Successfully tagged supa-cool-repo/my-project:99296c8
 
 The resultant image build can be viewed:
 ``` sh
-make -f sample/Makefile image-search
+make -f resources/sample/Makefile image-search
 ```
 
 ``` sh title="Image in docker."
@@ -48,16 +48,16 @@ REPOSITORY                  TAG       IMAGE ID       CREATED         SIZE
 supa-cool-repo/my-project   52c13b1   281099761321   10 months ago   9.14kB
 ```
 
-To run your new `supa-cool-repo/my-project:99296c8` container:
+To start a container from the `supa-cool-repo/my-project` image:
 ``` sh
-make -f sample/Makefile container-run
+make -f resources/sample/Makefile container-run
 ```
 
 Makester also supports image builds with
 [BuildKit](https://docs.docker.com/build/buildkit/){target="_blank"}.
 
 ``` sh
-make -f sample/Makefile image-buildx
+make -f resources/sample/Makefile image-buildx
 ```
 
 ``` sh title="Hello World image build with BuildKit."
@@ -92,24 +92,24 @@ with BuildKit. These include:
 
 To see the new plan for `docker buildx build`:
 ``` sh
-make -n -f sample/Makefile image-buildx
+make -n -f resources/sample/Makefile image-buildx
 ```
 
 ``` sh title="BuildKit's docker buildx build plan."
-docker buildx build --platform linux/arm64 --load -t supa-cool-repo/my-project:52c13b1 sample
+docker buildx build --platform linux/arm64 --load -t supa-cool-repo/my-project:<DOCKER_IMAGE_TAG> sample
 ```
 
 ### Support for multi-architecture builds
 !!! tag "[Makester v0.2.2](https://github.com/loum/makester/releases/tag/0.2.2){target="_blank"}"
 
-Makester can now [Leverage multi-CPU architecture support](https://docs.docker.com.xy2401.com/docker-for-mac/multi-arch/){target="_blank"}. However, there are some manual steps that need to be performed.
+Makester can now [Leverage multi-CPU architecture support](https://docs.docker.com/build/building/multi-platform/#:~:text=Support%20on%20Docker%20Desktop,%2C%20ppc64le%20%2C%20and%20even%20s390x%20.){target="_blank"}. However, there are some manual steps that need to be performed.
 
 ### Define your target Docker platforms
 To build an image that supports multiple architectures, you can define these by setting the
 `MAKESTER__DOCKER_PLATFORM` Makester variable. For example:
 
 ``` sh
-MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f sample/Makefile image-buildx
+MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f resources/sample/Makefile image-buildx
 ```
 
 However, in the default docker image build system you may see this error:
@@ -148,7 +148,7 @@ make image-registry-start
 The image tag will also be updated to reflect the local registry server:
 
 ``` sh
-MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -n -f sample/Makefile image-buildx
+MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -n -f resources/sample/Makefile image-buildx
 ```
 
 ``` sh title="BuildKit build plan with the local registry server running."
@@ -163,8 +163,20 @@ docker buildx build --platform linux/arm64,linux/amd64 --push -t localhost:15000
 Now we can build the multi-platform container image:
 
 ``` sh
-MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f sample/Makefile image-buildx
+MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f resources/sample/Makefile image-buildx
 ```
+
+!!! note
+    If you receive a `:15000: connect: connection refused` error, you may need to add the following to
+    your Docker's `daemon.json` configuration file:
+
+    ```
+    "insecure-registries" : [
+      "localhost:15000",
+      "127.0.0.1:15000",
+      "registry.me:15000"
+    ],
+    ```
 
 To see the images in your local registry server, first list the catalog:
 ``` sh
@@ -201,7 +213,7 @@ docker tag localhost:15000/supa-cool-repo/my-project:52c13b1 supa-cool-repo/my-p
 
 Now it is possible to search for the new, multi-platform image as per normal:
 ``` sh
-make -f sample/Makefile image-search
+make -f resources/sample/Makefile image-search
 ```
 
 ``` sh title="Image search for new, multi-platform image in docker output."
@@ -232,7 +244,7 @@ Manifests:
 ### Image clean up
 To delete the `supa-cool-repo/my-project` image:
 ``` sh
-make -f sample/Makefile image-rm
+make -f resources/sample/Makefile image-rm
 ```
 
 ## Command reference
@@ -338,7 +350,7 @@ MAKESTER__IMAGE_TARGET_TAG=52c13b1
 ```
 
 ``` sh
-make -f sample/Makefile print-MAKESTER__IMAGE_TAG_ALIAS
+make -f resources/sample/Makefile print-MAKESTER__IMAGE_TAG_ALIAS
 ```
 
 ``` sh title="MAKESTER__IMAGE_TAG_ALIAS based on MAKESTER__SERVICE_NAME:MAKESTER__IMAGE_TAG_ALIAS"
