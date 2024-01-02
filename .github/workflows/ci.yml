@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0
       - name: Check if the VERSION file has changed
         id: changed_version_file
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v41
         with:
           files: src/makester/VERSION
       - name: Read VERSION file
