@@ -70,18 +70,20 @@ makester/resources/scripts/primer.sh -i
 ```
 
 ## Maintenance
+!!! tag "[Makester v0.2.6](https://github.com/loum/makester/releases/tag/0.2.6)"
 
-Remember to regularly get the latest `Makester` updates:
+To get the latest `Makester` release:
 
 ```
-git submodule update --remote --merge
+resources/scripts/primer.sh -u
 ```
 
-Or, let Makester do the update for you:
-
-``` sh
-make submodule-update
-```
+!!! note
+    Prior to [Makester v0.2.6](https://github.com/loum/makester/releases/tag/0.2.6) you will first need
+    to sync the Makester `git` submodule:
+    ``` sh
+    make submodule-update
+    ```
 
 ## Minimal mode
 !!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3)"
