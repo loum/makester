@@ -6,6 +6,10 @@ MAKESTER__GITVERSION_CONFIG := resources/sample/GitVersion.yml
 
 include makefiles/makester.mk
 
+#
+# Makester overrides.
+#
+MAKESTER__GITVERSION_CONFIG := GitVersion.yml
 MAKESTER__VERSION_FILE := $(MAKESTER__PYTHON_PROJECT_ROOT)/VERSION
 
 init: py-venv-clear py-venv-init py-install
