@@ -40,8 +40,21 @@ while getopts ":iau" option; do
     esac
 done
 
-echo "### priming Makefile ..."
-cat << EOF > Makefile
+if [ "$UPGRADE" = true ]
+then
+    echo "### getting latest version of Makester ..."
+    MAKESTER_VERSION=$(curl -s $MAKESTER_URL | jq .tag_name | tr -d '"')
+    echo "### upstream Makester version detected: $MAKESTER_VERSION"
+    cd makester
+    git fetch -v --prune
+    git checkout $MAKESTER_VERSION
+    cd -
+fi
+
+if [ "$INIT_MAKESTER" = true -o "$INIT_PYTHON" = true ]
+then
+    echo "### priming Makefile ..."
+    cat << EOF > Makefile
 .SILENT:
 .DEFAULT_GOAL := help
 
@@ -64,14 +77,6 @@ help: makester-help
   init-dev             Build Makester environment\n"
 EOF
 echo "### done."
-
-if [ "$UPGRADE" = true ]
-then
-    MAKESTER_VERSION=$(curl -s $MAKESTER_URL | jq .tag_name | tr -d '"')
-    cd makester
-    git fetch -v --prune
-    git checkout $MAKESTER_VERSION
-    cd -
 fi
 
 if [ "$INIT_MAKESTER" = true -o "$INIT_PYTHON" = true ]
