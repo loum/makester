@@ -15,74 +15,94 @@ setup() {
 # bats test_tags=terraform-dependencies
 @test "Check if Makester is primed: false" {
     run make -f makefiles/terraform.mk
+
     assert_output --partial '### Add the following include statement to your Makefile
 include makester/makefiles/makester.mk'
-    [ "$status" -eq 2 ]
+
+    assert_failure
 }
 # bats test_tags=terraform-dependencies
 @test "Check if Makester is primed: true" {
     run make -f makefiles/makester.mk terraform-help
+
     assert_output --partial '(makefiles/terraform.mk)'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # Terraform variables.
 #
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_VERSION
 @test "MAKESTER__TERRAFORM_VERSION override" {
-    MAKESTER__TERRAFORM_VERSION=1.6.1  run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_VERSION
+    MAKESTER__TERRAFORM_VERSION=1.6.1 run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_VERSION
+
     assert_output 'MAKESTER__TERRAFORM_VERSION=1.6.1'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_EXE_NAME
 @test "MAKESTER__TERRAFORM_EXE_NAME default should be set when calling terraform.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_EXE_NAME
+
     assert_output 'MAKESTER__TERRAFORM_EXE_NAME=terraform'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_EXE_NAME
 @test "MAKESTER__TERRAFORM_EXE_NAME override" {
     MAKESTER__TERRAFORM_EXE_NAME=/usr/local/bin/terraform\
  run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_EXE_NAME
+
     assert_output 'MAKESTER__TERRAFORM_EXE_NAME=/usr/local/bin/terraform'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_EXE_INSTALL
 @test "MAKESTER__TERRAFORM_EXE_INSTALL default should be set when calling terraform.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_EXE_INSTALL
+
     assert_output 'MAKESTER__TERRAFORM_EXE_INSTALL=https://github.com/tfutils/tfenv'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_EXE_INSTALL
 @test "MAKESTER__TERRAFORM_EXE_INSTALL override" {
     MAKESTER__TERRAFORM_EXE_INSTALL=http://localhost:8000\
  run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_EXE_INSTALL
+
     assert_output 'MAKESTER__TERRAFORM_EXE_INSTALL=http://localhost:8000'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_WS
 @test "MAKESTER__TERRAFORM_WS override" {
     MAKESTER__TERRAFORM_WS=production\
  run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_WS
+
     assert_output 'MAKESTER__TERRAFORM_WS=production'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_PATH
 @test "MAKESTER__TERRAFORM_PATH default should be set when calling terraform.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_PATH
+
     assert_output "MAKESTER__TERRAFORM_PATH=$PWD/terraform"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 # bats test_tags=variables,terraform-variables,MAKESTER__TERRAFORM_PATH
 @test "MAKESTER__TERRAFORM_PATH override" {
     MAKESTER__TERRAFORM_PATH=dummy\
  run make -f makefiles/makester.mk print-MAKESTER__TERRAFORM_PATH
+
     assert_output 'MAKESTER__TERRAFORM_PATH=dummy'
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # Targets.
@@ -90,6 +110,7 @@ include makester/makefiles/makester.mk'
 # bats test_tags=targets,terraform-targets,tf-project-create,dry-run
 @test "Terraform flat directory project create: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-project-create --dry-run
+
     assert_output --regexp "### Creating a Terraform project directory structure under $PWD/terraform
 /.*/mkdir -pv $PWD/terraform
 /.*/touch $PWD/terraform/data.tf
@@ -98,140 +119,177 @@ include makester/makefiles/makester.mk'
 /.*/touch $PWD/terraform/provider.tf
 /.*/touch $PWD/terraform/terraform.tfvars
 eval \"\\$\_setup_provider\""
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-state-ls,dry-run
 @test "List existing Terraform resources: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-state-ls --dry-run
+
     assert_output --regexp "### listing all resources with the current Terraform state ...
 terraform -chdir=$PWD/terraform state list"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 # bats test_tags=targets,terraform-targets,tf-state-ls,dry-run
 @test "List existing Terraform resources MAKESTER__TERRAFORM_RESOURCE override: dry" {
     MAKESTER__TERRAFORM=terraform MAKESTER__TERRAFORM_RESOURCE=module.banana \
  run make -f makefiles/makester.mk tf-state-ls --dry-run
+
     assert_output --regexp "### listing all resources with the current Terraform state ...
 terraform -chdir=$PWD/terraform state list module.banana"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-pristine,dry-run
 @test "Remove Terraform resource state: dry" {
     MAKESTER__TERRAFORM=terraform MAKESTER__TERRAFORM_RESOURCE=module.banana \
  run make -f makefiles/makester.mk tf-pristine --dry-run
+
     assert_output --regexp "### remove a binding to an existing remote object without first destroying it ...
 terraform -chdir=$PWD/terraform state rm module.banana"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 # bats test_tags=targets,terraform-targets,tf-pristine,dry-run
 @test "Remove Terraform resource state MAKESTER__TERRAFORM_RESOURCE undefined: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-pristine --dry-run
+
     assert_output --regexp '### remove a binding to an existing remote object without first destroying it ...
 ### "MAKESTER__TERRAFORM_RESOURCE" undefined
 ###'
-    [ "$status" -eq 2 ]
+
+    assert_failure
 }
 
 # bats test_tags=targets,terraform-targets,tf-init,dry-run
 @test "Initialise a Terraform working directory: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-init --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform init"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-validate,dry-run
 @test "Validate Terraform configuration files: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-validate --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform validate"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-plan,dry-run
 @test "Preview the Terraform execution plan: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-plan --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform plan"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-apply,dry-run
 @test "Execute the Terraform execution plan: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-apply --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform apply"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-destroy,dry-run
 @test "Destroy all remote objects managed by Terraform configuration: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-destroy --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform destroy"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-fmt,dry-run
 @test "Rewrite Terraform configuration with consistent formatting: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-fmt --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform fmt -recursive"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-fmt-check,dry-run
 @test "Check Terraform configuration formatting: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-fmt-check --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform fmt -check -recursive"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-fmt-diff,dry-run
 @test "Display Terraform configuration formatting diffs: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-fmt-diff --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform fmt -diff -recursive"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-console,dry-run
 @test "Launch interactive console: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-console --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform console"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-version,dry-run
 @test "Display current Terraform version: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-version --dry-run
+
     assert_output "terraform -chdir=$PWD/terraform --version"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-ws-delete,dry-run
 @test "Workspaces - delete a workspace: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-ws-delete MAKESTER__TERRAFORM_WS=dummy --dry-run
+
     assert_output "### deleting workspace \"dummy\" ...
 terraform -chdir=$PWD/terraform workspace delete dummy"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-ws-new,dry-run
 @test "Workspaces - create a new workspace: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-ws-new MAKESTER__TERRAFORM_WS=dummy --dry-run
+
     assert_output "### creating workspace \"dummy\" ...
 terraform -chdir=$PWD/terraform workspace new dummy"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-ws-list,dry-run
 @test "Workspaces - list all available workspaces: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-ws-list --dry-run
+
     assert_output "### listing available workspaces ...
 terraform -chdir=$PWD/terraform workspace list"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,terraform-targets,tf-ws-select,dry-run
 @test "Workspaces - select a workspace: dry" {
     MAKESTER__TERRAFORM=terraform run make -f makefiles/makester.mk tf-ws-select MAKESTER__TERRAFORM_WS=dummy --dry-run
+
     assert_output "### selecting workspace \"dummy\" ...
 terraform -chdir=$PWD/terraform workspace select dummy"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }

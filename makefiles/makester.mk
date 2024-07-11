@@ -119,7 +119,7 @@ which-var:
 deprecated = $(call _deprecated-err,$1,$2,$3,$(strip $(value 4)))
 define _deprecated-err
 	$(info ### "$1" will be deprecated in Makester: $2)
-    $(info ### Replace "$1" with "$3")
+	$(info ### Replace "$1" with "$3")
 	$(if $4,$(error ###),)
 endef
 

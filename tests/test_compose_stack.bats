@@ -24,6 +24,7 @@ teardown_file() {
 @test "Sample Compose stack config output" {
     MAKESTER__DOCKER=docker MAKESTER__PROJECT_NAME=makester MAKESTER__COMPOSE_FILES="-f resources/sample/docker-compose.yml"\
  run make -f makefiles/makester.mk compose-config
+
     assert_output "name: makester
 services:
   demo:
@@ -39,26 +40,31 @@ services:
 networks:
   default:
     name: makester_default"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,compose-stack-targets,compose-stack-status
 @test "Sample Compose stack HTTP response" {
-    result="$(wget -qO- --server-response localhost:$SAMPLE_COMPOSE_PORT 2>&1 | awk '/^  HTTP/{print $2}')"
-    [ "$result" -eq 200 ]
+    run echo "$(wget -qO- --server-response localhost:$SAMPLE_COMPOSE_PORT 2>&1 | awk '/^  HTTP/{print $2}')"
+
+    assert_output 200
 }
 
 # bats test_tags=targets,compose-stack-targets,compose-ls
 @test "Sample Compose application listing" {
     MAKESTER__PROJECT_NAME=makester\
  run make -f makefiles/makester.mk compose-ls
+
     assert_output --regexp "makester[ ]+running"
-    [ "$status" -eq 0 ]
+
+    assert_success
 }
 
 # bats test_tags=targets,compose-stack-targets,compose-ps
 @test "Sample Compose container listing" {
     MAKESTER__PROJECT_NAME=makester MAKESTER__COMPOSE_FILES="-f resources/sample/docker-compose.yml"\
  run make -f makefiles/makester.mk compose-ps
-    [ "$status" -eq 0 ]
+
+    assert_success
 }

@@ -34,7 +34,7 @@ Add an [MIT license](https://en.wikipedia.org/wiki/MIT_License){target="_blank"}
 under `<MAKESTER__PROJECT_DIR>`. You will need to manually adjust the `<year>`
 and `<copyright holders>`:
 ``` sh
-make mit-license
+make makester-mit-license
 ```
 
 ### Update your existing Git Submodules

@@ -30,7 +30,7 @@ the ensuing mess, you're stuck with that turd until you come to your senses.
 Ensure [Terraform](https://developer.hashicorp.com/terraform/install){target="_blank"} is available in
 your path [(we recommend installing tfenv)](https://github.com/tfutils/tfenv){target="_blank"}.
 
-If you are operating Makester in [minimal mode](../../../getting-started#minimal-mode), then
+If you are operating Makester in [minimal mode](../../getting-started#minimal-mode), then
 append `terraform` to `MAKESTER__INCLUDES` to enable the Makester Terraform subsystem.
 
 ## Command reference
@@ -57,17 +57,6 @@ providers. All other files within the `terraform` directory are simple stubs, on
 
 With new Terraform configuration files in place, you will need to
 [initialise the working directory](#initialise-a-terraform-working-directory).
-
-``` sh
-make tf-state-ls
-```
-
-It is possible to filter resources by providing an address to the `MAKESTER__TERRAFORM_RESOURCE`
-variable:
-
-``` sh
-make tf-state-ls MAKESTER__TERRAFORM_RESOURCE=<OBJECT_ADDRESS>
-```
 
 ### Initialise a Terraform working directory
 [Terraform command: init](https://developer.hashicorp.com/terraform/cli/commands/init){target="_blank"}
@@ -168,6 +157,12 @@ List all resources in the state file:
 make tf-state-ls 
 ```
 
+It is possible to filter resources by providing an address to the `MAKESTER__TERRAFORM_RESOURCE` variable:
+
+``` sh
+make tf-state-ls MAKESTER__TERRAFORM_RESOURCE=<OBJECT_ADDRESS>
+```
+
 ### Workspaces: list all available workspaces
 [Terraform command: state list](https://developer.hashicorp.com/terraform/cli/commands/workspace/list){target="_blank"}
 
@@ -217,7 +212,7 @@ make tf-pristine MAKESTER__TERRAFORM_RESOURCE=<ADDRESS>
 
 ## Variables
 
-### `MAKESTER__TERRAFORM_RESOURCE`
+### `MAKESTER__TERRAFORM_PATH`
 Switch to a different working directory before executing the given subcommand.
 Defaults to `$(MAKESTER__PROJECT_DIR)/terraform`.
 
@@ -227,6 +222,10 @@ See [Switching working directory with `-chdir`](https://developer.hashicorp.com/
 Control Terraform workspace context. Default is `default`.
 
 See [Workspaces](https://developer.hashicorp.com/terraform/language/state/workspaces){target="_blank"}.
+
+
+### `MAKESTER__TERRAFORM_RESOURCE`
+Name of an address to the Terraform commands that supports resource filtering.
 
 ---
 [top](#terraform)

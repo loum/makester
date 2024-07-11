@@ -20,13 +20,9 @@ _terraform-cmd:
 
 define _terraform-cmd-err
 	$(info ### MAKESTER__TERRAFORM: <undefined>)
-	$(info ### MAKESTER__TERRAFORM_EXE_NAME set as "$(MAKESTER__TARRAFORM_EXE_NAME)")
-	$(call check-exe,$(MAKESTER__TARRAFORM_EXE_NAME),$(MAKESTER__TARRAFORM_EXE_INSTALL))
+	$(info ### MAKESTER__TERRAFORM_EXE_NAME set as "$(MAKESTER__TERRAFORM_EXE_NAME)")
+	$(call check-exe,$(MAKESTER__TERRAFORM_EXE_NAME),$(MAKESTER__TERRAFORM_EXE_INSTALL))
 endef
-
-ifneq (,$(wildcard $(MAKESTER__TERRAFORM)))
-  MAKESTER__TERRAFORM_VERSION ?= $(shell $(MAKESTER__TERRAFORM) version -json | jq .terraform_version | tr -d '"')
-endif
 
 ifdef MAKESTER__TERRAFORM_RESOURCE
   _TERRAFORM_RESOURCE ?= $(MAKESTER__TERRAFORM_RESOURCE)
@@ -40,7 +36,10 @@ terraform {
 EOF
 endef
 
+ifndef MAKESTER__TERRAFORM_VERSION
+MAKESTER__TERRAFORM_VERSION := $(shell $(MAKESTER__TERRAFORM) version -json 2>/dev/null | jq .terraform_version | tr -d '"')
 export _setup_provider = $(call _setup_provider_heredoc,$(MAKESTER__TERRAFORM_PATH),$(MAKESTER__TERRAFORM_VERSION))
+endif
 
 # Flat directory project layout.
 tf-project-create:
@@ -128,6 +127,7 @@ _tf-ws-select: _terraform-cmd
 terraform-help:
 	@echo "(makefiles/terraform.mk)\n\
   tf-apply             Terraform apply\n\
+  tf-console           Launch interactive console for evaluating expressions.\n\
   tf-destroy           Terraform destroy\n\
   tf-fmt-apply         Apply Terraform formatting changes\n\
   tf-fmt-check         Check if Terraform files are formatted\n\
@@ -136,8 +136,10 @@ terraform-help:
   tf-plan              Terraform plan\n\
   tf-validate          Terraform validate\n\
   tf-version           Terraform version\n\
-  tf-ws-dev            Terraform change to \"dev\" workspace\n\
-  tf-ws-list           Terraform list workspaces\n\
-  tf-ws-prod           Terraform change to \"prod\" workspace\n"
+  tf-version           Terraform version\n\
+  tf-ws-del            Delete an existing workspace\n\
+  tf-ws-list           List workspaces\n\
+  tf-ws-new            Create a new workspace\n\
+  tf-ws-select         Choose a different workspace to use for further operations.\n"
 
 .PHONY: terraform-help

@@ -25,10 +25,12 @@ git submodule add https://github.com/loum/makester.git
 !!! note
     Some versions of `git submodule add` will only `fetch` the submodule folder without any content.
     For first time initialisation (`pull` the submodule):
-    
-    ``` sh
-    git submodule update --init --recursive
-    ```
+  
+```
+``` sh
+git submodule update --init --recursive
+```
+```
 
 The `-i` switch will also install the Makester tooling that will be used in the following steps.
 

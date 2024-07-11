@@ -10,8 +10,7 @@ brew install make
 ```
 
 The `make` utility installed by Homebrew can be accessed by `gmake`.
-The [Homebrew make formulae](https://formulae.brew.sh/formula/make) notes sugge
-st how you can update your local `PATH` to use `gmake` as `make`. Alternatively, alias `make`:
+The [Homebrew make formulae](https://formulae.brew.sh/formula/make) notes suggest how you can update your local `PATH` to use `gmake` as `make`. Alternatively, alias `make`:
 ```
 alias make=gmake
 ```

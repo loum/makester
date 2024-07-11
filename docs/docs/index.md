@@ -24,8 +24,8 @@ If you use Python, Docker or Kubernetes daily then Makester can help you.
   For example, `make image-build`.
 - Simplify repetitive tasks with short, easy to remember `make` commands. For example, `make
   tests`, which I further alias to `mt` as I run it a million times a day ...
-- Makester does not intend to tell you **_how_** you should to things. It's just there to help you
-  work common tasks. If something you need is missing, then feel free to create a `Makefile` and
+- Makester does not intend to tell you **_how_** you should do things. It's just there to help you
+  work common and repetitive tasks. If something you need is missing, then feel free to create a `Makefile` and
   share.
 
 ## Where do I start?
