@@ -42,7 +42,9 @@ Get the code and change into the top level `git` project directory:
 git clone https://github.com/loum/makester.git && cd makester
 ```
 
-> **_NOTE:_** Run all commands from the top-level directory of the `git` repository.
+> [!NOTE]
+>
+> Run all commands from the top-level directory of the `git` repository.
 
 For first-time setup, prime the [Makester project](https://github.com/loum/makester.git):
 ```

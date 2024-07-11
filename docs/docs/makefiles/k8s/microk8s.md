@@ -48,7 +48,7 @@ You need 'multipass' set-up to build snaps: https://multipass.run.
 gmake: *** [makefiles/microk8s.mk:19: _uk8s-cmd] Error 2
 ```
 
-To start the essential Kuberentes services with minimal fuss:
+To start the essential Kubernetes services with minimal fuss:
 
 ``` sh title="Quick start convenience target."
 make microk8s-up

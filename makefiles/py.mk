@@ -246,7 +246,7 @@ py-type:
 	@mypy $(MAKESTER__MYPY_OPTIONS) $(TYPE_PATH)
 
 py-vars: _py-vars py-venv-vars
-_py-vars: 
+_py-vars:
 	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
 	$(info ### System python3 version: $(MAKESTER__PY3_VERSION))
 

@@ -29,9 +29,9 @@ docs
 Additions will need to be performed manually by adding new content under the `docs` directory. Some things you probably want to do in the first instance include:
 
 - Change the name of your site's documentation
-    - Edit the `site_name` setting in the `docs/mkdocs.yml`.
+  - Edit the `site_name` setting in the `docs/mkdocs.yml`.
 - Change the theme:
-    - Unless you are happy the the standard [MkDocs default theme](https://www.mkdocs.org/), enable the MkDocs `material` theme. Append the following to `docs/mkdocs.yml`:
+  - Unless you are happy the the standard [MkDocs default theme](https://www.mkdocs.org/), enable the MkDocs `material` theme. Append the following to `docs/mkdocs.yml`:
 ```
 theme:
   name: material

@@ -65,7 +65,8 @@ _microk8s-start:
 
 # MicroK8s version.
 #
-microk8s-version: UK8S_CMD = kubectl version --short
+microk8s-version: UK8S_CMD = version
+microk8s-kubectl-version: UK8S_CMD = kubectl version --short
 
 # Stops the kubernetes cluster.
 #
@@ -137,7 +138,7 @@ _microk8s-addon-dashboard: UK8S_CMD = enable dashboard
 _microk8s-dashboard-creds-msg:
 	$(info ### Login to the MicroK8s Kubernetes dashboard with following token:)
 microk8s-dashboard-creds: _microk8s-dashboard-creds-msg _microk8s-dashboard-creds
-_microk8s-dashboard-creds: UK8S_CMD = kubectl get secret -n kube-system microk8s-dashboard-token -o jsonpath="{.data.token}" | base64 -d; echo
+_microk8s-dashboard-creds: UK8S_CMD = kubectl create token default
 
 MICROK8S_DASHBOARD_PORT ?= 19443
 microk8s-addon-dashboard:
@@ -149,7 +150,7 @@ microk8s-addon-dashboard:
 microk8s-dashboard: _microk8s-reset-dashboard microk8s-addon-dashboard _microk8s-dashboard-msg
 	$(MAKE) _microk8s-dashboard _microk8s-dashboard-backoff
 	$(MAKE) microk8s-dashboard-creds
-_microk8s-dashboard-msg:
+_microk8s-dashboard-msg: makester-work-dir
 	$(info ### Kubernetes dashboard address forwarded to: https://$(MAKESTER__LOCAL_IP):$(MICROK8S_DASHBOARD_PORT))
 	$(info ### Kubernetes dashboard log output can be found at $(MAKESTER__WORK_DIR)/microk8s-dashboard.out)
 _microk8s-dashboard: UK8S_CMD = kubectl port-forward svc/kubernetes-dashboard\
@@ -232,15 +233,19 @@ microk8s-help:
                        MicroK8s CLI-blocking Kubernetes dashboard\n\
   microk8s-down        All-in-one helper to stop and release MicroK8s service resources\n\
   microk8s-install     Setup MicroK8s VM with default options\n\
+  microk8s-kubectl-version\n\
+		       Print the installed MicroK8s version and revision number\n\
   microk8s-namespaces  List the namespaces in the MicroK8s cluster\n\
   microk8s-namespace-add\n\
                        Create namespace defined by \"K8S_NAMESPACES\" in MicroK8s cluster\n\
   microk8s-namespace-del\n\
                        Delete namespace defined by \"K8S_NAMESPACES\" from MicroK8s cluster\n\
+  microk8s-reset       Return the MicroK8s node to the default initial state\n\
   microk8s-start       Starts the kubernetes cluster\n\
   microk8s-status      Displays the status of the cluster\n\
   microk8s-stop        Stop Kubernetes\n\
   microk8s-up          All-in-one helper to start required MicroK8s services\n\
+  microk8s-version     Print the installed MicroK8s version and revision number\n\
   microk8s-wait        Wait for the Kubernetes services to initialise\n"
 
 .PHONY: microk8s-help

@@ -1,6 +1,7 @@
 # FAQs
 
-#### How do I upgrade Makester?
+## How do I upgrade Makester?
+
 Use the Makester primer tool in upgrade mode:
 ```
 resources/scripts/primer.sh -u
@@ -12,5 +13,6 @@ to sync the Makester `git` submodule:
 make submodule-update
 ```
 
-#### Why is the default `make` on macOS so old?
+### Why is the default `make` on macOS so old?
+
 Apple seems to have an issue with licensing around GNU products: more specifically to the terms of the GPLv3 licence agreement. It is unlikely that Apple will provide current versions of utilities that are bound by the GPLv3 licensing constraints.

@@ -170,13 +170,15 @@ MAKESTER__DOCKER_PLATFORM=linux/arm64,linux/amd64 make -f resources/sample/Makef
     If you receive a `:15000: connect: connection refused` error, you may need to add the following to
     your Docker's `daemon.json` configuration file:
 
-    ```
-    "insecure-registries" : [
-      "localhost:15000",
-      "127.0.0.1:15000",
-      "registry.me:15000"
-    ],
-    ```
+```
+```
+"insecure-registries" : [
+  "localhost:15000",
+  "127.0.0.1:15000",
+  "registry.me:15000"
+],
+```
+```
 
 To see the images in your local registry server, first list the catalog:
 ``` sh
@@ -279,7 +281,7 @@ make image-buildx
 ```
 
 ### Create a `buildx` builder
-As per [docker buildx create](https://docs.docker.com/engine/reference/commandline/buildx_create/), 
+As per [docker buildx create](https://docs.docker.com/engine/reference/commandline/buildx_create/),
 create a `buildx` builder instance to leverage capabilities provided by BuildKit. Such as
 multi-arch image builds:
 
@@ -338,7 +340,7 @@ Unique identifier used to distinguish container image builds. Defaults to
 [HASH](../makester/#hash).
 
 ### `MAKESTER__IMAGE_TAG_ALIAS`
-Convenience variable that is made up of the 
+Convenience variable that is made up of the
 [MAKESTER__SERVICE_NAME](../makester/#makester__service_name) and `MAKESTER__IMAGE_TARGET_TAG`. For example:
 
 ``` sh title="MAKESTER__SERVICE_NAME sample value"
