@@ -478,6 +478,24 @@ black src/makester'
     assert_success
 }
 
+# bats test_tags=target,py-md-fmt,dry-run
+@test "Markdown formatter MD_FMT_PATH undefined: dry" {
+    run make -f makefiles/makester.mk py-md-fmt --dry-run
+
+    assert_output --partial '### "MD_FMT_PATH" undefined'
+
+    assert_failure
+}
+# bats test_tags=target,py-md-fmt,dry-run
+@test "Markdown formatter MD_FMT_PATH set: dry" {
+    MD_FMT_PATH=docs run make -f makefiles/makester.mk py-md-fmt --dry-run
+
+    assert_output '### Formatting Markdown files under "docs"
+mdformat docs'
+
+    assert_success
+}
+
 # bats test_tags=target,py-lint-src,dry-run
 @test "Python src modules linter: dry" {
     run make -f makefiles/makester.mk py-lint-src --dry-run

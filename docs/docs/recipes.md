@@ -9,7 +9,8 @@
 
 The following recipe defines a _backoff_ strategy with `docker compose` in addition
 to adding an action to run the initialisation script, `init-script.sh`:
-``` sh
+
+```sh
 backoff:
     @makester backoff localhost 10000 --detail "HiveServer2"
     @makester backoff localhost 10002 --detail "Web UI for HiveServer2"
@@ -22,7 +23,7 @@ local-build-up: compose-up backoff
 
 ### Multi-arch builds
 
-As you may have noticed, [multi-architecture builds](../makefiles/docker/#support-for-multi-architecture-builds)
+As you may have noticed, [multi-architecture builds](makefiles/docker.md#support-for-multi-architecture-builds)
 can be somewhat of a grind. This recipe creates a new target called `multi-arch-build` that will:
 
 - creates a new `buildx builder` called `multiarch` and selects that for use
@@ -30,7 +31,7 @@ can be somewhat of a grind. This recipe creates a new target called `multi-arch-
 - builds image with multi-architecture support and publishes to the local registry server
 - shifts the new multi-architecture image from the local registry server into docker
 
-``` sh title="Multi-arch container image builds."
+```sh title="Multi-arch container image builds."
 image-pull-into-docker:
     $(info ### Pulling local registry image $(MAKESTER__SERVICE_NAME):$(HASH) into docker)
     $(MAKESTER__DOCKER) pull $(MAKESTER__SERVICE_NAME):$(HASH)
@@ -55,7 +56,8 @@ multi-arch-build: image-registry-start image-buildx-builder
 ### Provide Multiple `docker compose` `up`/`down` Targets
 
 Override `MAKESTER__COMPOSE_FILES` Makester parameter to customise multiple build/destroy environments:
-``` sh
+
+```sh
 test-compose-up: MAKESTER__COMPOSE_FILES = -f docker-compose.yml -f docker-compose-test.yml
 test-compose-up: compose-up
 
@@ -69,14 +71,15 @@ dev-compose-up: compose-up
 ## Versioning
 
 ### Release branch and tagging
-!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3){target="_blank"}"
 
-The [sample GitVersion.yml](https://github.com/loum/makester/blob/main/sample/GitVersion.yml){target="_blank"}
+!!! tag "[Makester v0.2.3](https://github.com/loum/makester/releases/tag/0.2.3){target="\_blank"}"
+
+The [sample GitVersion.yml](https://github.com/loum/makester/blob/main/sample/GitVersion.yml){target="\_blank"}
 now includes a dedicated `release` section that caters for `release` branches. This allows you to
 version increment main-line releases independent from your main-line branch. This mitigates the need to make
 changes directly to your `main` branch. For example:
 
-``` sh title="Preparing for release."
+```sh title="Preparing for release."
 git checkout main
 git checkout -b release
 make gitversion-release
@@ -87,10 +90,10 @@ incremental rules.
 
 Here is a samle GitHub action that creates a tag and pre-release when the `VERSION` file change
 has been detected. It is based on `makester`'s versioning strategy and the excellent
-[marvinpinto/action-automatic-releases](https://github.com/marvinpinto/action-automatic-releases){target="_blank"}
+[marvinpinto/action-automatic-releases](https://github.com/marvinpinto/action-automatic-releases){target="\_blank"}
 action:
 
-``` sh title="VERSION file action for automatic releases"
+```sh title="VERSION file action for automatic releases"
 name: Makester CI
 run-name: ${{ github.actor }} ${{ github.event_name }} event Makester CI 🚀
 on: push
@@ -125,5 +128,6 @@ jobs:
           prerelease: true
 ```
 
----
+______________________________________________________________________
+
 [top](#recipes)

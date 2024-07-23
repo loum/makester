@@ -3,13 +3,15 @@
 ## How do I upgrade Makester?
 
 Use the Makester primer tool in upgrade mode:
+
 ```
 resources/scripts/primer.sh -u
 ```
 
 Prior to [Makester v0.2.6](https://github.com/loum/makester/releases/tag/0.2.6) you will first need
 to sync the Makester `git` submodule:
-``` sh
+
+```sh
 make submodule-update
 ```
 

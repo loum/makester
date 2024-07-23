@@ -214,6 +214,11 @@ py-fmt:
 	$(info ### Formatting Python files under "$(FMT_PATH)")
 	@black $(FMT_PATH)
 
+py-md-fmt:
+	$(call check-defined, MD_FMT_PATH)
+	$(info ### Formatting Markdown files under "$(MD_FMT_PATH)")
+	@mdformat $(MD_FMT_PATH)
+
 py-lint-src:
 	$(info ### Linting Python files under "$(MAKESTER__PYTHONPATH)")
 	@pylint $(MAKESTER__PYTHONPATH)
@@ -257,6 +262,7 @@ py-help: _py-help _py-venv-help
 _py-help:
 	@echo "($(MAKESTER__MAKEFILES)/py.mk)\n\
   py-check             All-in-one code validator\n\
+  py-cli               Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-dep               Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-distribution      Create a versioned archive file that contains your Python project's packages\n\
   py-fmt               Format Python modules defined by \"FMT_PATH\"\n\
@@ -264,8 +270,8 @@ _py-help:
   py-install           Install Python project package dependencies\n\
   py-lint              Lint Python modules defined by \"LINT_PATH\"\n\
   py-lint-all          Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
+  py-md-fmt            Format Markdown files defined by \"MD_FMT_PATH\"\n\
   py-project-create    Create a minimal Python project directory structure scaffolding\n\
   py-pylintrc          Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\"\n\
   py-setup-cfg         Add new setup.cfg configuration to \"$(MAKESTER__SETUP_CFG)\"\n\
-  py-cli               Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\"\n\
   py-vars              Display system Python settings\n"

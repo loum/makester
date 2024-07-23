@@ -2,35 +2,35 @@
 
 !!! tag "[Makester v0.2.4](https://github.com/loum/makester/releases/tag/0.2.4)"
 
-[MicroK8s](https://microk8s.io/){target="_blank"} is an alternate, lightweight Kubernetes implementation
-that is ideal for localised testing, experimentation and shaking out production deployments.
+[MicroK8s](https://microk8s.io/){target="\_blank"} is a lightweight Kubernetes implementation
+that is ideal for localised testing, experimentation and for shaking out production deployments.
 
 !!! note
     This Makester addon is not intended to be a replacement for full suite of
-    [MicroK8s commands](https://microk8s.io/docs/command-reference){target="_blank"}. Rather, it
+    [MicroK8s commands](https://microk8s.io/docs/command-reference){target="\_blank"}. Rather, it
     is abstracting the most basic set of instructions required to get a minimal Kubernetes
     instance operational with minimal fuss.
-    
-    See the [MicroK8s commands reference](https://microk8s.io/docs/command-reference){target="_blank"} for the full
+
+    See the [MicroK8s commands reference](https://microk8s.io/docs/command-reference){target="\_blank"} for the full
     suite of available commands. Similarly,
-    [`microk8s kubectl`](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands){target="_blank"}
+    [`microk8s kubectl`](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands){target="\_blank"}
     provides the list of commands to run against the Kubernetes cluster.
 
 ## Getting started
 
-If you are operating Makester in [minimal mode](../../../getting-started#minimal-mode), then
+If you are operating Makester in [minimal mode](../../getting-started.md#minimal-mode), then
 append `microk8s` to `MAKESTER__INCLUDES` to enable the Makester MicroK8s subsystem.
 
 Start by checking the MicroK8s status:
 
-``` sh title="MicroK8s status: pristine environment."
+```sh title="MicroK8s status: pristine environment."
 make microk8s-status
 ```
 
 If the `microk8s` executable is not found, then a link to the installation notes is displayed as
 follows:
 
-``` sh title="MicroK8s not installed."
+```sh title="MicroK8s not installed."
 ### Checking MicroK8s status ...
 ### MAKESTER__MICROK8S: <undefined>
 ### MAKESTER__MICROK8S_EXE_NAME set as "microk8ss"
@@ -39,10 +39,11 @@ follows:
 makefiles/microk8s.mk:16: *** ###.  Stop.
 ```
 
-Install [Microk8s](https://microk8s.io/docs/getting-started){target="_blank"} suited to your platform.
+Install [Microk8s](https://microk8s.io/docs/getting-started){target="\_blank"} suited to your platform.
 
-MacOS users will need to also install [Multipass](https://multipass.run/){target="_blank"}:
-``` sh title="Install Multipass."
+MacOS users will need to also install [Multipass](https://multipass.run/){target="\_blank"}:
+
+```sh title="Install Multipass."
 ### Checking MicroK8s status ...
 You need 'multipass' set-up to build snaps: https://multipass.run.
 gmake: *** [makefiles/microk8s.mk:19: _uk8s-cmd] Error 2
@@ -50,7 +51,7 @@ gmake: *** [makefiles/microk8s.mk:19: _uk8s-cmd] Error 2
 
 To start the essential Kubernetes services with minimal fuss:
 
-``` sh title="Quick start convenience target."
+```sh title="Quick start convenience target."
 make microk8s-up
 ```
 
@@ -59,70 +60,76 @@ granular targets that allow you to customise and explore the Kubernetes cluster.
 
 To clean up all resources:
 
-``` sh title="Clean up all resources."
+```sh title="Clean up all resources."
 make microk8s-down
 ```
 
 ## Command reference
 
 ### All-in-one Kubernetes service starter
+
 A convenience target to start the most essential Kubernetes services, such as DNS, and
 provide access to the Kubernetes dashboard:
 
-``` sh
+```sh
 make microk8s-up
 ```
 
 ### All-in-one Kubernetes service stopper
+
 Restore the MicroK8s to original state and release all resources:
 
-``` sh
+```sh
 make microk8s-down
 ```
 
 !!! note
-    This target will also stop the underlying `microk8s-vm`.
+    For Multipass environments, this target will also stop the underlying `microk8s-vm`.
 
 ### Start MicroK8s
+
 Start a local, lightweight Kubernetes:
 
-``` sh
+```sh
 make microk8s-start
 ```
 
 ### Wait for MicroK8s services to initialise
+
 In addition to the `microk8s status` target, this alternate status target will wait until all of
 the Kubernetes targets are ready:
 
-``` sh
+```sh
 make microk8s-wait
 ```
 
 ### MicroK8s version
+
 Print the installed MicroK8s version and revision number:
 
-``` sh
+```sh
 make microk8s-version
 ```
 
-``` sh title="MicroK8s version sample output."
+```sh title="MicroK8s version sample output."
 Client Version: v1.26.3
 Kustomize Version: v4.5.7
 Server Version: v1.26.3
 ```
 
 ### Start the MicroK8s Kubernetes dashboard
+
 This MicroK8s Kubernetes dashboard variant is non-blocking and can be used in pipelines and
 scripts. It will automatically enable the dashboard addon:
 
-``` sh
+```sh
 make microk8s-dashboard
 ```
 
 The output will contain the URL to the Kubernetes dashboard in addition to a token that can be used
 to authenticate to the service. For example:
 
-``` sh title="Sample Kubernetes dashboard URL and token."
+```sh title="Sample Kubernetes dashboard URL and token."
 ...
 ### Kubernetes dashboard address forwarded to: https://192.168.1.211:19443
 ### Kubernetes dashboard log output can be found at .makester/microk8s-dashboard.out
@@ -136,41 +143,47 @@ Enter the token at the Kubernetes dashboard login screen:
 ![Kubernetes dashboard login](../../assets/images/kubernetes_dashboard_login.png)
 
 ### Enable the Kubernetes dashboard addon
-See for [Addon: dashboard](https://microk8s.io/docs/addon-dashboard){target="_blank"} for more information:
 
-``` sh
+See for [Addon: dashboard](https://microk8s.io/docs/addon-dashboard){target="\_blank"} for more information:
+
+```sh
 make microk8s-addon-dashboard
 ```
 
 ### Regenerate the MicroK8s Kubernetes dashboard authentication token
+
 The MicroK8s Kubernetes dashboard will timeout the login after a period of inactivity. Regenerate
 the token with:
 
-``` sh
+```sh
 make microk8s-dashboard-creds
 ```
 
 ### Start the MicroK8s Kubernetes dashboard proxy
+
 This is a CLI-blocking variant of `make microk8s-dashboard`. Use `Ctrl-C` to terminate.
 
-See [microk8s dashboard-proxy](https://microk8s.io/docs/command-reference#heading--microk8s-dashboard-proxy){target="_blank"}
+See [microk8s dashboard-proxy](https://microk8s.io/docs/command-reference#heading--microk8s-dashboard-proxy){target="\_blank"}
 for more information:
 
-``` sh
+```sh
 make microk8s-dashboard-proxy
 ```
 
 ### List active namespaces in the Kubernetes cluster
+
 This `kubectl` command lists the current active namespaces:
 
-``` sh
+```sh
 make microk8s-namespaces
 ```
 
 ## Variables
 
 ### `MICROK8S_DASHBOARD_PORT`
+
 The MicroK8s Kubernetes dashboard port (default `<19443>`).
 
----
+______________________________________________________________________
+
 [top](#microk8s)
