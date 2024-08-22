@@ -1,11 +1,11 @@
 ifndef .DEFAULT_GOAL
-.DEFAULT_GOAL := py-help
+  .DEFAULT_GOAL := py-help
 endif
 
 ifndef MAKESTER__PRIMED
-$(info ### Add the following include statement to your Makefile)
-$(info include makester/makefiles/makester.mk)
-$(error ### missing include dependency)
+  $(info ### Add the following include statement to your Makefile)
+  $(info include makester/makefiles/makester.mk)
+  $(error ### missing include dependency)
 endif
 
 MAKESTER__PYTHONPATH ?= $(MAKESTER__PROJECT_DIR)/src

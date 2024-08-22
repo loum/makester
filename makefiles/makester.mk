@@ -12,11 +12,21 @@ ifndef MAKESTER__VERBOSE
   MAKEFLAGS += --no-print-directory
 endif
 
+ifndef MAKESTER__STANDALONE
+  MAKESTER__STANDALONE ?= false
+endif
+
 MAKESTER__SUBMODULE_NAME ?= makester
-MAKESTER__MAKEFILES ?= $(if $(wildcard $(MAKESTER__SUBMODULE_NAME)),makester/makefiles,makefiles)
+ifeq ($(strip $(MAKESTER__STANDALONE)),true)
+  MAKESTER__MAKEFILES ?= $(HOME)/.makester/makefiles
+  MAKESTER__BIN ?= $(HOME)/.makester/venv/bin
+else
+  MAKESTER__MAKEFILES ?= $(if $(wildcard $(MAKESTER__SUBMODULE_NAME)),makester/makefiles,makefiles)
+  MAKESTER__BIN ?= $(PWD)/venv/bin
+endif
 
 # Add PyPI bin to the end of PATH to ensure system Python is found first.
-export PATH := $(shell echo $$PATH:$(PWD)/venv/bin)
+export PATH := $(shell echo $$PATH:$(MAKESTER__BIN))
 
 # Prepare the makester working directory. Place all makester convenience capability here.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester

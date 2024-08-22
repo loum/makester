@@ -122,9 +122,22 @@ microk8s status'
     MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
  run make -f makefiles/makester.mk microk8s-install --dry-run
 
-    assert_output --partial 'make _microk8s-install-msg _microk8s-install
+    assert_output 'make _microk8s-install-msg _microk8s-install
 ### Installing MicroK8s ...
-microk8s install'
+microk8s install --cpu 2 --mem 4 --channel "1.28/stable" --image 22.04 --disk 50'
+
+    assert_success
+}
+# bats test_tags=targets,microk8s-targets,microk8s-install,dry-run
+@test "Microk8s install for Darwin with overridden settings: dry" {
+    MAKESTER__UNAME=Darwin MULTIPASS_CPU=4 MULTIPASS_MEMORY=8 MULTIPASS_CHANNEL="1.30/stable"\
+ MULTIPASS_IMAGE=24.04 MULTIPASS_DISK=100\
+ MAKESTER__LOCAL_IP=192.168.1.1 MAKESTER__MICROK8S=microk8s\
+ run make -f makefiles/makester.mk microk8s-install --dry-run
+
+    assert_output 'make _microk8s-install-msg _microk8s-install
+### Installing MicroK8s ...
+microk8s install --cpu 4 --mem 8 --channel "1.30/stable" --image 24.04 --disk 100'
 
     assert_success
 }
@@ -222,7 +235,7 @@ until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --a
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
 microk8s kubectl create token default'
@@ -250,7 +263,7 @@ until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --a
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19999:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19999 --detail "MicroK8s Kubernetes dashboard"
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19999 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
 microk8s kubectl create token default'
@@ -395,7 +408,7 @@ until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --a
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
 microk8s kubectl create token default'

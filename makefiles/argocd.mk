@@ -140,10 +140,10 @@ _argocd-example-ui _argocd-dashboard _argocd-creds _argocd-install _argocd-ns _a
 _argocd-example-del _argocd-example-sync _argocd-example _argocd-cli-login: _argocd-cmd
 
 _argocd-backoff:
-	venv/bin/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__ARGOCD_DASHBOARD_PORT) --detail "Argo CD API server"
+	$(MAKESTER__BIN)/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__ARGOCD_DASHBOARD_PORT) --detail "Argo CD API server"
 
 _argocd-example-backoff:
-	venv/bin/makester backoff $(MAKESTER__LOCAL_IP) 20888 --detail "Argo CD Example App"
+	$(MAKESTER__BIN)/makester backoff $(MAKESTER__LOCAL_IP) 20888 --detail "Argo CD Example App"
 
 argocd-help:
 	@echo "(makefiles/argocd.mk)\n\

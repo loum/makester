@@ -305,9 +305,7 @@ Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 Use [mypy](https://mypy-lang.org/) for code type annotation.
 
 !!! note
-
-Makester defaults to a more strict interpretation of type annotation checks with the
-`--disallow-untyped-defs` switch. This can be overridden with `MAKESTER__MYPY_OPTIONS`.
+    Makester defaults to a more strict interpretation of type annotation checks with the `--disallow-untyped-defs` switch. This can be overridden with `MAKESTER__MYPY_OPTIONS`.
 
 ```sh
 make py-type-all
@@ -364,6 +362,40 @@ TYPE_PATH=src/makester make py-type
 ```sh title="Sample type annotation output when setting LINT_PATH with a path to Python modules."
 ### Type annotating Python files under "src/makester"
 Success: no issues found in 4 source files
+```
+
+### Markdown formatter
+
+!!! tag "[Makester v0.3.0](https://github.com/loum/makester/releases/tag/0.3.0){target="\_blank"}"
+
+Use [mdformat](https://mdformat.readthedocs.io/en/stable/) as a CommonMark compliant Markdown formatter.
+
+```sh
+make py-md-fmt
+```
+
+Without providing a `MD_FMT_PATH`, the command will error:
+
+```sh title="Markdown formatting error without setting a path."
+### "MD_FMT_PATH" undefined
+###
+makefiles/py.mk:218: *** ###.  Stop.
+```
+
+The following example demonstrates how to set `MD_FMT_PATH` for a single Markdown file:
+
+```sh title="Formatting a single Markdown file."
+make py-md-fmt MD_FMT_PATH=docs/docs/index.md
+```
+
+```sh title="Sample formatter output when setting MD_FMT_PATH."
+### Formatting Markdown files under "docs/docs/index.md"
+```
+
+Directory paths to Markdown files are also supported:
+
+```sh title="Markdown formatting under a given path."
+make py-md-fmt MD_FMT_PATH=docs
 ```
 
 ### All-in-one code checker

@@ -124,7 +124,7 @@ microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/a
     assert_output --regexp 'pkill -f "port-forward svc/argocd-server"
 .*make _argocd-dashboard _argocd-backoff _argocd-dashboard-msg
 microk8s kubectl port-forward svc/argocd-server -n argocd 20443:443 --address="0.0.0.0" > /.*/.makester/argocd-dashboard.out 2>&1 &
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 20443 --detail "Argo CD API server"
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 20443 --detail "Argo CD API server"
 ### Argo CD API Server address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:20443
 ### Argo CD API Server log output can be found at /.*/.makester/argocd-dashboard.out
 .*make argocd-creds
@@ -141,7 +141,7 @@ microk8s kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="\
     assert_output --regexp 'pkill -f "port-forward svc/argocd-server"
 .*make _argocd-dashboard _argocd-backoff _argocd-dashboard-msg
 microk8s kubectl port-forward svc/argocd-server -n argocd 9999:443 --address="0.0.0.0" > /.*/.makester/argocd-dashboard.out 2>&1 &
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 9999 --detail "Argo CD API server"
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 9999 --detail "Argo CD API server"
 ### Argo CD API Server address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:9999
 ### Argo CD API Server log output can be found at /.*/.makester/argocd-dashboard.out
 .*make argocd-creds

@@ -216,10 +216,18 @@ teardown_file() {
 }
 
 # bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
-@test "MAKESTER__MAKEFILES default should be set when calling py.mk" {
+@test "MAKESTER__MAKEFILES default should be set" {
     run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
 
     assert_output "MAKESTER__MAKEFILES=makefiles"
+
+    assert_success
+}
+# bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
+@test "MAKESTER__MAKEFILES with MAKESTER__STANDALONE set should be set to correct path" {
+    MAKESTER__STANDALONE=true run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+
+    assert_output "MAKESTER__MAKEFILES=$HOME/.makester/makefiles"
 
     assert_success
 }

@@ -15,8 +15,13 @@ ifndef MAKESTER__VENV_TOOL
 endif
 
 # OK, set some globals.
-MAKESTER__PIP ?= $(MAKESTER__PROJECT_DIR)/venv/bin/pip
-MAKESTER__PYTHON ?= $(MAKESTER__PROJECT_DIR)/venv/bin/python
+ifeq ($(strip $(MAKESTER__STANDALONE)),true)
+  MAKESTER__PIP ?= $(MAKESTER__BIN)/pip
+  MAKESTER__PYTHON ?= $(MAKESTER__BIN)/python
+else
+  MAKESTER__PIP ?= $(MAKESTER__PROJECT_DIR)/venv/bin/pip
+  MAKESTER__PYTHON ?= $(MAKESTER__PROJECT_DIR)/venv/bin/python
+endif
 
 # Symbol to be deprecated in Makester 0.3.0
 clear-env: _clear-env-warn py-venv-clear
