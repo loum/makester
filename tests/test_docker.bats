@@ -306,7 +306,7 @@ docker run --rm -d\\
  -p 15000:5000\\
  --name makester-registry\\
  registry:2
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
 
     assert_success
 }
@@ -321,7 +321,7 @@ docker run --rm -d\\
  -p 5001:5000\\
  --name makester-registry\\
  registry:2
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 5001 --detail "Local registry server"'
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 5001 --detail "Local registry server"'
 
     assert_success
 }
@@ -336,7 +336,7 @@ docker run --rm -d\\
  -p 15000:5000\\
  --name makester-registry\\
  registry:3
-venv/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
+.*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 15000 --detail "Local registry server"'
 
     assert_success
 }

@@ -55,6 +55,13 @@ To start the essential Kubernetes services with minimal fuss:
 make microk8s-up
 ```
 
+!!! note
+    For [multipass](https://multipass.run/) deployments, it is possible to configure the underlying VM resources that are passed to the `microk8s install` command via the available `MUTLIPASS_*` settings. The default arrangement is as follows:
+
+    ```bash
+    make microk8s-up MULTIPASS_CPU=2 MULTIPASS_MEMORY=4 MULTIPASS_DISK=50 MULTIPASS_CHANNEL="1.28/stable" MULTIPASS_IMAGE=22.04
+    ```
+
 `make microk8s-up` should cater for the majority of scenarios. However, Makester also provides more
 granular targets that allow you to customise and explore the Kubernetes cluster.
 

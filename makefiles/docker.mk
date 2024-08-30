@@ -60,7 +60,7 @@ ifndef MAKESTER__LOCAL_REGISTRY
 endif
 
 _image-registry-backoff:
-	@venv/bin/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__LOCAL_REGISTRY_PORT) --detail "Local registry server"
+	@$(MAKESTER__BIN)/makester backoff $(MAKESTER__LOCAL_IP) $(MAKESTER__LOCAL_REGISTRY_PORT) --detail "Local registry server"
 
 _image-registry-start:
 ifeq ($(call MAKESTER__LOCAL_REGISTRY_RUNNING),makester-registry)

@@ -1,11 +1,11 @@
 ifndef .DEFAULT_GOAL
-.DEFAULT_GOAL := microk8s-help
+  .DEFAULT_GOAL := microk8s-help
 endif
 
 ifndef MAKESTER__PRIMED
-$(info ### Add the following include statement to your Makefile)
-$(info include makester/makefiles/makester.mk)
-$(error ### missing include dependency)
+  $(info ### Add the following include statement to your Makefile)
+  $(info include makester/makefiles/makester.mk)
+  $(error ### missing include dependency)
 endif
 
 MAKESTER__MICROK8S_EXE_NAME ?= microk8s
@@ -32,13 +32,28 @@ microk8s-status: _microk8s-status-msg _microk8s-status
 _microk8s-status: UK8S_CMD = status
 
 # MicroK8s install.
+ifndef MULTIPASS_CPU
+  MULTIPASS_CPU := 2
+endif
+ifndef MULTIPASS_MEMORY
+  MULTIPASS_MEMORY := 4
+endif
+ifndef MULTIPASS_DISK
+  MULTIPASS_DISK := 50
+endif
+ifndef MULTIPASS_CHANNEL
+  MULTIPASS_CHANNEL := 1.28/stable
+endif
+ifndef MULTIPASS_IMAGE
+  MULTIPASS_IMAGE := 22.04
+endif
 _microk8s-install-msg:
 	$(info ### Installing MicroK8s ...)
 microk8s-install:
 ifeq ($(MAKESTER__UNAME),Darwin)
 	$(MAKE) _microk8s-install-msg _microk8s-install
 endif
-_microk8s-install: UK8S_CMD = install
+_microk8s-install: UK8S_CMD = install --cpu $(MULTIPASS_CPU) --mem $(MULTIPASS_MEMORY) --channel "$(MULTIPASS_CHANNEL)" --image $(MULTIPASS_IMAGE) --disk $(MULTIPASS_DISK)
 
 # MicroK8s uninstall.
 _microk8s-uninstall-msg:
@@ -181,7 +196,7 @@ endef
 microk8s-version: UK8S_CMD = kubectl version --short
 
 _microk8s-dashboard-backoff:
-	venv/bin/makester backoff $(MAKESTER__LOCAL_IP) $(MICROK8S_DASHBOARD_PORT) --detail "MicroK8s Kubernetes dashboard"
+	$(MAKESTER__BIN)/makester backoff $(MAKESTER__LOCAL_IP) $(MICROK8S_DASHBOARD_PORT) --detail "MicroK8s Kubernetes dashboard"
 
 microk8s-dashboard-stop:
 	$(info ### Closing MicroK8s dashboard port-forward at https://$(MAKESTER__LOCAL_IP):$(MICROK8S_DASHBOARD_PORT))
