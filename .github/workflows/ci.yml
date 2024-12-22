@@ -5,41 +5,50 @@ permissions:
   contents: write
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: sudo apt-get install -y python3 zsh
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
+          path: .makester
           submodules: recursive
           fetch-depth: 0
+      - run: pwd
+      - run: ls -al
+      - run: echo $HOME
+      - run: echo $GITHUB_WORKSPACE
       - name: Project Makester vars
-        run: make -f makefiles/makester.mk vars
+        run: HOME=$GITHUB_WORKSPACE make -f $GITHUB_WORKSPACE/.makester/Makefile vars
       - name: Project Makester test suite
         run: |
-          make init
-          make tests
+          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
+          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester tests
       - run: echo "🍏 ${{ job.status }}"
   pre-release:
     needs: tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
+      - run: sudo apt-get install -y python3 zsh
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
+          path: .makester
           submodules: recursive
           fetch-depth: 0
       - name: Check if the VERSION file has changed
         id: changed_version_file
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v45
         with:
+          path: .makester
           files: src/makester/VERSION
       - name: Read VERSION file
         if: steps.changed_version_file.outputs.any_changed == 'true'
         id: get_version
-        run: echo "VERSION=$(cat src/makester/VERSION)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(cat GITHUB_WORKSPACE/.makester/src/makester/VERSION)" >> $GITHUB_OUTPUT
       - name: Create pre-release
         if: steps.changed_version_file.outputs.any_changed == 'true'
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -49,15 +58,17 @@ jobs:
           automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
           prerelease: true
   docs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
     steps:
+      - run: sudo apt-get install -y python3 zsh
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
+          path: .makester
           submodules: recursive
       - name: Project Makester docs build
         run: |
-          make init
-          make docs-gh-deploy
+          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
+          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester docs-gh-deploy
       - run: echo "🍏 ${{ job.status }}"

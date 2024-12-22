@@ -5,7 +5,8 @@
 #
 # bats file_tags=py
 setup_file() {
-    export MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    export MAKESTER__PROJECT_DIR
 }
 setup() {
     unset MAKESTER__SYSTEM_PYTHON3
@@ -15,7 +16,7 @@ setup() {
 teardown_file() {
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-setup-cfg-rm
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-cli-rm
-    rmdir $MAKESTER__PROJECT_DIR
+    rmdir "$MAKESTER__PROJECT_DIR"
 }
 
 # Python include dependencies.
@@ -283,6 +284,15 @@ include makester/makefiles/makester.mk'
 
     assert_success
 }
+# bats test_tags=target,py-install-makester,dry-run
+@test "Python package install MAKESTER__PIP_INSTALL override in MAKESTER__STANDALONE mode: dry" {
+    _VENV_DIR_EXISTS=1 MAKESTER__STANDALONE=true run make -f makefiles/makester.mk py-install-makester --dry-run
+
+    assert_output --regexp '### Installing project dependencies into .*/venv ...
+.*/venv/bin/pip install --find-links=~/wheelhouse -e .'
+
+    assert_success
+}
 
 # bats test_tags=target,py-pylintrc,dry-run
 @test "Python pylint configuration generator: dry" {
@@ -334,7 +344,7 @@ pipdeptree'
 @test "Python setup.cfg primer" {
     MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg \
  run make -f makefiles/makester.mk py-setup-cfg
-    diff $MAKESTER__PROJECT_DIR/setup.cfg tests/files/out/py/default-setup.cfg
+    diff "$MAKESTER__PROJECT_DIR"/setup.cfg tests/files/out/py/default-setup.cfg
 
     assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
 
@@ -344,27 +354,27 @@ pipdeptree'
 @test "Python setup.cfg primer MAKESTER__PACKAGE_NAME override" {
     MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg MAKESTER__PACKAGE_NAME=banana\
  run make -f makefiles/makester.mk py-setup-cfg
-    diff $MAKESTER__PROJECT_DIR/setup.cfg tests/files/out/py/package-name-override-setup.cfg
+    diff "$MAKESTER__PROJECT_DIR"/setup.cfg tests/files/out/py/package-name-override-setup.cfg
 
     assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
 
     assert_success
 }
 
-# bats test_tags=target,_py-cli-init
+# bats test_tags=target,py-cli
 @test "Python CLI __init__ primer" {
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-init
-    diff $MAKESTER__PROJECT_DIR/__init__.py tests/files/out/py/cli-init.py
+    diff "$MAKESTER__PROJECT_DIR"/__init__.py tests/files/out/py/cli-init.py
 
     assert_output "### Writing CLI __init__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
 
     assert_success
 }
 
-# bats test_tags=target,_py-cli-main
+# bats test_tags=target,py-cli
 @test "Python CLI __main__ primer" {
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-main
-    diff $MAKESTER__PROJECT_DIR/__main__.py tests/files/out/py/cli-main.py
+    diff "$MAKESTER__PROJECT_DIR"/__main__.py tests/files/out/py/cli-main.py
 
     assert_output "### Writing CLI __main__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
 
@@ -474,24 +484,6 @@ black something_else"
 
     assert_output '### Formatting Python files under "src/makester"
 black src/makester'
-
-    assert_success
-}
-
-# bats test_tags=target,py-md-fmt,dry-run
-@test "Markdown formatter MD_FMT_PATH undefined: dry" {
-    run make -f makefiles/makester.mk py-md-fmt --dry-run
-
-    assert_output --partial '### "MD_FMT_PATH" undefined'
-
-    assert_failure
-}
-# bats test_tags=target,py-md-fmt,dry-run
-@test "Markdown formatter MD_FMT_PATH set: dry" {
-    MD_FMT_PATH=docs run make -f makefiles/makester.mk py-md-fmt --dry-run
-
-    assert_output '### Formatting Markdown files under "docs"
-mdformat docs'
 
     assert_success
 }

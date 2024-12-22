@@ -41,7 +41,7 @@ MAKESTER__PIP_INSTALL_EXTRAS ?= dev
 py-install-extras: MAKESTER__PIP_INSTALL := -e .[$(MAKESTER__PIP_INSTALL_EXTRAS)]
 py-install-extras: py-install
 
-py-install-makester: MAKESTER__PIP_INSTALL := -e makester
+py-install-makester: MAKESTER__PIP_INSTALL = -e $(MAKESTER__SUBMODULE_NAME)
 py-install-makester: MAKESTER__WORK_DIR := $(PWD)/makester/.makester
 py-install-makester: MAKESTER__VERSION_FILE := makester/$(MAKESTER__PYTHONPATH)/makester/VERSION
 py-install-makester: MAKESTER__PROJECT_NAME := makester
@@ -68,6 +68,51 @@ py-deps:
 
 # Private Makefile includes that leverage capabilities in this Makefile.
 include $(MAKESTER__MAKEFILES)/_py-venv.mk
+
+define _py_makefile_heredoc
+cat <<'EOF' > Makefile
+.SILENT:
+.DEFAULT_GOAL := help
+
+#
+# Makester overrides.
+#
+MAKESTER__STANDALONE := true
+
+include $2/.makester/makefiles/makester.mk
+
+MAKESTER__PROJECT_NAME := $1
+MAKESTER__VERSION_FILE := src/$$(MAKESTER__PACKAGE_NAME)/VERSION
+
+#
+# Local Makefile targets.
+#
+_venv-init: py-venv-clear py-venv-init
+
+# Build the local development environment.
+#
+init-dev: _venv-init py-install-makester
+	MAKESTER__PIP_INSTALL_EXTRAS=dev $(MAKE) py-install-extras
+
+# Streamlined production packages.
+#
+init: _venv-init
+	$(MAKE) py-install
+
+help: makester-help
+	printf "\n(Makefile)\n"
+	$$(call help-line,init,Build \"$1\" environment streamlined for production releases)
+	$$(call help-line,init-dev,Build \"$1\" environment)
+EOF
+endef
+
+export _py_makefile_script = $(call _py_makefile_heredoc,$(MAKESTER__PRIMER_PROJECT_NAME),$$(HOME))
+
+py-makefile:
+	$(info ### Writing Makefile ...)
+	@eval "$$_py_makefile_script"
+
+py-primer: py-makefile makester-repo-ceremony docs-bootstrap py-project-create gitversion-release py-cli
 
 define _setup_cfg_heredoc
 cat <<EOF > $1
@@ -107,6 +152,7 @@ dev =
     pytest-cov
     pytest-sugar
     twine
+    typer
 
 [options.packages.find]
 where = src
@@ -160,10 +206,7 @@ cat <<EOF > $1/__main__.py
 import typer
 
 
-app = typer.Typer(
-    add_completion=False,
-    help="makefiles CLI tool",
-)
+app = typer.Typer(add_completion=False, help="CLI tool")
 
 
 @app.command()
@@ -214,11 +257,6 @@ py-fmt:
 	$(info ### Formatting Python files under "$(FMT_PATH)")
 	@black $(FMT_PATH)
 
-py-md-fmt:
-	$(call check-defined, MD_FMT_PATH)
-	$(info ### Formatting Markdown files under "$(MD_FMT_PATH)")
-	@mdformat $(MD_FMT_PATH)
-
 py-lint-src:
 	$(info ### Linting Python files under "$(MAKESTER__PYTHONPATH)")
 	@pylint $(MAKESTER__PYTHONPATH)
@@ -250,28 +288,36 @@ py-type:
 	$(info ### Type annotating Python files under "$(TYPE_PATH)")
 	@mypy $(MAKESTER__MYPY_OPTIONS) $(TYPE_PATH)
 
+define py-vars-header
+	printf "\n%60s\n" " " | tr ' ' '-'
+	printf "Makester Python variables\n"
+	printf "%60s\n" " " | tr ' ' '-'
+endef
+
 py-vars: _py-vars py-venv-vars
 _py-vars:
-	$(info ### System python3: $(MAKESTER__SYSTEM_PYTHON3))
-	$(info ### System python3 version: $(MAKESTER__PY3_VERSION))
+	$(call py-vars-header)
+	$(call help-line,System python3:,$(MAKESTER__SYSTEM_PYTHON3))
+	$(call help-line,System python3 version:,$(MAKESTER__PY3_VERSION))
 
 py-check: py-fmt-all py-lint-all py-type-all
 
 py-help: _py-help _py-venv-help
 
 _py-help:
-	@echo "($(MAKESTER__MAKEFILES)/py.mk)\n\
-  py-check             All-in-one code validator\n\
-  py-cli               Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\"\n\
-  py-dep               Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\"\n\
-  py-distribution      Create a versioned archive file that contains your Python project's packages\n\
-  py-fmt               Format Python modules defined by \"FMT_PATH\"\n\
-  py-fmt-all           Format all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
-  py-install           Install Python project package dependencies\n\
-  py-lint              Lint Python modules defined by \"LINT_PATH\"\n\
-  py-lint-all          Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\"\n\
-  py-md-fmt            Format Markdown files defined by \"MD_FMT_PATH\"\n\
-  py-project-create    Create a minimal Python project directory structure scaffolding\n\
-  py-pylintrc          Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\"\n\
-  py-setup-cfg         Add new setup.cfg configuration to \"$(MAKESTER__SETUP_CFG)\"\n\
-  py-vars              Display system Python settings\n"
+	printf "\n($(MAKESTER__MAKEFILES)/py.mk)\n"
+	$(call help-line,py-check,All-in-one code validator)
+	$(call help-line,py-cli,Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\")
+	$(call help-line,py-dep,Display Python package dependencies for \"$(MAKESTER__PACKAGE_NAME)\")
+	$(call help-line,py-distribution,Create a versioned archive file that contains your Python project's packages)
+	$(call help-line,py-fmt,Format Python modules defined by \"FMT_PATH\")
+	$(call help-line,py-fmt-all,Format all Python modules under \"$(MAKESTER__PYTHONPATH)\")
+	$(call help-line,py-install,Install Python project package dependencies)
+	$(call help-line,py-install-makester,Install Makester's Python package dependencies)
+	$(call help-line,py-lint,Lint Python modules defined by \"LINT_PATH\")
+	$(call help-line,py-lint-all,Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\")
+	$(call help-line,py-makefile,Create a project Makefile)
+	$(call help-line,py-project-create,Create a minimal Python project directory structure scaffolding)
+	$(call help-line,py-pylintrc,Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\")
+	$(call help-line,py-setup-cfg,Add new setup.cfg configuration to \"$(MAKESTER__SETUP_CFG)\")
+	$(call help-line,py-vars,Display system Python settings)

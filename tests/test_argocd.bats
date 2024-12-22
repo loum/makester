@@ -75,8 +75,10 @@ include makester/makefiles/makester.mk'
     MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk argocd-ns --dry-run
 
     assert_output --regexp 'make K8S_NAMESPACE=argocd microk8s-namespace-add
+
 .*make _microk8s-namespaces-add-msg _microk8s-namespace-add
 ### Create namespace "argocd" in MicroK8s ...
+
 microk8s kubectl create namespace "argocd"'
 
     assert_success
@@ -87,8 +89,10 @@ microk8s kubectl create namespace "argocd"'
     MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk argocd-ns-del --dry-run
 
     assert_output --regexp 'make K8S_NAMESPACE=argocd microk8s-namespace-del
+
 .*make _microk8s-namespaces-del-msg _microk8s-namespace-del
 ### Deleting namespace "argocd" in MicroK8s ...
+
 microk8s kubectl delete namespace "argocd"'
 
     assert_success
@@ -102,16 +106,24 @@ microk8s kubectl delete namespace "argocd"'
     assert_output --regexp '### Installing ArgoCD instance on MicroK8s ...
 .*make microk8s-addon-dns
 ### Enabling the MicroK8s DNS addon ...
+
 microk8s enable dns
 ### Checking MicroK8s status ...
 .*make argocd-ns
 .*make K8S_NAMESPACE=argocd microk8s-namespace-add
+
 .*make _microk8s-namespaces-add-msg _microk8s-namespace-add
 ### Create namespace "argocd" in MicroK8s ...
+
 microk8s kubectl create namespace "argocd"
 .*make argocd-install
 ### Installing Argo CD API Server to the "argocd" namespace
-microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml'
+
+microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+make _argocd-pod-wait
+### Waiting for argocd-server pod in argocd namespace to be ready ...
+
+until \[ "\$\(microk8s kubectl wait -n argocd --for=condition=ready pod --all 2>/dev/null | grep argocd-server | cut -f 2- -d\ )" = "condition met" ]; do sleep 2; done'
 
     assert_success
 }
@@ -123,12 +135,16 @@ microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/a
 
     assert_output --regexp 'pkill -f "port-forward svc/argocd-server"
 .*make _argocd-dashboard _argocd-backoff _argocd-dashboard-msg
+
 microk8s kubectl port-forward svc/argocd-server -n argocd 20443:443 --address="0.0.0.0" > /.*/.makester/argocd-dashboard.out 2>&1 &
 .*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 20443 --detail "Argo CD API server"
 ### Argo CD API Server address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:20443
 ### Argo CD API Server log output can be found at /.*/.makester/argocd-dashboard.out
+
+
 .*make argocd-creds
 ### Login to the Argo CD API Server as user "admin" with following password:
+
 microk8s kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="\{.data.password\}" \| base64 -d; echo'
 
     assert_success
@@ -140,12 +156,16 @@ microk8s kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="\
 
     assert_output --regexp 'pkill -f "port-forward svc/argocd-server"
 .*make _argocd-dashboard _argocd-backoff _argocd-dashboard-msg
+
 microk8s kubectl port-forward svc/argocd-server -n argocd 9999:443 --address="0.0.0.0" > /.*/.makester/argocd-dashboard.out 2>&1 &
 .*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 9999 --detail "Argo CD API server"
 ### Argo CD API Server address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:9999
 ### Argo CD API Server log output can be found at /.*/.makester/argocd-dashboard.out
+
+
 .*make argocd-creds
 ### Login to the Argo CD API Server as user "admin" with following password:
+
 microk8s kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="\{.data.password\}" \| base64 -d; echo'
 
     assert_success

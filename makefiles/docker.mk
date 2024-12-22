@@ -238,30 +238,30 @@ else
 endif
 
 docker-help:
-	@echo "($(MAKESTER__MAKEFILES)/docker.mk)\n\
-  container-bash       Bash on container $(MAKESTER__CONTAINER_NAME) as \"USER\"\n\
-  container-logs       Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end)\n\
-  container-root       Shell on container $(MAKESTER__CONTAINER_NAME) as user \"root\"\n\
-  container-run        Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME)\n\
-  container-sh         Shell on container $(MAKESTER__CONTAINER_NAME) as \"USER\"\n\
-  container-status     Check container $(MAKESTER__CONTAINER_NAME) run status\n\
-  container-stop       Stop container $(MAKESTER__CONTAINER_NAME)\n\
-  image-build          Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) (alias bi)\n\
-  image-buildx         Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) with BuildKit\n\
-  image-push           Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\"\n\
-  image-rm             Delete docker image \"$(MAKESTER__IMAGE_TAG_ALIAS)\" (alias rmi)\n\
-  image-rm-dangling    Remove all dangling images\n\
-  image-registry-start Deploy a local image registry server\n\
-  image-registry-stop  Stop the local image registry server\n\
-  image-search         List docker images that match \"$(MAKESTER__SERVICE_NAME)*\" (alias si)\n\
-  image-tag            Tag image $(MAKESTER__SERVICE_NAME) \"$(HASH)\" (as per default build)\n\
-  image-tag-latest     Tag image $(MAKESTER__SERVICE_NAME) \"latest\"\n\
-  image-tag-latest-rm  Undo \"image-tag-latest\"\n\
-  image-tag-main       Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)\"\n\
-  image-tag-main-rm    Undo \"image-tag-main\"\n\
-  image-tag-suite      Convenience image create and tag all-in-one helper\n\
-  image-tag-suite-rm   Convenience image tag and image delete all-in-one helper\n\
-  image-tag-version    Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\"\n\
-  image-tag-version-rm Undo \"image-tag-version\"\n"
+	printf "\n($(MAKESTER__MAKEFILES)/docker.mk)\n"
+	$(call help-line,container-bash,Bash on container $(MAKESTER__CONTAINER_NAME) as \"USER\")
+	$(call help-line,container-logs,Follow container $(MAKESTER__CONTAINER_NAME) logs (Ctrl-C to end))
+	$(call help-line,container-root,Shell on container $(MAKESTER__CONTAINER_NAME) as user \"root\")
+	$(call help-line,container-run,Run image $(MAKESTER__SERVICE_NAME):$(HASH) as $(MAKESTER__CONTAINER_NAME))
+	$(call help-line,container-sh,Shell on container $(MAKESTER__CONTAINER_NAME) as \"USER\")
+	$(call help-line,container-status,Check container $(MAKESTER__CONTAINER_NAME) run status)
+	$(call help-line,container-stop,Stop container $(MAKESTER__CONTAINER_NAME))
+	$(call help-line,image-build,Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS))
+	$(call help-line,image-buildx,Build docker image and tag as $(MAKESTER__IMAGE_TAG_ALIAS) with BuildKit)
+	$(call help-line,image-push,Push image \"$(MAKESTER__IMAGE_TAG_ALIAS)\")
+	$(call help-line,image-registry-start,Deploy a local image registry server)
+	$(call help-line,image-registry-stop,Stop the local image registry server)
+	$(call help-line,image-rm,Delete docker image \"$(MAKESTER__IMAGE_TAG_ALIAS)\")
+	$(call help-line,image-rm-dangling,Remove all dangling images)
+	$(call help-line,image-search,List docker images that match \"$(MAKESTER__SERVICE_NAME)*\")
+	$(call help-line,image-tag,Tag image $(MAKESTER__SERVICE_NAME) \"$(HASH)\" (as per default build))
+	$(call help-line,image-tag-latest,Tag image $(MAKESTER__SERVICE_NAME) \"latest\")
+	$(call help-line,image-tag-latest-rm,Undo \"image-tag-latest\")
+	$(call help-line,image-tag-main,Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)\")
+	$(call help-line,image-tag-main-rm,Undo \"image-tag-main\")
+	$(call help-line,image-tag-suite,Convenience image create and tag all-in-one helper)
+	$(call help-line,image-tag-suite-rm,Convenience image tag and image delete all-in-one helper)
+	$(call help-line,image-tag-version,Tag image $(MAKESTER__SERVICE_NAME) \"$(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)\")
+	$(call help-line,image-tag-version-rm,Undo \"image-tag-version\")
 
 .PHONY: docker-help

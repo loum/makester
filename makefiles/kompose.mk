@@ -37,7 +37,7 @@ _kompose-rm:
 kompose-clear: _kompose-rm
 
 kompose-help:
-	@echo "($(MAKESTER__MAKEFILES)/kompose.mk)\n\
-  kompose              Convert config files from \"$(MAKESTER__COMPOSE_K8S_EPHEMERAL)\"\n"
+	printf "\n($(MAKESTER__MAKEFILES)/kompose.mk)\n"
+	$(call help-line,kompose,Convert config files from \"$(MAKESTER__COMPOSE_K8S_EPHEMERAL)\")
 
 .PHONY: kompose-help

@@ -36,12 +36,12 @@ compose-up: COMPOSE_CMD = up -d
 compose-config compose-down compose-ls compose-ps compose-up compose-version: _compose-cmd
 
 compose-help:
-	@echo "($(MAKESTER__MAKEFILES)/compose.mk)\n\
-  compose-config       Compose stack \"$(MAKESTER__PROJECT_NAME)\" config ($(MAKESTER__COMPOSE_FILES))\n\
-  compose-down         Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes)\n\
-  compose-ls           List running compose projects\n\
-  compose-ps           List running compose containers\n\
-  compose-up           Compose stack \"$(MAKESTER__PROJECT_NAME)\" create ($(MAKESTER__COMPOSE_FILES))\n\
-  compose-version      Compose version\n"
+	printf "\n($(MAKESTER__MAKEFILES)/compose.mk)\n"
+	$(call help-line,compose-config,Compose stack \"$(MAKESTER__PROJECT_NAME)\" config ($(MAKESTER__COMPOSE_FILES)))
+	$(call help-line,compose-down,Compose stack \"$(MAKESTER__PROJECT_NAME)\" destroy (including volumes))
+	$(call help-line,compose-ls,List running compose projects)
+	$(call help-line,compose-ps,List running compose containers)
+	$(call help-line,compose-up,Compose stack \"$(MAKESTER__PROJECT_NAME)\" create ($(MAKESTER__COMPOSE_FILES)))
+	$(call help-line,compose-version,Compose version)
 
 .PHONY: compose-help

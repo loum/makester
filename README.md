@@ -45,27 +45,25 @@ Follow [these notes](https://loum.github.io/makester/macos/#upgrading-gnu-make-m
 
 ## Getting Started
 
-Get the code and change into the top level `git` project directory:
+### Operating System Compatibility
 
-```
-git clone https://github.com/loum/makester.git && cd makester
-```
+| O/S            | Status |
+| :------------- | :----: |
+| Linux          |   ✅   |
+| macOS          |   ✅   |
+| Windows        |   ❌   |
+| Windows (WSL2) |   ✅   |
 
-> \[!NOTE\]
->
-> Run all commands from the top-level directory of the `git` repository.
+### Basic Installation
 
-For first-time setup, prime the [Makester project](https://github.com/loum/makester.git):
+Makester is installed by running one of the following commands in your terminal. You can install this via the
+command-line with either `curl`, `wget` or another similar tool.
 
-```
-git submodule update --init
-```
-
-Prepare the Makester environment:
-
-```
-make init
-```
+| Method    | Command                                                                                           |
+| :-------- | :------------------------------------------------------------------------------------------------ |
+| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/loum/makester/main/tools/install.sh)"`     |
+| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/loum/makester/main/tools/install.sh)"`       |
+| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/loum/makester/main/tools/install.sh)"`     |
 
 ## Running the Test Harness
 
