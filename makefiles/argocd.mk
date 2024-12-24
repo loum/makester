@@ -145,21 +145,22 @@ _argocd-backoff:
 _argocd-example-backoff:
 	$(MAKESTER__BIN)/makester backoff $(MAKESTER__LOCAL_IP) 20888 --detail "Argo CD Example App"
 
+_ARGOCD_URL := https://$(MAKESTER__LOCAL_IP):$(MAKESTER__ARGOCD_DASHBOARD_PORT)
+
 argocd-help:
-	@echo "(makefiles/argocd.mk)\n\
-  argocd-cli-login     Login to the Argo CD CLI\n\
-  argocd-creds         Dump the Argo CD credentials in plain-text\n\
-  argocd-dashboard     Start the Argo CD API server at https://$(MAKESTER__LOCAL_IP):$(MAKESTER__ARGOCD_DASHBOARD_PORT)\n\
-  argocd-dashboard-stop\n\
-                       Stop the Argo CD API server at https://$(MAKESTER__LOCAL_IP):$(MAKESTER__ARGOCD_DASHBOARD_PORT)\n\
-  argocd-deploy        Convenience all-in-one target to stand up an ArgoCD instance\n\
-  argocd-down          Argo CD deployment clean up\n\
-  argocd-example       Create the Argo CD example guestbook application\n\
-  argocd-example-del   Delete the Argo CD example guestbook application\n\
-  argocd-example-ui    Start the Argo CD example guestbook application UI\n\
-  argocd-install       Install an ArgoCD instance into the \"argocd\" namespace\n\
-  argocd-ns            Create the \"argocd\" namespace\n\
-  argocd-ns-del        Delete the \"argocd\" namespace\n\
-  argocd-up            Argo CD deployment and API server setup\n"
+	printf "\n($(MAKESTER__MAKEFILES)/argocd.mk)\n"
+	$(call help-line,argocd-cli-login,Login to the Argo CD CLI)
+	$(call help-line,argocd-creds,Dump the Argo CD credentials in plain-text)
+	$(call help-line,argocd-dashboard,Start the Argo CD API server at $(_ARGOCD_URL))
+	$(call help-line,argocd-dashboard-stop,Stop the Argo CD API server at $(_ARGOCD_URL))
+	$(call help-line,argocd-deploy,Convenience all-in-one target to stand up an ArgoCD instance)
+	$(call help-line,argocd-down,Argo CD deployment clean up)
+	$(call help-line,argocd-example,Create the Argo CD example guestbook application)
+	$(call help-line,argocd-example-del,Delete the Argo CD example guestbook application)
+	$(call help-line,argocd-example-ui,Start the Argo CD example guestbook application UI)
+	$(call help-line,argocd-install,Install an ArgoCD instance into the \"argocd\" namespace)
+	$(call help-line,argocd-ns,Create the \"argocd\" namespace)
+	$(call help-line,argocd-ns-del,Delete the \"argocd\" namespace)
+	$(call help-line,argocd-up,Argo CD deployment and API server setup)
 
 .PHONY: argocd-help

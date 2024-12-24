@@ -124,6 +124,7 @@ microk8s status'
 
     assert_output 'make _microk8s-install-msg _microk8s-install
 ### Installing MicroK8s ...
+
 microk8s install --cpu 2 --mem 4 --channel "1.28/stable" --image 22.04 --disk 50'
 
     assert_success
@@ -137,6 +138,7 @@ microk8s install --cpu 2 --mem 4 --channel "1.28/stable" --image 22.04 --disk 50
 
     assert_output 'make _microk8s-install-msg _microk8s-install
 ### Installing MicroK8s ...
+
 microk8s install --cpu 4 --mem 8 --channel "1.30/stable" --image 24.04 --disk 100'
 
     assert_success
@@ -158,6 +160,7 @@ microk8s install --cpu 4 --mem 8 --channel "1.30/stable" --image 24.04 --disk 10
 
     assert_output --partial 'make _microk8s-uninstall-msg _microk8s-uninstall
 ### Uninstalling MicroK8s ...
+
 microk8s uninstall'
 
     assert_success
@@ -190,6 +193,7 @@ microk8s status --wait-ready'
 microk8s start
 .*make microk8s-wait
 ### Checking MicroK8s status ...
+
 microk8s status --wait-ready$'
 
     assert_success
@@ -222,22 +226,27 @@ microk8s kubectl create token default'
     assert_output --regexp 'pkill -f "port-forward svc/kubernetes-dashboard"
 .*make _microk8s-addon-dashboard
 ### Enabling the MicroK8s dashboard addon ...
+
 microk8s enable dashboard
 .*make _microk8s-addon-dashboard-wait
 ### Waiting for Kubernetes dashboard service ...
+
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
 .*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+
 until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
 ### Creating Makester working directory "'$MAKESTER__WORK_DIR'"
 /.*/mkdir -pv '$MAKESTER__WORK_DIR'
 ### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
+
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
 .*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
+
 microk8s kubectl create token default'
 
     assert_success
@@ -250,22 +259,27 @@ microk8s kubectl create token default'
     assert_output --regexp 'pkill -f "port-forward svc/kubernetes-dashboard"
 .*make _microk8s-addon-dashboard
 ### Enabling the MicroK8s dashboard addon ...
+
 microk8s enable dashboard
 .*make _microk8s-addon-dashboard-wait
 ### Waiting for Kubernetes dashboard service ...
+
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
 .*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+
 until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
 ### Creating Makester working directory "'$MAKESTER__WORK_DIR'"
 /.*/mkdir -pv '$MAKESTER__WORK_DIR'
 ### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19999
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
+
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19999:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
 .*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19999 --detail "MicroK8s Kubernetes dashboard"
 .*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
+
 microk8s kubectl create token default'
 
     assert_success
@@ -277,12 +291,15 @@ microk8s kubectl create token default'
 
     assert_output --regexp '.*make _microk8s-addon-dashboard
 ### Enabling the MicroK8s dashboard addon ...
+
 microk8s enable dashboard
 .*make _microk8s-addon-dashboard-wait
 ### Waiting for Kubernetes dashboard service ...
+
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
 .*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+
 until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done'
 
     assert_success
@@ -327,6 +344,7 @@ makefiles/microk8s.mk:[0-9]+: \*\*\* ###.  Stop.'
 
     assert_output --regexp 'make _microk8s-namespaces-add-msg _microk8s-namespace-add
 ### Create namespace "argocd" in MicroK8s ...
+
 microk8s kubectl create namespace "argocd"'
 
     assert_success
@@ -350,6 +368,7 @@ makefiles/microk8s.mk:[0-9]+: \*\*\* ###.  Stop.'
 
     assert_output --regexp 'make _microk8s-namespaces-del-msg _microk8s-namespace-del
 ### Deleting namespace "argocd" in MicroK8s ...
+
 microk8s kubectl delete namespace "argocd"'
 
     assert_success
@@ -362,6 +381,7 @@ microk8s kubectl delete namespace "argocd"'
 
     assert_output --partial 'make _microk8s-reset-msg _microk8s-reset
 ### Resetting MicroK8s ...
+
 microk8s reset'
 
     assert_success
@@ -378,39 +398,55 @@ microk8s reset'
 
 # bats test_tags=targets,microk8s-targets,microk8s-up,dry-run
 @test "Microk8s all-in-one starter: dry" {
-    MAKESTER__MICROK8S=microk8s run make -f makefiles/makester.mk microk8s-up --dry-run
+    MAKESTER__MICROK8S=microk8s MAKESTER__UNAME=Darwin MAKESTER__LOCAL_IP=192.168.1.1\
+ run make -f makefiles/makester.mk microk8s-up --dry-run
 
     assert_output --regexp 'make microk8s-install
+make _microk8s-install-msg _microk8s-install
+### Installing MicroK8s ...
+
+microk8s install --cpu 2 --mem 4 --channel "1.28/stable" --image 22.04 --disk 50
 .*make microk8s-start
 ### Starting MicroK8s ...
+
 microk8s start
 .*make microk8s-wait
 ### Checking MicroK8s status ...
+
 microk8s status --wait-ready
 .*make microk8s-addon-dns
 ### Enabling the MicroK8s DNS addon ...
+
 microk8s enable dns
 ### Checking MicroK8s status ...
 .*make microk8s-dashboard
 /.*/pkill -f "port-forward svc/kubernetes-dashboard"
 .*make _microk8s-addon-dashboard
+make _microk8s-addon-dashboard-wait
+make microk8s-pod-wait
 ### Enabling the MicroK8s dashboard addon ...
+
 microk8s enable dashboard
-.*make _microk8s-addon-dashboard-wait
 ### Waiting for Kubernetes dashboard service ...
+
 until \[ \$\(microk8s status --addon dashboard\) = enabled \]; do sleep 2; done
-.*make microk8s-pod-wait
 ### Waiting for Kubernetes pods in kube-system namespace to be ready ...
+
 until \[ "\$\(microk8s kubectl wait -n kube-system --for=condition=ready pod --all 2>/dev/null \| grep kubernetes-dashboard \| cut -f 2- -d\\ \)" = "condition met" \]; do sleep 2; done
 ### Creating Makester working directory "'$MAKESTER__WORK_DIR'"
+
 /.*/mkdir -pv '$MAKESTER__WORK_DIR'
 ### Kubernetes dashboard address forwarded to: https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
 ### Kubernetes dashboard log output can be found at '$MAKESTER__WORK_DIR'/microk8s-dashboard.out
+
+
 .*make _microk8s-dashboard _microk8s-dashboard-backoff
+.*make microk8s-dashboard-creds
+
 microk8s kubectl port-forward svc/kubernetes-dashboard -n kube-system 19443:443 --address="0.0.0.0" > '$MAKESTER__WORK_DIR'/microk8s-dashboard.out 2>&1 &
 .*/bin/makester backoff [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ 19443 --detail "MicroK8s Kubernetes dashboard"
-.*make microk8s-dashboard-creds
 ### Login to the MicroK8s Kubernetes dashboard with following token:
+
 microk8s kubectl create token default'
 
     assert_success
@@ -423,18 +459,22 @@ microk8s kubectl create token default'
 
     assert_output --regexp 'make microk8s-dashboard-stop
 ### Closing MicroK8s dashboard port-forward at https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
+
 .*make _microk8s-reset-dashboard
 /.*/pkill -f "port-forward svc/kubernetes-dashboard"
 .*make microk8s-reset
 .*make _microk8s-reset-msg _microk8s-reset
 ### Resetting MicroK8s ...
+
 microk8s reset
 .*make microk8s-stop
 ### Stopping MicroK8s ...
+
 microk8s stop
 .*make microk8s-uninstall
 .*make _microk8s-uninstall-msg _microk8s-uninstall
 ### Uninstalling MicroK8s ...
+
 microk8s uninstall$'
 
     assert_success
@@ -446,10 +486,12 @@ microk8s uninstall$'
 
     assert_output --regexp 'make microk8s-dashboard-stop
 ### Closing MicroK8s dashboard port-forward at https://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:19443
+
 .*make _microk8s-reset-dashboard
 /.*/pkill -f "port-forward svc/kubernetes-dashboard"
 .*make microk8s-stop
 ### Stopping MicroK8s ...
+
 microk8s stop
 .*make microk8s-uninstall$'
 

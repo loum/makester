@@ -82,13 +82,12 @@ _gitversion-release-rm:
 gitversion-clear: _gitversion-release-rm _gitversion-versions-rm
 
 versioning-help:
-	@echo "($(MAKESTER__MAKEFILES)/versioning.mk)\n\
-  gitversion           GitVersion usage message\n\
-  gitversion-clear     Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\"\n\
-  gitversion-debug     Display the GitVersion project release values unfiltered\n\
-  gitversion-release   GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\" to $(MAKESTER__VERSION_FILE)\n\
-  gitversion-release-ro\n\
-                       Read-only dump of GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\"\n\
-  gitversion-version   The actual GitVersion version\n"
+	printf "\n($(MAKESTER__MAKEFILES)/versioning.mk)\n"
+	$(call help-line,gitversion,GitVersion usage message)
+	$(call help-line,gitversion-clear,Clear the temporary GitVersion working files under \"$(MAKESTER__WORK_DIR)\")
+	$(call help-line,gitversion-debug,Display the GitVersion project release values unfiltered)
+	$(call help-line,gitversion-release,GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\" to $(MAKESTER__VERSION_FILE))
+	$(call help-line,gitversion-release-ro,Read-only dump of GitVersion \"$(MAKESTER__GITVERSION_VARIABLE)\")
+	$(call help-line,gitversion-version,The actual GitVersion version)
 
 .PHONY: versioning-help

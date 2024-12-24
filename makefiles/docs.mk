@@ -39,10 +39,10 @@ docs-gh-deploy:
 	cd $(MAKESTER__DOCS_DIR); $(MAKESTER__DOCS) gh-deploy --site-dir $(MAKESTER__DOCS_BUILD_PATH) --force
 
 docs-help:
-	@echo "($(MAKESTER__MAKEFILES)/docs.mk)\n\
-  docs-project-create  Create the project documentation directory structure\n\
-  docs-build           Build the project static site documentation\n\
-  docs-gh-deploy       Deploy documentation to GitHub\n\
-  docs-preview         Site documentation live preview\n"
+	printf "\n($(MAKESTER__MAKEFILES)/docs.mk)\n"
+	$(call help-line,docs-build,Build the project static site documentation)
+	$(call help-line,docs-gh-deploy,Deploy documentation to GitHub)
+	$(call help-line,docs-preview,Site documentation live preview)
+	$(call help-line,docs-project-create,Create the project documentation directory structure)
 
 .PHONY: docs-help

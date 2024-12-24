@@ -5,7 +5,8 @@
 #
 # bats file_tags=makester
 setup_file() {
-    export MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    MAKESTER__WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    export MAKESTER__WORK_DIR
 }
 setup() {
     load 'test_helper/common-setup'
@@ -339,6 +340,25 @@ teardown_file() {
     assert_success
 }
 
+# bats test_tags=variables,makester-variables,MAKESTER__HOME
+@test "MAKESTER__HOME in MAKESTER__STANDALONE mode" {
+    MAKESTER__STANDALONE=true MAKESTER__HOME=/Users/test/.makester\
+ run make -f makefiles/makester.mk print-MAKESTER__HOME
+
+    assert_output "MAKESTER__HOME=/Users/test/.makester"
+
+    assert_success
+}
+# bats test_tags=variables,makester-variables,MAKESTER__HOME
+@test "MAKESTER__HOME not in MAKESTER__STANDALONE mode" {
+    MAKESTER__STANDALONE=false\
+ run make -f makefiles/makester.mk print-MAKESTER__HOME
+
+    assert_output "MAKESTER__HOME=$PWD/makester"
+
+    assert_success
+}
+
 # Targets.
 #
 # bats test_tags=target,check-exe
@@ -391,7 +411,7 @@ teardown_file() {
     MAKESTER__PROJECT_DIR=$PWD run make -f makefiles/makester.mk makester-readme --dry-run
 
     assert_output --regexp "### Adding README.md stub to \"$PWD\"
-/.*/echo \"# makefiles\" > $PWD/README.md"
+printf \"# %s\\\n\" \"makefiles\" > $PWD/README.md"
 
     assert_success
 }
@@ -401,7 +421,7 @@ teardown_file() {
  run make -f makefiles/makester.mk makester-readme --dry-run
 
     assert_output --regexp "### Adding README.md stub to \"$PWD\"
-/.*/echo \"# banana\" > $PWD/README.md"
+printf \"# %s\\\n\" \"banana\" > $PWD/README.md"
 
     assert_success
 }
@@ -415,7 +435,45 @@ teardown_file() {
 ### Adding MIT license to \"$PWD\"
 /.*/cp /.*/makester/resources/mit.md $PWD/LICENSE.md
 ### Adding README.md stub to \"$PWD\"
-/.*/echo \"# makefiles\" > $PWD/README.md"
+printf \"# %s\\\n\" \"makefiles\" > $PWD/README.md"
+
+    assert_success
+}
+
+# bats test_tags=target,md-fmt,dry-run
+@test "Markdown formatter MD_FMT_PATH undefined: dry" {
+    run make -f makefiles/makester.mk md-fmt --dry-run
+
+    assert_output --partial '### "MD_FMT_PATH" undefined'
+
+    assert_failure
+}
+# bats test_tags=target,md-fmt,dry-run
+@test "Markdown formatter MD_FMT_PATH set: dry" {
+    MD_FMT_PATH=docs run make -f makefiles/makester.mk md-fmt --dry-run
+
+    assert_output '### Formatting Markdown files under "docs"
+mdformat docs'
+
+    assert_success
+}
+
+# bats test_tags=target,makester-uninstall,dry-run
+@test "Makester uninstall in MAKESTER__STANDALONE mode: dry" {
+    MAKESTER__STANDALONE=true MAKESTER__HOME=/Users/test/.makester\
+ run make -f makefiles/makester.mk makester-uninstall --dry-run
+
+    assert_output "MAKESTER=/Users/test/.makester sh /Users/test/.makester/tools/uninstall.sh"
+
+    assert_success
+}
+# bats test_tags=target,makester-uninstall,dry-run
+@test "Makester uninstall not in MAKESTER__STANDALONE mode: dry" {
+    MD_FMT_PATH=docs run make -f makefiles/makester.mk md-fmt --dry-run
+
+    MAKESTER__STANDALONE=false run make -f makefiles/makester.mk makester-uninstall --dry-run
+
+    assert_output "### Makester can only be uninstalled in MAKESTER__STANDALONE mode"
 
     assert_success
 }

@@ -15,7 +15,7 @@ ifndef MAKESTER__VENV_TOOL
 endif
 
 # OK, set some globals.
-ifeq ($(strip $(MAKESTER__STANDALONE)),true)
+ifeq ($(strip $(MAKESTER__PROJECT_NAME)),makester)
   MAKESTER__PIP ?= $(MAKESTER__BIN)/pip
   MAKESTER__PYTHON ?= $(MAKESTER__BIN)/python
 else
@@ -72,11 +72,11 @@ makester-requirements: py-install
 pip-editable: py-install
 
 SETUP_PY := $(MAKESTER__PROJECT_DIR)/setup.py
-package-clean:
+py-package-clean:
 	$(info ### Cleaning PyPI package temporary directories ...)
 	$(MAKESTER__PYTHON) $(SETUP_PY) clean
 
-package: package-clean
+py-package: py-package-clean
 	$(info ### Building package ...)
 	$(MAKESTER__PYTHON) $(SETUP_PY) bdist_wheel --dist-dir $(MAKESTER__WHEEL) --verbose
 
@@ -86,22 +86,23 @@ _py-versions-warn:
 	$(call deprecated,py-versions,0.3.0,py-venv-vars)
 
 py-venv-vars:
-	$(info ### ---)
-	$(info ### Virtual env tooling: $(MAKESTER__VENV_TOOL))
-	$(info ### Virtual env Python: $(MAKESTER__PYTHON))
-	$(info ### Virtual env pip: $(MAKESTER__PIP))
+	printf -- "-%.0s" {1..10}; printf "\n"
+	$(call help-line,Virtual env tooling:,$(MAKESTER__VENV_TOOL))
+	$(call help-line,Virtual env Python:,$(MAKESTER__PYTHON))
+	$(call help-line,Virtual env pip:,$(MAKESTER__PIP))
 
 py-venv-repl py:
 	-@$(MAKESTER__PYTHON)
 
 _py-venv-help:
-	@echo "  ---\n\
-  package              Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse)\n\
-  pip-editable         Build virtual environment deps from \"setup.py\"\n\
-  pip-requirements     Build virtual environment deps from \"requirements.txt\"\n\
-  py-venv-clear        Delete virtual environment \"$(MAKESTER__VENV_HOME)\"\n\
-  py-venv-init         Build virtual environment \"$(MAKESTER__VENV_HOME)\"\n\
-  py-venv-repl         Start the vitual environment Python REPL\n\
-  py-venv-vars         Display your environment Python setup\n"
+	printf -- "%.0s" {1..10}; printf "\n"
+	$(call help-line,pip-editable,Build virtual environment deps from \"setup.py\")
+	$(call help-line,pip-requirements,Build virtual environment deps from \"requirements.txt\")
+	$(call help-line,py-package,Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse))
+	$(call help-line,py-package-clean,Clear Python package artifacts)
+	$(call help-line,py-venv-clear,Delete virtual environment \"$(MAKESTER__VENV_HOME)\")
+	$(call help-line,py-venv-init,Build virtual environment \"$(MAKESTER__VENV_HOME)\")
+	$(call help-line,py-venv-repl,Start the vitual environment Python REPL)
+	$(call help-line,py-venv-vars,Display your environment Python setup)
 
-.PHONY: package
+.PHONY: py-package

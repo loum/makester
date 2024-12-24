@@ -72,17 +72,17 @@ kube-context kube-context-use kube-apply kube-del kube-get: kubectl-cmd
 kube-apply kube-del: mkdir-k8s-manifests
 
 k8s-help:
-	@echo "($(MAKESTER__MAKEFILES)/k8s.mk)\n\
-  kube-apply           Create resource(s) in all manifest files in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
-  kube-context         Get all Kubernetes cluster contexts\n\
-  kube-context-set     Change Kubernetes cluster context by setting \"MAKESTER__KUBECTL_CONTEXT\" defaults \"minikube\"\n\
-  kube-del             Delete a pod using the type and name specified in \"${MAKESTER__K8_MANIFESTS}\" directory\n\
-  kube-get             View the Pods and Services\n\
-  mk-dashboard         Access the Kubernetes Dashboard (Ctrl-C to stop)\n\
-  mk-del               Delete Minikube local cluster\n\
-  mk-service           Get Service access details (if \"LoadBalancer\" type specified)\n\
-  mk-start             Start Minikube locally and create a cluster (docker driver)\n\
-  mk-status            Check Minikube local cluster status\n\
-  mk-stop              Stop Minikube local cluster\n"
+	printf "\n($(MAKESTER__MAKEFILES)/k8s.mk)\n"
+	$(call help-line,kube-apply,Create resource(s) in all manifest files in \"${MAKESTER__K8_MANIFESTS}\" directory)
+	$(call help-line,kube-context,Get all Kubernetes cluster contexts)
+	$(call help-line,kube-context-set,Change Kubernetes cluster context by setting \"MAKESTER__KUBECTL_CONTEXT\" defaults \"minikube\")
+	$(call help-line,kube-del,Delete a pod using the type and name specified in \"${MAKESTER__K8_MANIFESTS}\" directory)
+	$(call help-line,kube-get,View the Pods and Services)
+	$(call help-line,mk-dashboard,Access the Kubernetes Dashboard (Ctrl-C to stop))
+	$(call help-line,mk-del,Delete Minikube local cluster)
+	$(call help-line,mk-service,Get Service access details (if \"LoadBalancer\" type specified))
+	$(call help-line,mk-start,Start Minikube locally and create a cluster (docker driver))
+	$(call help-line,mk-status,Check Minikube local cluster status)
+	$(call help-line,mk-stop,Stop Minikube local cluster)
 
 .PHONY: k8s-help konvert .makester/mk-docker-env.mk

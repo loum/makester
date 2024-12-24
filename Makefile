@@ -1,14 +1,19 @@
 .SILENT:
 .DEFAULT_GOAL := help
 
-MAKESTER__PROJECT_NAME := makester
-MAKESTER__GITVERSION_CONFIG := resources/sample/GitVersion.yml
-
-include makefiles/makester.mk
+# Use a single bash shell for each job, and immediately exit on failure
+SHELL := zsh
+.SHELLFLAGS := -ceu
+.ONESHELL:
 
 #
 # Makester overrides.
 #
+MAKESTER__STANDALONE := true
+
+include $(HOME)/.makester/makefiles/makester.mk
+
+MAKESTER__PROJECT_NAME := makester
 MAKESTER__GITVERSION_CONFIG := GitVersion.yml
 MAKESTER__VERSION_FILE := $(MAKESTER__PYTHON_PROJECT_ROOT)/VERSION
 
@@ -18,11 +23,9 @@ TESTS_TO_RUN := $(if $(TESTS),$(TESTS),tests)
 tests:
 	tests/bats/bin/bats $(TESTS_TO_RUN)
 
-MAKESTER__RESOURCES_DIR := $(MAKESTER__PROJECT_DIR)/resources
-
 help: makester-help
-	@echo "(simple/Makefile)\n\
-  init                 Build Makester environment\n\
-  tests                Run code test suite\n"
+	$(call makefile-help-header)
+	$(call help-line,init,Build Makester environment)
+	$(call help-line,tests,Run code test suite)
 
 .PHONY: tests

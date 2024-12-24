@@ -4,10 +4,7 @@
 import typer
 
 
-app = typer.Typer(
-    add_completion=False,
-    help="makefiles CLI tool",
-)
+app = typer.Typer(add_completion=False, help="CLI tool")
 
 
 @app.command()

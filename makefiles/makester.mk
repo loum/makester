@@ -18,17 +18,23 @@ endif
 
 MAKESTER__SUBMODULE_NAME ?= makester
 ifeq ($(strip $(MAKESTER__STANDALONE)),true)
+  MAKESTER__SUBMODULE_NAME = .
+  MAKESTER__HOME ?= $(HOME)/.makester
   MAKESTER__MAKEFILES ?= $(HOME)/.makester/makefiles
   MAKESTER__BIN ?= $(HOME)/.makester/venv/bin
+  MAKESTER__RESOURCES_DIR ?= $(HOME)/.makester/resources
 else
+  MAKESTER__HOME ?= $(PWD)/$(MAKESTER__SUBMODULE_NAME)
   MAKESTER__MAKEFILES ?= $(if $(wildcard $(MAKESTER__SUBMODULE_NAME)),makester/makefiles,makefiles)
   MAKESTER__BIN ?= $(PWD)/venv/bin
+  MAKESTER__RESOURCES_DIR ?= $(MAKESTER__PROJECT_DIR)/makester/resources
 endif
 
 # Add PyPI bin to the end of PATH to ensure system Python is found first.
 export PATH := $(shell echo $$PATH:$(MAKESTER__BIN))
 
 # Prepare the makester working directory. Place all makester convenience capability here.
+# In MAKESTER__STANDALONE mode, each project should have a separate working directory.
 MAKESTER__WORK_DIR ?= $(PWD)/.makester
 makester-work-dir:
 	$(info ### Creating Makester working directory "$(MAKESTER__WORK_DIR)")
@@ -43,7 +49,11 @@ ifndef MAKESTER__PROJECT_NAME
 endif
 
 # Simulate PyPI package naming convention (replacing hyphens with underscores).
+ifdef MAKESTER__PRIMER_PROJECT_NAME
+MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PRIMER_PROJECT_NAME) | tr - _)
+else
 MAKESTER__PACKAGE_NAME ?= $(shell echo $(MAKESTER__PROJECT_NAME) | tr - _)
+endif
 
 MAKESTER__PROJECT_DIR ?= $(PWD)
 MAKESTER__PYTHON_PROJECT_ROOT ?= $(MAKESTER__PROJECT_DIR)/src/$(MAKESTER__PACKAGE_NAME)
@@ -77,7 +87,6 @@ makester-k8s-manifest-dir:
 	$(info ### Creating Makester k8s manifest directory "$(MAKESTER__K8S_MANIFESTS)")
 	$(shell which mkdir) -pv $(MAKESTER__K8S_MANIFESTS)
 
-MAKESTER__RESOURCES_DIR ?= $(MAKESTER__PROJECT_DIR)/makester/resources
 makester-gitignore:
 	$(info ### Adding a sane .gitignore to "$(MAKESTER__PROJECT_DIR)")
 	$(shell which cp) $(MAKESTER__RESOURCES_DIR)/project.gitignore $(MAKESTER__PROJECT_DIR)/.gitignore
@@ -88,7 +97,11 @@ makester-mit-license:
 
 makester-readme:
 	$(info ### Adding README.md stub to "$(MAKESTER__PROJECT_DIR)")
-	$(shell which echo) "# $(MAKESTER__PROJECT_NAME)" > $(MAKESTER__PROJECT_DIR)/README.md
+ifdef MAKESTER__PRIMER_PROJECT_NAME
+	printf "# %s\n" "$(MAKESTER__PRIMER_PROJECT_NAME)" > $(MAKESTER__PROJECT_DIR)/README.md
+else
+	printf "# %s\n" "$(MAKESTER__PROJECT_NAME)" > $(MAKESTER__PROJECT_DIR)/README.md
+endif
 
 makester-repo-ceremony: makester-gitignore makester-mit-license makester-readme
 
@@ -103,6 +116,42 @@ clean:
 
 submodule-update:
 	$(GIT) submodule update --remote --merge
+
+md-fmt:
+	$(call check-defined, MD_FMT_PATH)
+	$(info ### Formatting Markdown files under "$(MD_FMT_PATH)")
+	@mdformat $(MD_FMT_PATH)
+
+makester-uninstall:
+ifeq ($(strip $(MAKESTER__STANDALONE)),true)
+	MAKESTER=$(MAKESTER__HOME) sh $(MAKESTER__HOME)/tools/uninstall.sh
+else
+	$(info ### Makester can only be uninstalled in MAKESTER__STANDALONE mode)
+endif
+
+define _makester_minimal_heredoc
+cat <<'EOF' > Makefile
+.SILENT:
+.DEFAULT_GOAL := help
+
+#
+# Makester overrides.
+#
+MAKESTER__STANDALONE := true
+MAKESTER__INCLUDES := py docs
+MAKESTER__PROJECT_NAME := $1
+
+include $2/.makester/makefiles/makester.mk
+
+help: makester-help
+	printf "\n(Makefile)\n"
+endef
+
+export _makester_minimal_script = $(call _makester_minimal_heredoc,$(MAKESTER__PRIMER_PROJECT_NAME),$$(HOME))
+
+makester-minimal:
+	$(info ### Writing minimal Makefile ...)
+	@eval "$$_makester_minimal_script"
 
 # Check that given variables are set and all have non-empty values.  # Exit with an error otherwise.
 # See https://stackoverflow.com/questions/10858261/abort-makefile-if-variable-not-set
@@ -147,8 +196,13 @@ define _check-exe-err
 	$(if $3,,$(error ###))
 endef
 
-MAKESTER__ARCH ?= $(shell uname -m)
-MAKESTER__UNAME ?= $(shell uname)
+ifndef MAKESTER__ARCH
+  MAKESTER__ARCH ?= $(shell uname -m)
+endif
+
+ifndef MAKESTER__UNAME
+  MAKESTER__UNAME ?= $(shell uname)
+endif
 
 ifndef MAKESTER__LOCAL_IP
   ifeq ($(MAKESTER__UNAME), Darwin)
@@ -175,39 +229,53 @@ endif
 _includes ?= $(foreach _m,$(MAKESTER__INCLUDES),$(wildcard $(MAKESTER__MAKEFILES)/$(_m).mk))
 include $(call _includes)
 
+define makester-vars-header
+	printf "\n%60s\n" " " | tr ' ' '-'
+	printf "Makester variables\n"
+	printf "%60s\n" " " | tr ' ' '-'
+endef
+
+define help-line
+	printf "  %-30s %s\n" "$1" "$2"
+endef
+
+define makefile-help-header
+	printf "\n%60s\n" " " | tr ' ' '-'
+	printf "\"$(MAKESTER__PROJECT_NAME)\" project Makefile targets\n"
+	printf "%60s\n" " " | tr ' ' '-'
+endef
+
 vars:
-	@echo "\n\
-  HASH:                              $(HASH)\n\
-  MAKESTER__LOCAL_IP:                $(MAKESTER__LOCAL_IP)\n\
-  \nStandard override variables:\n\n\
-  MAKESTER__K8S_MANIFESTS:           $(MAKESTER__K8S_MANIFESTS)\n\
-  MAKESTER__RELEASE_VERSION:         $(MAKESTER__RELEASE_VERSION)\n\
-  MAKESTER__WORK_DIR:                $(MAKESTER__WORK_DIR)\n\
-  \nOverride variables at the top of your Makefile before the includes:\n\n\
-  MAKESTER__PACKAGE_NAME:            $(MAKESTER__PACKAGE_NAME)\n\
-  MAKESTER__PROJECT_DIR:             $(MAKESTER__PROJECT_DIR)\n\
-  MAKESTER__PROJECT_NAME:            $(MAKESTER__PROJECT_NAME)\n\
-  MAKESTER__PYTHON_PROJECT_ROOT:     $(MAKESTER__PYTHON_PROJECT_ROOT)\n\
-  MAKESTER__RELEASE_NUMBER:          $(MAKESTER__RELEASE_NUMBER)\n\
-  MAKESTER__REPO_NAME:               $(MAKESTER__REPO_NAME)\n\
-  MAKESTER__SERVICE_NAME:            $(MAKESTER__SERVICE_NAME)\n\
-  MAKESTER__STATIC_SERVICE_NAME:     $(MAKESTER__STATIC_SERVICE_NAME)\n\
-  MAKESTER__VERSION_FILE:            $(MAKESTER__VERSION_FILE)\n"
+	$(call makester-vars-header)
+	printf "\nOverride variables at the top of your Makefile before the includes:\n"
+	$(call help-line,MAKESTER__STANDALONE:,$(MAKESTER__STANDALONE))
+	printf "\nStandard override variables:\n"
+	$(call help-line,HASH:,$(HASH))
+	$(call help-line,MAKESTER__LOCAL_IP:,$(MAKESTER__LOCAL_IP))
+	$(call help-line,MAKESTER__K8S_MANIFESTS:,$(MAKESTER__K8S_MANIFESTS))
+	$(call help-line,MAKESTER__RELEASE_VERSION:,$(MAKESTER__RELEASE_VERSION))
+	$(call help-line,MAKESTER__WORK_DIR:,$(MAKESTER__WORK_DIR))
+	$(call help-line,MAKESTER__PACKAGE_NAME:,$(MAKESTER__PACKAGE_NAME))
+	$(call help-line,MAKESTER__PROJECT_DIR:,$(MAKESTER__PROJECT_DIR))
+	$(call help-line,MAKESTER__PROJECT_NAME:,$(MAKESTER__PROJECT_NAME))
+	$(call help-line,MAKESTER__PYTHON_PROJECT_ROOT:,$(MAKESTER__PYTHON_PROJECT_ROOT))
+	$(call help-line,MAKESTER__RELEASE_NUMBER:,$(MAKESTER__RELEASE_NUMBER))
+	$(call help-line,MAKESTER__REPO_NAME:,$(MAKESTER__REPO_NAME))
+	$(call help-line,MAKESTER__SERVICE_NAME:,$(MAKESTER__SERVICE_NAME))
+	$(call help-line,MAKESTER__STATIC_SERVICE_NAME:,$(MAKESTER__STATIC_SERVICE_NAME))
+	$(call help-line,MAKESTER__VERSION_FILE:,$(MAKESTER__VERSION_FILE))
 
 makester-help: $(patsubst %,%-help,$(value MAKESTER__INCLUDES))
-	@echo "\
---------------------------------------------------------------------------------------------\n\
-Targets\n\
---------------------------------------------------------------------------------------------\n"
-	@echo "($(MAKESTER__MAKEFILES)/makester.mk)\n\
-  clean                Remove all files not tracked by Git\n\
-  makester-repo-ceremony\n\
-	                   All-in-one repository ancillary files helper\n\
-  makester-gitignore   Adding a sane .gitignore to \"$(MAKESTER__PROJECT_DIR)\"\n\
-  makester-mit-license Add an MIT license to \"$(MAKESTER__PROJECT_DIR)\"\n\
-  makester-readme      Add an simple README to \"$(MAKESTER__PROJECT_DIR)\"\n\
-  print-<var>          Display the Makefile global variable '<var>' value\n\
-  submodule-update     Update your existing Git submodules\n\
-  vars                 Display all Makester global variable values\n"
+	printf "\n($(MAKESTER__MAKEFILES)/makester.mk)\n"
+	$(call help-line,clean,Remove all files not tracked by Git)
+	$(call help-line,makester-gitignore,Adding a sane .gitignore to \"$(MAKESTER__PROJECT_DIR)\")
+	$(call help-line,makester-mit-license,Add an MIT license to \"$(MAKESTER__PROJECT_DIR)\")
+	$(call help-line,makester-readme,Add an simple README to \"$(MAKESTER__PROJECT_DIR)\")
+	$(call help-line,makester-repo-ceremony,All-in-one repository ancillary files helper)
+	$(call help-line,makester-uninstall,Remove Makester standalone project repository \"$(MAKESTER__HOME)\")
+	$(call help-line,md-fmt,Format Markdown files defined by \"MD_FMT_PATH\")
+	$(call help-line,print-MAKESTER__[VARIABLE],Display the Makester global VARIABLE value)
+	$(call help-line,submodule-update,Update your existing Git submodules)
+	$(call help-line,vars,Display all Makester global variable values)
 
 .PHONY: makester-help

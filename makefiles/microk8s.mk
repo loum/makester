@@ -237,30 +237,24 @@ _microk8s-addon-dashboard\
  microk8s-version: _uk8s-cmd
 
 microk8s-help:
-	@echo "($(MAKESTER__MAKEFILES)/microk8s.mk)\n\
-  microk8s-addon-dashboard\n\
-                       Enable the MicroK8s DNS addon\n\
-  microk8s-addon-dns   Enable the MicroK8s DNS addon\n\
-  microk8s-dashboard   MicroK8s Kubernetes dashboard as a background service\n\
-  microk8s-dashboard-creds\n\
-                       Display the MicroK8s Kubernetes dashboard auth token\n\
-  microk8s-dashboard-proxy\n\
-                       MicroK8s CLI-blocking Kubernetes dashboard\n\
-  microk8s-down        All-in-one helper to stop and release MicroK8s service resources\n\
-  microk8s-install     Setup MicroK8s VM with default options\n\
-  microk8s-kubectl-version\n\
-		       Print the installed MicroK8s version and revision number\n\
-  microk8s-namespaces  List the namespaces in the MicroK8s cluster\n\
-  microk8s-namespace-add\n\
-                       Create namespace defined by \"K8S_NAMESPACES\" in MicroK8s cluster\n\
-  microk8s-namespace-del\n\
-                       Delete namespace defined by \"K8S_NAMESPACES\" from MicroK8s cluster\n\
-  microk8s-reset       Return the MicroK8s node to the default initial state\n\
-  microk8s-start       Starts the kubernetes cluster\n\
-  microk8s-status      Displays the status of the cluster\n\
-  microk8s-stop        Stop Kubernetes\n\
-  microk8s-up          All-in-one helper to start required MicroK8s services\n\
-  microk8s-version     Print the installed MicroK8s version and revision number\n\
-  microk8s-wait        Wait for the Kubernetes services to initialise\n"
+	printf "\n($(MAKESTER__MAKEFILES)/microk8s.mk)\n"
+	$(call help-line,microk8s-addon-dashboard,Enable the MicroK8s DNS addon)
+	$(call help-line,microk8s-addon-dns,Enable the MicroK8s DNS addon)
+	$(call help-line,microk8s-dashboard,MicroK8s Kubernetes dashboard as a background service)
+	$(call help-line,microk8s-dashboard-creds,Display the MicroK8s Kubernetes dashboard auth token)
+	$(call help-line,microk8s-dashboard-proxy,MicroK8s CLI-blocking Kubernetes dashboard)
+	$(call help-line,microk8s-down,All-in-one helper to stop and release MicroK8s service resources)
+	$(call help-line,microk8s-install,Setup MicroK8s VM with default options)
+	$(call help-line,microk8s-kubectl-version,Print the installed MicroK8s version and revision number)
+	$(call help-line,microk8s-namespace-add,Create namespace defined by \"K8S_NAMESPACES\" in MicroK8s cluster)
+	$(call help-line,microk8s-namespace-del,Delete namespace defined by \"K8S_NAMESPACES\" from MicroK8s cluster)
+	$(call help-line,microk8s-namespaces,List the namespaces in the MicroK8s cluster)
+	$(call help-line,microk8s-reset,Return the MicroK8s node to the default initial state)
+	$(call help-line,microk8s-start,Starts the kubernetes cluster)
+	$(call help-line,microk8s-status,Displays the status of the cluster)
+	$(call help-line,microk8s-stop,Stop Kubernetes)
+	$(call help-line,microk8s-up,All-in-one helper to start required MicroK8s services)
+	$(call help-line,microk8s-version,Print the installed MicroK8s version and revision number)
+	$(call help-line,microk8s-wait,Wait for the Kubernetes services to initialise)
 
 .PHONY: microk8s-help

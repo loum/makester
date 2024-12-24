@@ -125,21 +125,20 @@ _tf-ws-new \
 _tf-ws-select: _terraform-cmd
 
 terraform-help:
-	@echo "(makefiles/terraform.mk)\n\
-  tf-apply             Terraform apply\n\
-  tf-console           Launch interactive console for evaluating expressions.\n\
-  tf-destroy           Terraform destroy\n\
-  tf-fmt-apply         Apply Terraform formatting changes\n\
-  tf-fmt-check         Check if Terraform files are formatted\n\
-  tf-fmt-diff          Diff the Terraform formatting changes\n\
-  tf-init              Terraform init\n\
-  tf-plan              Terraform plan\n\
-  tf-validate          Terraform validate\n\
-  tf-version           Terraform version\n\
-  tf-version           Terraform version\n\
-  tf-ws-del            Delete an existing workspace\n\
-  tf-ws-list           List workspaces\n\
-  tf-ws-new            Create a new workspace\n\
-  tf-ws-select         Choose a different workspace to use for further operations.\n"
+	printf "\n($(MAKESTER__MAKEFILES)/terraform.mk)\n"
+	$(call help-line,tf-apply,Terraform apply)
+	$(call help-line,tf-console,Launch interactive console for evaluating expressions)
+	$(call help-line,tf-destroy,Terraform destroy)
+	$(call help-line,tf-fmt-apply,Apply Terraform formatting changes)
+	$(call help-line,tf-fmt-check,Check if Terraform files are formatted)
+	$(call help-line,tf-fmt-diff,Diff the Terraform formatting changes)
+	$(call help-line,tf-init,Terraform init)
+	$(call help-line,tf-plan,Terraform plan)
+	$(call help-line,tf-validate,Terraform validate)
+	$(call help-line,tf-version,Terraform version)
+	$(call help-line,tf-ws-del,Delete an existing workspace)
+	$(call help-line,tf-ws-list,List workspaces)
+	$(call help-line,tf-ws-new,Create a new workspace)
+	$(call help-line,tf-ws-select,Choose a different workspace to use for further operations)
 
 .PHONY: terraform-help
