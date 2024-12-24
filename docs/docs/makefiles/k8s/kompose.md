@@ -50,7 +50,7 @@ The name of the binary Makester will search for in your `PATH` (defaults to `kom
 
 `MAKESTER__KOMPOSE_EXE_NAME` can be overridden if you have special requirements, or want to use a
 `kompose` executable that is not in your `PATH`. Just set `MAKESTER__KOMPOSE_EXE_NAME` to your
-prefered value in your `Makefile`:
+preferred value in your `Makefile`:
 
 ```sh
 MAKESTER__KOMPOSE_EXE_NAME := /opt/kompose/bin/kompose

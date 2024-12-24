@@ -30,7 +30,9 @@ mkdir $MAKESTER__PRIMER_PROJECT_NAME && cd $_ && git init && git commit -m "init
 Next, prepare your `Makefile`. The `Makefile` will feature targets that can help you get things done.
 Select a scenario from below.
 
-For a generic project, or if you want the most minimal `Makefile` to get you started:
+### Brand new generic project
+
+For a generic project, or if you want the most minimal `Makefile` simply to get you started:
 
 ```sh
 make -f ~/.makester/Makefile makester-minimal
@@ -42,12 +44,14 @@ Should should be able to access your project's help:
 make help
 ```
 
+You can now evolve your `Makefile` to suit your project needs.
+
 ### Brand new Python project
 
 Makester tooling can provide opionionated scaffolding for common components of a Python coding project.
 
 ```sh title="Initialise Python project boilerplate."
-make -f ~/.makester/Makefile py-primer
+make -f ~/.makester/Makefile py-proj-makefile && make py-proj-primer
 ```
 
 #### What just happened?
@@ -72,6 +76,11 @@ new Python coding project and can start work immediately on your problem domain.
 If you already have a `Makefile`, then just include Makester:
 
 ```sh
+#
+# Makester overrides.
+#
+MAKESTER__STANDALONE := true
+
 include $(HOME)/.makester/makefiles/makester.mk
 ```
 

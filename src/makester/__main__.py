@@ -90,12 +90,3 @@ def common(
 
     if ctx.obj.quiet:
         suppress_logging()
-
-
-def main() -> None:
-    """Script entry point."""
-    app()
-
-
-if __name__ == "__main__":
-    main()

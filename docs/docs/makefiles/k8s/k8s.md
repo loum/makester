@@ -6,7 +6,7 @@ Shakeout or debug your container services prior to deploying to Kubernetes.
     All Kubernetes manifests are expected to be in the `MAKESTER__K8_MANIFESTS` directory (defaults to `$MAKESTER__WORK_DIR/k8s/manifests`).
 
 !!! warning
-    Care must be taken when managing mulitple Kubernetes contexts. `kubectl` will operate against the active context.
+    Care must be taken when managing multiple Kubernetes contexts. `kubectl` will operate against the active context.
 
 The Makester minikube subsystem is an optional facility as it requires binaries that you will need
 to install yourself. In the case of Kubernetes minikube, you can get the link to the installation
@@ -134,7 +134,7 @@ The name of the binary Makester will search for in your `PATH` (defaults to `min
 
 `MAKESTER__MINIKUBE_EXE_NAME` can be overridden if you have special requirements, or want to use a
 `minikube` executable that is not in your `PATH`. Just set `MAKESTER__MINIKUBE_EXE_NAME` to your
-prefered value in your `Makefile`:
+preferred value in your `Makefile`:
 
 ```
 MAKESTER__MINIKUBE_EXE_NAME := /opt/minikube/bin/minikube
@@ -163,7 +163,7 @@ The name of the binary Makester will search for in your `PATH` (defaults to `kub
 
 `MAKESTER__KUBECTL_EXE_NAME` can be overridden if you have special requirements, or want to use a
 `kubectl` executable that is not in your `PATH`. Just set `MAKESTER__KUBECTL_EXE_NAME` to your
-prefered value in your `Makefile`:
+preferred value in your `Makefile`:
 
 ```
 MAKESTER__KUBECTL_EXE_NAME := /opt/kubectl/bin/kubectl

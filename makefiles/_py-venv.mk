@@ -95,7 +95,7 @@ py-venv-repl py:
 	-@$(MAKESTER__PYTHON)
 
 _py-venv-help:
-	printf -- "%.0s" {1..10}; printf "\n"
+	printf -- "-%.0s" {1..10}; printf "\n"
 	$(call help-line,pip-editable,Build virtual environment deps from \"setup.py\")
 	$(call help-line,pip-requirements,Build virtual environment deps from \"requirements.txt\")
 	$(call help-line,py-package,Build python package from \"setup.py\" and write to \"--wheel-dir\" (defaults to ~/wheelhouse))

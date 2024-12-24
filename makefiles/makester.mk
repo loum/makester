@@ -1,6 +1,6 @@
 .SILENT:
 ifndef .DEFAULT_GOAL
-  .DEFAULT_GOAL := makester-help
+.DEFAULT_GOAL := makester-help
 endif
 
 # Set this to true to indicate that this Makefile has been read.
@@ -16,15 +16,24 @@ ifndef MAKESTER__STANDALONE
   MAKESTER__STANDALONE ?= false
 endif
 
+# MAKESTER__HOME is defined as the base directory from where the Makester's
+# Makefile was invoked from. This can exists in a few places:
+#
+# 1. Makester (standalone) dev (wherever it's checked out).
+# 2. Makester (standalone) default home (~/.makester).
+# 3. Makester embeded within a project as a Git submodule (legacy and will be deprecated).
+#
+ifndef MAKESTER__HOME
+  MAKESTER__HOME ?= $(dir $(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+endif
+
 MAKESTER__SUBMODULE_NAME ?= makester
 ifeq ($(strip $(MAKESTER__STANDALONE)),true)
   MAKESTER__SUBMODULE_NAME = .
-  MAKESTER__HOME ?= $(HOME)/.makester
-  MAKESTER__MAKEFILES ?= $(HOME)/.makester/makefiles
-  MAKESTER__BIN ?= $(HOME)/.makester/venv/bin
-  MAKESTER__RESOURCES_DIR ?= $(HOME)/.makester/resources
+  MAKESTER__MAKEFILES ?= $(MAKESTER__HOME)makefiles
+  MAKESTER__BIN ?= $(MAKESTER__HOME)venv/bin
+  MAKESTER__RESOURCES_DIR ?= $(MAKESTER__HOME)resources
 else
-  MAKESTER__HOME ?= $(PWD)/$(MAKESTER__SUBMODULE_NAME)
   MAKESTER__MAKEFILES ?= $(if $(wildcard $(MAKESTER__SUBMODULE_NAME)),makester/makefiles,makefiles)
   MAKESTER__BIN ?= $(PWD)/venv/bin
   MAKESTER__RESOURCES_DIR ?= $(MAKESTER__PROJECT_DIR)/makester/resources
@@ -219,6 +228,7 @@ _version_val = $(if $(wildcard $(MAKESTER__VERSION_FILE)),$(shell cat $(MAKESTER
 MAKESTER__RELEASE_VERSION ?= $(call _version_val)
 
 # Makester includes happen here.
+#
 ifndef MAKESTER__INCLUDES
   ifeq ($(strip $(MAKESTER__MINIMAL)),true)
     MAKESTER__INCLUDES ?= py docs
@@ -249,6 +259,9 @@ vars:
 	$(call makester-vars-header)
 	printf "\nOverride variables at the top of your Makefile before the includes:\n"
 	$(call help-line,MAKESTER__STANDALONE:,$(MAKESTER__STANDALONE))
+	$(call help-line,MAKESTER__HOME:,$(MAKESTER__HOME))
+	$(call help-line,MAKESTER__BIN:,$(MAKESTER__BIN))
+	$(call help-line,MAKESTER__RESOURCES_DIR:,$(MAKESTER__RESOURCES_DIR))
 	printf "\nStandard override variables:\n"
 	$(call help-line,HASH:,$(HASH))
 	$(call help-line,MAKESTER__LOCAL_IP:,$(MAKESTER__LOCAL_IP))

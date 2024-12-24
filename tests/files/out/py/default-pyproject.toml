@@ -7,14 +7,14 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "makester"
+name = "makefiles"
 authors = [
-    {name = "Lou Markovski", email = "lou.markovski@gmail.com"},
+    {name = "<CHANGE_ME>", email = "CHANGE_ME@email.com"},
 ]
-description = "Common Project Build and Management Tooling"
+description = "<CHANGE_ME>"
 readme = "README.md"
 requires-python = ">=3"
-license = {file = "LICENCE.md"}
+license = {file = "LICENSE.md"}
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -27,35 +27,25 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: Python :: 3",
 ]
-dependencies = [
-    "Jinja2",
-    "backoff",
-    "black",
-    "build",
-    "logga",
-    "mdformat",
-    "mdformat-admon",
-    "mkdocs-material",
-    "mkdocs-material-extensions",
-    "mkdocstrings-python",
-    "mypy",
-    "pipdeptree",
-    "pylint",
-    "typer[all]",
-]
+dependencies = []
 dynamic = ["version"]
 
 [tool.setuptools-git-versioning]
 enabled = true
-version_file = "src/makester/VERSION"
+version_file = "src/makefiles/VERSION"
+
+[project.optional-dependencies]
+dev = [
+    "mkdocstrings-python",
+    "pytest",
+    "pytest-cov",
+    "pytest-sugar",
+    "twine",
+    "typer",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [project.scripts]
-makester = "makester.__main__:app"
-
-[project.urls]
-Documentation = "https://loum.github.io/makester/"
-Repository = "https://github.com/loum/makester"
-Issues = "https://github.com/loum/makester/issues"
+makefiles = "makefiles.__main__:app"

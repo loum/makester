@@ -2,7 +2,11 @@
 .DEFAULT_GOAL := help
 
 # Use a single bash shell for each job, and immediately exit on failure
+ifeq (,$(shell which zsh))
+SHELL := bash
+else
 SHELL := zsh
+endif
 .SHELLFLAGS := -ceu
 .ONESHELL:
 
@@ -10,8 +14,11 @@ SHELL := zsh
 # Makester overrides.
 #
 MAKESTER__STANDALONE := true
-
+ifneq ($(wildcard $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/makefiles/makester.mk),)
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/makefiles/makester.mk
+else
 include $(HOME)/.makester/makefiles/makester.mk
+endif
 
 MAKESTER__PROJECT_NAME := makester
 MAKESTER__GITVERSION_CONFIG := GitVersion.yml

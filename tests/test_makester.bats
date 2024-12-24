@@ -226,9 +226,10 @@ teardown_file() {
 }
 # bats test_tags=variables,makester-variables,MAKESTER__MAKEFILES
 @test "MAKESTER__MAKEFILES with MAKESTER__STANDALONE set should be set to correct path" {
-    MAKESTER__STANDALONE=true run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
+    MAKESTER__HOME=/Users/test/.makester/ MAKESTER__STANDALONE=true \
+ run make -f makefiles/makester.mk print-MAKESTER__MAKEFILES
 
-    assert_output "MAKESTER__MAKEFILES=$HOME/.makester/makefiles"
+    assert_output "MAKESTER__MAKEFILES=/Users/test/.makester/makefiles"
 
     assert_success
 }
@@ -341,20 +342,28 @@ teardown_file() {
 }
 
 # bats test_tags=variables,makester-variables,MAKESTER__HOME
-@test "MAKESTER__HOME in MAKESTER__STANDALONE mode" {
-    MAKESTER__STANDALONE=true MAKESTER__HOME=/Users/test/.makester\
+@test "MAKESTER__HOME in MAKESTER__STANDALONE" {
+    MAKESTER__STANDALONE=true MAKESTER__HOME=/Users/test/.makester/\
  run make -f makefiles/makester.mk print-MAKESTER__HOME
 
-    assert_output "MAKESTER__HOME=/Users/test/.makester"
+    assert_output "MAKESTER__HOME=/Users/test/.makester/"
 
     assert_success
 }
 # bats test_tags=variables,makester-variables,MAKESTER__HOME
-@test "MAKESTER__HOME not in MAKESTER__STANDALONE mode" {
-    MAKESTER__STANDALONE=false\
+@test "MAKESTER__HOME in MAKESTER__STANDALONE mode" {
+    MAKESTER__STANDALONE=true MAKESTER__HOME=/Users/test/.makester/\
  run make -f makefiles/makester.mk print-MAKESTER__HOME
 
-    assert_output "MAKESTER__HOME=$PWD/makester"
+    assert_output "MAKESTER__HOME=/Users/test/.makester/"
+
+    assert_success
+}
+# bats test_tags=variables,makester-variables,MAKESTER__HOME
+@test "MAKESTER__HOME when not in MAKESTER__STANDALONE mode" {
+    MAKESTER__STANDALONE=false run make -f makefiles/makester.mk print-MAKESTER__HOME
+
+    assert_output "MAKESTER__HOME=$PWD/makefiles/"
 
     assert_success
 }

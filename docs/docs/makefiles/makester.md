@@ -17,7 +17,7 @@ make makester-help
 
 ### Display the Makester variables
 
-Makester context is driven by environment variables. Most of these variables can be overriden to
+Makester context is driven by environment variables. Most of these variables can be overridden to
 suit your particular use cases.
 
 ```sh title="Display the state of the Makester variables."
