@@ -1,19 +1,18 @@
 """Template environment variables.
 
 """
-from typing import Dict, Optional, Text
 import json
 import os
 import shutil
 import tempfile
+from typing import Dict, Optional
 
-from logga import log
 import jinja2
+from logga import log
 
 
-def get_environment_values(token: Optional[Text] = None) -> dict:
-    """
-    Returns a dictionary structure of all environment values.
+def get_environment_values(token: Optional[str] = None) -> dict:
+    """Returns a dictionary structure of all environment values.
 
     The optional `token` argument filters environment variables to only those that
     start with `token`.
@@ -32,9 +31,8 @@ def get_environment_values(token: Optional[Text] = None) -> dict:
     return env_variables
 
 
-def get_json_values(path_to_json: Text) -> Dict:
-    """
-    Parse JSON file `path_to_json` into a Python dictionary.
+def get_json_values(path_to_json: str) -> Dict:
+    """Parse JSON file `path_to_json` into a Python dictionary.
 
     """
     log.info('Sourcing JSON values from "%s"', path_to_json)
@@ -50,10 +48,9 @@ def get_json_values(path_to_json: Text) -> Dict:
 
 
 def build_from_template(
-    env_map: Dict, template_file_path: Text, write_output: bool = False
+    env_map: Dict, template_file_path: str, write_output: bool = False
 ) -> None:
-    """
-    Take `template_file_path` and template against variables
+    """Take `template_file_path` and template against variables
     defined by `env_map`.
 
     `template_file_path` needs to end with a `.j2` extension as the generated
@@ -73,7 +70,7 @@ def build_from_template(
 
     """
 
-    def env_override(value: Text, key: Text) -> Text:
+    def env_override(value: str, key: str) -> str:
         return os.getenv(key, value)
 
     target_template_file_path = os.path.splitext(template_file_path)

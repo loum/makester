@@ -24,7 +24,11 @@ endif
 # 3. Makester embeded within a project as a Git submodule (legacy and will be deprecated).
 #
 ifndef MAKESTER__HOME
-  MAKESTER__HOME ?= $(dir $(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+  ifeq ($(strip $(firstword $(MAKEFILE_LIST))),Makefile)
+    MAKESTER__HOME ?= $(HOME)/.makester/
+  else
+    MAKESTER__HOME ?= $(dir $(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+  endif
 endif
 
 MAKESTER__SUBMODULE_NAME ?= makester

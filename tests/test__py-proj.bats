@@ -47,9 +47,7 @@ teardown_file() {
     MAKESTER__RESOURCES_DIR=resources MAKESTER__PROJECT_DIR=/var/tmp/fruit MAKESTER__PACKAGE_NAME=banana\
  run make -f makefiles/makester.mk py-proj-create --dry-run
 
-    assert_output --regexp "### Generating project pylint configuration to /var/tmp/fruit/pylintrc ...
-pylint --generate-rcfile > /var/tmp/fruit/pylintrc
-### Writing pyproject.toml to \"/var/tmp/fruit/pyproject.toml\" ...
+    assert_output --regexp "### Writing pyproject.toml to \"/var/tmp/fruit/pyproject.toml\" ...
 eval \"\\\$_pyproject_toml_script\"
 ### Creating a Python project directory structure under /var/tmp/fruit/src/banana
 /.*/mkdir -pv /var/tmp/fruit/src/banana

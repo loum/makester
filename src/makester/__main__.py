@@ -1,12 +1,11 @@
 """Makester CLI.
 
 """
-from dataclasses import dataclass
-from typing import Text
 import json
+from dataclasses import dataclass
 
-from logga import log, suppress_logging
 import typer
+from logga import log, suppress_logging
 
 import makester.templater
 import makester.waitster
@@ -26,19 +25,19 @@ class Common:
 
 @app.command()
 def templater(
-    template: Text = typer.Argument(
+    template: str = typer.Argument(
         ...,
         help="Path to Jinja2 template (absolute, or relative to user home)",
         show_default=False,
     ),
-    env_filter: Text = typer.Option(
+    env_filter: str = typer.Option(
         None,
         "--filter",
         "-f",
         help="Environment variable filter (ignored when mapping is taken from JSON file)",
         show_default=False,
     ),
-    mapping: Text = typer.Option(
+    mapping: str = typer.Option(
         None,
         "--mapping",
         "-m",
@@ -57,7 +56,7 @@ def templater(
     if mapping:
         mappings.update(makester.templater.get_json_values(mapping))
     else:
-        mappings.update(makester.templater.get_environment_values(token=(env_filter)))
+        mappings.update(makester.templater.get_environment_values(token=env_filter))
 
     log.info("Template mapping values sourced:\n%s", json.dumps(mappings, indent=2))
 
@@ -66,11 +65,11 @@ def templater(
 
 @app.command()
 def backoff(
-    host: Text = typer.Argument(
+    host: str = typer.Argument(
         ..., help="Host name of service connection.", show_default=False
     ),
     port: int = typer.Argument(..., help="Service port number.", show_default=False),
-    detail: Text = typer.Option(
+    detail: str = typer.Option(
         "Service", "--detail", "-d", help="Meaningful description for backoff port"
     ),
 ) -> None:

@@ -1,8 +1,15 @@
 name: Makester CI
+
 run-name: ${{ github.actor }} ${{ github.event_name }} event Makester CI 🚀
+
 on: push
+
 permissions:
   contents: write
+
+env:
+  MAKESTER__HOME: "${{ github.workspace }}/"
+
 jobs:
   tests:
     runs-on: ubuntu-24.04
@@ -14,15 +21,14 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          path: .makester
           submodules: recursive
           fetch-depth: 0
       - name: Project Makester vars
-        run: HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester vars
+        run: make vars
       - name: Project Makester test suite
         run: |
-          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
-          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester tests
+          make init
+          make tests
       - run: echo "🍏 ${{ job.status }}"
   pre-release:
     needs: tests
@@ -32,19 +38,17 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          path: .makester
           submodules: recursive
           fetch-depth: 0
       - name: Check if the VERSION file has changed
         id: changed_version_file
         uses: tj-actions/changed-files@v45
         with:
-          path: .makester
           files: src/makester/VERSION
       - name: Read VERSION file
         if: steps.changed_version_file.outputs.any_changed == 'true'
         id: get_version
-        run: echo "VERSION=$(cat $GITHUB_WORKSPACE/.makester/src/makester/VERSION)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(cat src/makester/VERSION)" >> $GITHUB_OUTPUT
       - name: Create pre-release
         if: steps.changed_version_file.outputs.any_changed == 'true'
         uses: "softprops/action-gh-release@v2"
@@ -62,11 +66,9 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          path: .makester
           submodules: recursive
       - name: Project Makester docs build
         run: |
-          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
-          HOME=$GITHUB_WORKSPACE MAKESTER__DOCS_DIR=$GITHUB_WORKSPACE/.makester \
-            make -C $GITHUB_WORKSPACE/.makester docs-gh-deploy
+          make init
+          make docs-gh-deploy
       - run: echo "🍏 ${{ job.status }}"

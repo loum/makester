@@ -40,7 +40,7 @@ dependencies = [
     "mkdocstrings-python",
     "mypy",
     "pipdeptree",
-    "pylint",
+    "ruff",
     "typer[all]",
 ]
 dynamic = ["version"]
@@ -59,3 +59,61 @@ makester = "makester.__main__:app"
 Documentation = "https://loum.github.io/makester/"
 Repository = "https://github.com/loum/makester"
 Issues = "https://github.com/loum/makester/issues"
+
+[tool.ruff]
+target-version = "py37"
+line-length = 120
+fix = true
+
+[tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+    # pylint
+    "PLC", "PLE", "PLR", "PLW",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+    # pylint
+    "PLC", "PLE", "PLR", "PLW",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+ignore = [
+    # DoNotAssignLambda
+    "E731",
+]
+
+[tool.ruff.format]
+preview = true
