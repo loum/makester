@@ -5,14 +5,15 @@
 #
 # bats file_tags=_py-venv
 setup_file() {
-    export MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    MAKESTER__PROJECT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/makester-XXXXXX")
+    export MAKESTER__PROJECT_DIR
 }
 setup() {
     load 'test_helper/common-setup'
     _common_setup
 }
 teardown_file() {
-    rmdir $MAKESTER__PROJECT_DIR
+    rmdir "$MAKESTER__PROJECT_DIR"
 }
 
 # Python venv variables.
@@ -82,7 +83,7 @@ teardown_file() {
 # Targets.
 #
 # bats test_tags=target,py-venv-create,dry
-@test "Python virtual environmnent create: dry" {
+@test "Python virtual environment create: dry" {
     run make -f makefiles/makester.mk py-venv-create --dry-run
 
     assert_output --regexp "### Creating virtual environment .*/venv ..."
@@ -91,7 +92,7 @@ teardown_file() {
 }
 
 # bats test_tags=target,py-venv-clear,dry
-@test "Python virtual environmnent delete: dry" {
+@test "Python virtual environment delete: dry" {
     _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk py-venv-clear --dry-run
 
     assert_output --regexp "### Deleting virtual environment .*/venv ..."

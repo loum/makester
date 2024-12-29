@@ -6,7 +6,7 @@ The Makester utilities are Python scripts that available to your project when yo
 the Makester environment with:
 
 ```sh
-make py-install-makester
+make -C $HOME/.makester py-install
 ```
 
 ## `makester` usage

@@ -88,7 +88,7 @@ make gitversion-release
 The `gitversion release` will update your `VERSION` file in accordance with your main-line version
 incremental rules.
 
-Here is a samle GitHub action that creates a tag and pre-release when the `VERSION` file change
+Here is a sample GitHub action that creates a tag and pre-release when the `VERSION` file change
 has been detected. It is based on `makester`'s versioning strategy and the excellent
 [marvinpinto/action-automatic-releases](https://github.com/marvinpinto/action-automatic-releases){target="\_blank"}
 action:

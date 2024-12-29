@@ -1,6 +1,5 @@
-.SILENT:
 ifndef .DEFAULT_GOAL
-  .DEFAULT_GOAL := makester-help
+.DEFAULT_GOAL := makester-help
 endif
 
 ifndef MAKESTER__PRIMED

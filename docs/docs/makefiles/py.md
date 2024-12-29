@@ -26,7 +26,7 @@ system, if that is what you really want to do.
     Quick start Python project based on [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/){target="\_blank"}.
 
 ```sh
-make py-project-create
+make py-proj-create
 ```
 
 !!! note
@@ -35,7 +35,7 @@ make py-project-create
 For example, given `MAKESTER__PROJECT_DIR=/var/tmp/fruit`:
 
 ```sh
-MAKESTER__PACKAGE_NAME=banana make py-project-create
+MAKESTER__PACKAGE_NAME=banana make py-proj-create
 ```
 
 Makester will produce the following directory layout:
@@ -134,7 +134,7 @@ make py-install
 ```
 
 !!! note
-    `pip` editable installs via `pyproject.toml` are supported in conjuction
+    `pip` editable installs via `pyproject.toml` are supported together
     with [setuptools v64.0.0](https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400)
     as the backend and [pip v21.3](https://pip.pypa.io/en/stable/news/#v21-3) as the frontend.
     Both `setuptools` and `pip` are automatically updated as part of `make py-venv-create`.

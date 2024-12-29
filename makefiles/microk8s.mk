@@ -1,11 +1,11 @@
 ifndef .DEFAULT_GOAL
-  .DEFAULT_GOAL := microk8s-help
+.DEFAULT_GOAL := microk8s-help
 endif
 
 ifndef MAKESTER__PRIMED
-  $(info ### Add the following include statement to your Makefile)
-  $(info include makester/makefiles/makester.mk)
-  $(error ### missing include dependency)
+$(info ### Add the following include statement to your Makefile)
+$(info include makester/makefiles/makester.mk)
+$(error ### missing include dependency)
 endif
 
 MAKESTER__MICROK8S_EXE_NAME ?= microk8s

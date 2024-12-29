@@ -14,8 +14,6 @@ setup() {
     _common_setup
 }
 teardown_file() {
-    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-setup-cfg-rm
-    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-cli-rm
     rmdir "$MAKESTER__PROJECT_DIR"
 }
 
@@ -83,7 +81,7 @@ include makester/makefiles/makester.mk'
     run make -f makefiles/makester.mk print-MAKESTER__SYSTEM_PYTHON3
 
     assert_output --regexp 'MAKESTER__SYSTEM_PYTHON3=.*/python3'
-    # We don't want the virtual enviornment Python here.
+    # We don't want the virtual environment Python here.
     refute_output --regexp 'MAKESTER__SYSTEM_PYTHON3=.*/3env'
 
     assert_success
@@ -207,24 +205,6 @@ include makester/makefiles/makester.mk'
     assert_success
 }
 
-# bats test_tags=variables,py-variables,MAKESTER__SETUP_CFG
-@test "MAKESTER__SETUP_CFG default should be set when calling py.mk" {
-    MAKESTER__PROJECT_DIR=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk print-MAKESTER__SETUP_CFG
-
-    assert_output "MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg"
-
-    assert_success
-}
-# bats test_tags=variables,py-variables,MAKESTER__SETUP_CFG
-@test "MAKESTER__SETUP_CFG override" {
-    MAKESTER__SETUP_CFG=test\
- run make -f makefiles/makester.mk print-MAKESTER__SETUP_CFG
-
-    assert_output 'MAKESTER__SETUP_CFG=test'
-
-    assert_success
-}
-
 # Targets.
 #
 # bats test_tags=target,py-vars
@@ -266,30 +246,10 @@ include makester/makefiles/makester.mk'
 }
 # bats test_tags=target,py-install-extras,dry-run
 @test "Python package extras install MAKESTER__PIP_INSTALL_EXTRAS override: dry" {
-    MAKESTER__PIP_INSTALL_EXTRAS=test\
- run make -f makefiles/makester.mk py-install-extras --dry-run
+    MAKESTER__PIP_INSTALL_EXTRAS="test" run make -f makefiles/makester.mk py-install-extras --dry-run
 
     assert_output --regexp '### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[test\]'
-
-    assert_success
-}
-
-# bats test_tags=target,py-install-makester,dry-run
-@test "Python package install MAKESTER__PIP_INSTALL override: dry" {
-    _VENV_DIR_EXISTS=1 run make -f makefiles/makester.mk py-install-makester --dry-run
-
-    assert_output --regexp '### Installing project dependencies into .*/venv ...
-.*/venv/bin/pip install --find-links=~/wheelhouse -e makester'
-
-    assert_success
-}
-# bats test_tags=target,py-install-makester,dry-run
-@test "Python package install MAKESTER__PIP_INSTALL override in MAKESTER__STANDALONE mode: dry" {
-    _VENV_DIR_EXISTS=1 MAKESTER__STANDALONE=true run make -f makefiles/makester.mk py-install-makester --dry-run
-
-    assert_output --regexp '### Installing project dependencies into .*/venv ...
-.*/venv/bin/pip install --find-links=~/wheelhouse -e .'
 
     assert_success
 }
@@ -311,72 +271,12 @@ include makester/makefiles/makester.mk'
     assert_success
 }
 
-# bats test_tags=target,py-project-create,dry-run
-@test "Python project scaffolding: dry" {
-    MAKESTER__RESOURCES_DIR=resources MAKESTER__PROJECT_DIR=/var/tmp/fruit MAKESTER__PACKAGE_NAME=banana\
- run make -f makefiles/makester.mk py-project-create --dry-run
-
-    assert_output --regexp '### Generating project pylint configuration to /var/tmp/fruit/pylintrc ...
-pylint --generate-rcfile > /var/tmp/fruit/pylintrc
-### Writing setup.cfg to "/var/tmp/fruit/setup.cfg" ...
-eval "\$_setup_cfg_script"
-### Creating a Python project directory structure under /var/tmp/fruit/src/banana
-/.*/mkdir -pv /var/tmp/fruit/src/banana
-/.*/touch /var/tmp/fruit/src/banana/__init__.py
-/.*/mkdir -pv /var/tmp/fruit/tests/banana
-/.*/cp resources/blank_directory.gitignore /var/tmp/fruit/tests/banana/.gitignore
-/.*/cp resources/pyproject.toml /var/tmp/fruit'
-
-    assert_success
-}
-
 # bats test_tags=target,py-deps,dry-run
 @test "Python project package dependency dump" {
     run make -f makefiles/makester.mk py-deps --dry-run
 
     assert_output '### Displaying "makefiles" package dependencies ...
 pipdeptree'
-
-    assert_success
-}
-
-# bats test_tags=target,py-setup-cfg
-@test "Python setup.cfg primer" {
-    MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg \
- run make -f makefiles/makester.mk py-setup-cfg
-    diff "$MAKESTER__PROJECT_DIR"/setup.cfg tests/files/out/py/default-setup.cfg
-
-    assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
-
-    assert_success
-}
-# bats test_tags=target,py-setup-cfg
-@test "Python setup.cfg primer MAKESTER__PACKAGE_NAME override" {
-    MAKESTER__SETUP_CFG=$MAKESTER__PROJECT_DIR/setup.cfg MAKESTER__PACKAGE_NAME=banana\
- run make -f makefiles/makester.mk py-setup-cfg
-    diff "$MAKESTER__PROJECT_DIR"/setup.cfg tests/files/out/py/package-name-override-setup.cfg
-
-    assert_output "### Writing setup.cfg to \"$MAKESTER__PROJECT_DIR/setup.cfg\" ..."
-
-    assert_success
-}
-
-# bats test_tags=target,py-cli
-@test "Python CLI __init__ primer" {
-    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-init
-    diff "$MAKESTER__PROJECT_DIR"/__init__.py tests/files/out/py/cli-init.py
-
-    assert_output "### Writing CLI __init__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
-
-    assert_success
-}
-
-# bats test_tags=target,py-cli
-@test "Python CLI __main__ primer" {
-    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR run make -f makefiles/makester.mk _py-cli-main
-    diff "$MAKESTER__PROJECT_DIR"/__main__.py tests/files/out/py/cli-main.py
-
-    assert_output "### Writing CLI __main__.py scaffolding under \"$MAKESTER__PROJECT_DIR\" ..."
 
     assert_success
 }

@@ -17,12 +17,8 @@ jobs:
           path: .makester
           submodules: recursive
           fetch-depth: 0
-      - run: pwd
-      - run: ls -al
-      - run: echo $HOME
-      - run: echo $GITHUB_WORKSPACE
       - name: Project Makester vars
-        run: HOME=$GITHUB_WORKSPACE make -f $GITHUB_WORKSPACE/.makester/Makefile vars
+        run: HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester vars
       - name: Project Makester test suite
         run: |
           HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
@@ -48,14 +44,15 @@ jobs:
       - name: Read VERSION file
         if: steps.changed_version_file.outputs.any_changed == 'true'
         id: get_version
-        run: echo "VERSION=$(cat GITHUB_WORKSPACE/.makester/src/makester/VERSION)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(cat $GITHUB_WORKSPACE/.makester/src/makester/VERSION)" >> $GITHUB_OUTPUT
       - name: Create pre-release
         if: steps.changed_version_file.outputs.any_changed == 'true'
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: "softprops/action-gh-release@v2"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: ${{ steps.get_version.outputs.version }}
-          automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          name: ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          generate_release_notes: true
           prerelease: true
   docs:
     runs-on: ubuntu-24.04
@@ -70,5 +67,6 @@ jobs:
       - name: Project Makester docs build
         run: |
           HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester init
-          HOME=$GITHUB_WORKSPACE make -C $GITHUB_WORKSPACE/.makester docs-gh-deploy
+          HOME=$GITHUB_WORKSPACE MAKESTER__DOCS_DIR=$GITHUB_WORKSPACE/.makester \
+            make -C $GITHUB_WORKSPACE/.makester docs-gh-deploy
       - run: echo "🍏 ${{ job.status }}"
