@@ -51,7 +51,7 @@ You can now evolve your `Makefile` to suit your project needs.
 Makester tooling can provide opionionated scaffolding for common components of a Python coding project.
 
 ```sh title="Initialise Python project boilerplate."
-make -f ~/.makester/Makefile py-proj-makefile && make py-proj-primer
+make -f ~/.makester/Makefile py-proj-makefile && make py-proj-primer && make init-dev
 ```
 
 #### What just happened?
@@ -67,8 +67,17 @@ new Python coding project and can start work immediately on your problem domain.
 - Pylint configuration. [More targeted configuration options for linting](makefiles/py.md#create-a-pylint-configuration).
 - [mypy](https://mypy-lang.org/) for code type annotation and [black](https://pypi.org/project/black/)
   for code formatting are ready to go. See [make py-check](makefiles/py.md#all-in-one-code-checker).
-- Placeholder for a project CLI that defaults to the `MAKESTER__PROJECT_NAME`. This can be invoked
-  with `venv/bin/<MAKESTER__PROJECT_NAME>`
+- Placeholder for a project CLI that defaults to the `MAKESTER__PROJECT_NAME`. For our `supa-idea` project, this can be
+  invoked with `venv/bin/supa_idea --help` to render the following output:
+  ```sh
+  Usage: supa_idea [OPTIONS]
+
+  Script entry point.
+
+  ╭─ Options ────────────────────────────────────────────────────────────────╮
+  │ --help          Show this message and exit.                              │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ```
 - [Dynamic versioning](makefiles/versioning.md#generate-dynamic-version).
 
 ## Existing project

@@ -41,11 +41,6 @@ MAKESTER__PIP_INSTALL_EXTRAS ?= dev
 py-install-extras: MAKESTER__PIP_INSTALL := -e .[$(MAKESTER__PIP_INSTALL_EXTRAS)]
 py-install-extras: py-install
 
-MAKESTER__PYLINT_RCFILE ?= $(MAKESTER__PROJECT_DIR)/pylintrc
-py-pylintrc:
-	$(info ### Generating project pylint configuration to $(MAKESTER__PYLINT_RCFILE) ...)
-	@pylint --generate-rcfile > $(MAKESTER__PYLINT_RCFILE)
-
 py-deps:
 	$(info ### Displaying "$(MAKESTER__PACKAGE_NAME)" package dependencies ...)
 	@pipdeptree
@@ -54,8 +49,6 @@ py-deps:
 #
 include $(MAKESTER__MAKEFILES)/_py-venv.mk
 include $(MAKESTER__MAKEFILES)/_py-proj.mk
-
-py-primer: py-proj-makefile makester-repo-ceremony docs-bootstrap py-proj-create gitversion-release py-proj-cli py-install
 
 py-distribution:
 	$(MAKESTER__PYTHON) -m build
@@ -77,18 +70,18 @@ py-fmt:
 
 py-lint-src:
 	$(info ### Linting Python files under "$(MAKESTER__PYTHONPATH)")
-	@pylint $(MAKESTER__PYTHONPATH)
+	@ruff check $(MAKESTER__PYTHONPATH)
 
 py-lint-tests:
 	$(info ### Linting Python files under "$(MAKESTER__TESTS_PYTHONPATH)")
-	@pylint $(MAKESTER__TESTS_PYTHONPATH)
+	@ruff check $(MAKESTER__TESTS_PYTHONPATH)
 
 py-lint-all: py-lint-src py-lint-tests
 
 py-lint:
 	$(call check-defined, LINT_PATH)
 	$(info ### Linting Python files under "$(LINT_PATH)")
-	@pylint $(LINT_PATH)
+	@ruff check $(LINT_PATH)
 
 MAKESTER__MYPY_OPTIONS ?= --disallow-untyped-defs
 py-type-src:
@@ -132,5 +125,4 @@ _py-help:
 	$(call help-line,py-install,Install Python project package dependencies)
 	$(call help-line,py-lint,Lint Python modules defined by \"LINT_PATH\")
 	$(call help-line,py-lint-all,Lint all Python modules under \"$(MAKESTER__PYTHONPATH)\")
-	$(call help-line,py-pylintrc,Add new pylint configuration to \"$(MAKESTER__PYLINT_RCFILE)\")
 	$(call help-line,py-vars,Display system Python settings)

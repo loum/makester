@@ -169,24 +169,6 @@ include makester/makefiles/makester.mk'
     assert_success
 }
 
-# bats test_tags=variables,py-variables,MAKESTER__PYLINT_RCFILE
-@test "MAKESTER__PYLINT_RCFILE default should be set when calling py.mk" {
-    run make -f makefiles/makester.mk print-MAKESTER__PYLINT_RCFILE
-
-    assert_output --regexp 'MAKESTER__PYLINT_RCFILE=.*/pylintrc'
-
-    assert_success
-}
-# bats test_tags=variables,py-variables,MAKESTER__PYLINT_RCFILE
-@test "MAKESTER__PYLINT_RCFILE override" {
-    MAKESTER__PYLINT_RCFILE=pylintrc\
- run make -f makefiles/makester.mk print-MAKESTER__PYLINT_RCFILE
-
-    assert_output 'MAKESTER__PYLINT_RCFILE=pylintrc'
-
-    assert_success
-}
-
 # bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
 @test "MAKESTER__PIP_INSTALL_EXTRAS default should be set when calling py.mk" {
     run make -f makefiles/makester.mk print-MAKESTER__PIP_INSTALL_EXTRAS
@@ -197,7 +179,7 @@ include makester/makefiles/makester.mk'
 }
 # bats test_tags=variables,py-variables,MAKESTER__PIP_INSTALL_EXTRAS
 @test "MAKESTER__PIP_INSTALL_EXTRAS override" {
-    MAKESTER__PIP_INSTALL_EXTRAS=test\
+    MAKESTER__PIP_INSTALL_EXTRAS="test"\
  run make -f makefiles/makester.mk print-MAKESTER__PIP_INSTALL_EXTRAS
 
     assert_output 'MAKESTER__PIP_INSTALL_EXTRAS=test'
@@ -250,23 +232,6 @@ include makester/makefiles/makester.mk'
 
     assert_output --regexp '### Installing project dependencies into .*/venv ...
 .*/venv/bin/pip install --find-links=~/wheelhouse -e \.\[test\]'
-
-    assert_success
-}
-
-# bats test_tags=target,py-pylintrc,dry-run
-@test "Python pylint configuration generator: dry" {
-    run make -f makefiles/makester.mk py-pylintrc --dry-run
-
-    assert_output --regexp 'pylint --generate-rcfile > /.*/pylintrc'
-
-    assert_success
-}
-# bats test_tags=target,py-pylintrc,dry-run
-@test "Python pylint configuration generator MAKESTER__PYLINT_RCFILE override: dry" {
-    MAKESTER__PYLINT_RCFILE=pylintrc run make -f makefiles/makester.mk py-pylintrc --dry-run
-
-    assert_output --regexp 'pylint --generate-rcfile > pylintrc'
 
     assert_success
 }
@@ -393,7 +358,7 @@ black src/makester'
     run make -f makefiles/makester.mk py-lint-src --dry-run
 
     assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
-pylint $MAKESTER__PROJECT_DIR/src"
+ruff check $MAKESTER__PROJECT_DIR/src"
 
     assert_success
 }
@@ -402,7 +367,7 @@ pylint $MAKESTER__PROJECT_DIR/src"
     MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-src --dry-run
 
     assert_output "### Linting Python files under \"something_else\"
-pylint something_else"
+ruff check something_else"
 
     assert_success
 }
@@ -412,7 +377,7 @@ pylint something_else"
     run make -f makefiles/makester.mk py-lint-tests --dry-run
 
     assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
-pylint $MAKESTER__PROJECT_DIR/tests"
+ruff check $MAKESTER__PROJECT_DIR/tests"
 
     assert_success
 }
@@ -421,7 +386,7 @@ pylint $MAKESTER__PROJECT_DIR/tests"
     MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-tests --dry-run
 
     assert_output "### Linting Python files under \"something_else\"
-pylint something_else"
+ruff check something_else"
 
     assert_success
 }
@@ -431,9 +396,9 @@ pylint something_else"
     run make -f makefiles/makester.mk py-lint-all --dry-run
 
     assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
-pylint $MAKESTER__PROJECT_DIR/src
+ruff check $MAKESTER__PROJECT_DIR/src
 ### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
-pylint $MAKESTER__PROJECT_DIR/tests"
+ruff check $MAKESTER__PROJECT_DIR/tests"
 
     assert_success
 }
@@ -442,9 +407,9 @@ pylint $MAKESTER__PROJECT_DIR/tests"
     MAKESTER__PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-all --dry-run
 
     assert_output "### Linting Python files under \"something_else\"
-pylint something_else
+ruff check something_else
 ### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
-pylint $MAKESTER__PROJECT_DIR/tests"
+ruff check $MAKESTER__PROJECT_DIR/tests"
 
     assert_success
 }
@@ -453,9 +418,9 @@ pylint $MAKESTER__PROJECT_DIR/tests"
     MAKESTER__TESTS_PYTHONPATH=something_else run make -f makefiles/makester.mk py-lint-all --dry-run
 
     assert_output "### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
-pylint $MAKESTER__PROJECT_DIR/src
+ruff check $MAKESTER__PROJECT_DIR/src
 ### Linting Python files under \"something_else\"
-pylint something_else"
+ruff check something_else"
 
     assert_success
 }
@@ -473,7 +438,7 @@ pylint something_else"
     LINT_PATH=src/makester run make -f makefiles/makester.mk py-lint --dry-run
 
     assert_output '### Linting Python files under "src/makester"
-pylint src/makester'
+ruff check src/makester'
 
     assert_success
 }
@@ -588,9 +553,9 @@ black $MAKESTER__PROJECT_DIR/src
 ### Formatting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
 black $MAKESTER__PROJECT_DIR/tests
 ### Linting Python files under \"$MAKESTER__PROJECT_DIR/src\"
-pylint $MAKESTER__PROJECT_DIR/src
+ruff check $MAKESTER__PROJECT_DIR/src
 ### Linting Python files under \"$MAKESTER__PROJECT_DIR/tests\"
-pylint $MAKESTER__PROJECT_DIR/tests
+ruff check $MAKESTER__PROJECT_DIR/tests
 ### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/src\"
 mypy --disallow-untyped-defs $MAKESTER__PROJECT_DIR/src
 ### Type annotating Python files under \"$MAKESTER__PROJECT_DIR/tests\"

@@ -48,6 +48,7 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-sugar",
+    "ruff",
     "twine",
     "typer",
 ]
@@ -57,6 +58,64 @@ where = ["src"]
 
 [project.scripts]
 $2 = "$2.__main__:app"
+
+[tool.ruff]
+target-version = "py37"
+line-length = 120
+fix = true
+
+[tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+    # pylint
+    "PLC", "PLE", "PLR", "PLW",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+    # pylint
+    "PLC", "PLE", "PLR", "PLW",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+ignore = [
+    # DoNotAssignLambda
+    "E731",
+]
+
+[tool.ruff.format]
+preview = true
 EOF
 endef
 
@@ -178,14 +237,14 @@ _py-cli-main-rm:
 py-proj-cli-rm:
 	$(MAKE) _py-cli-init-rm _py-cli-main-rm
 
-py-proj-create: py-pylintrc py-proj-toml-create
+py-proj-create: py-proj-toml-create
 	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))
 	@$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
 	@$(shell which touch) $(MAKESTER__PYTHON_PROJECT_ROOT)/__init__.py
 	@$(shell which mkdir) -pv $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)
 	@$(shell which cp) $(MAKESTER__RESOURCES_DIR)/blank_directory.gitignore $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)/.gitignore
 
-py-proj-primer: makester-repo-ceremony py-proj-create py-proj-cli docs-bootstrap gitversion-release py-install
+py-proj-primer: makester-repo-ceremony py-proj-create py-proj-cli docs-bootstrap gitversion-release
 
 _py-proj-help:
 	printf -- "-%.0s" {1..10}; printf "\n"

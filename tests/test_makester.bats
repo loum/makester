@@ -361,9 +361,10 @@ teardown_file() {
 }
 # bats test_tags=variables,makester-variables,MAKESTER__HOME
 @test "MAKESTER__HOME when not in MAKESTER__STANDALONE mode" {
-    MAKESTER__STANDALONE=false run make -f makefiles/makester.mk print-MAKESTER__HOME
+    MAKESTER__STANDALONE=false MAKESTER__HOME=/Users/test/.makester/\
+ run make -f makefiles/makester.mk print-MAKESTER__HOME
 
-    assert_output "MAKESTER__HOME=$PWD/makefiles/"
+    assert_output "MAKESTER__HOME=/Users/test/.makester/"
 
     assert_success
 }

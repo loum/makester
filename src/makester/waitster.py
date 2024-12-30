@@ -1,11 +1,10 @@
 """Wait until dependent service is ready.
 
 """
-from typing import Text
 import telnetlib
 
-from logga import log
 import backoff
+from logga import log
 
 
 @backoff.on_exception(
@@ -14,7 +13,7 @@ import backoff
     max_time=300,
     interval=5,
 )
-def port_backoff(host: Text, port: int, detail: Text) -> None:
+def port_backoff(host: str, port: int, detail: str) -> None:
     """Service backoff until ready."""
     msg = f"Checking host:port {host}:{port}"
     if detail is not None:

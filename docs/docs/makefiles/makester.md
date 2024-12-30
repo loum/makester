@@ -57,12 +57,6 @@ convention is adhered to within the project. Makester introduces special purpose
 `MAKESTER__<VARIABLE_NAME>`. Makester will attempt to provide sane defaults to get you started. However, it
 is recommended that you override these values in your own project's Makefile to provide more informative context.
 
-Makester special purpose variable values can be viewed any time with the `vars` target:
-
-```sh
-make vars
-```
-
 A description of the Makester special purpose variables follows:
 
 ### `MAKESTER__PROJECT_NAME`
