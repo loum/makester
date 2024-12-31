@@ -49,6 +49,7 @@ dev = [
     "pytest-cov",
     "pytest-sugar",
     "ruff",
+    "structlog",
     "twine",
     "typer",
 ]
@@ -204,20 +205,16 @@ cat <<EOF > $1/__main__.py
 """
 import typer
 
+from .logging_config import log
+
 
 app = typer.Typer(add_completion=False, help="CLI tool")
 
 
 @app.command()
-
-
-def main() -> None:
-    """Script entry point."""
-    app()
-
-
-if __name__ == "__main__":
-    main()
+def supa_idea() -> None:
+    """Command placeholder."""
+    log.info("Looks like you invoked the supa_idea command 🤓")
 EOF
 endef
 
@@ -234,8 +231,131 @@ _py-cli-main-rm:
 	$(info ### Deleting CLI __main__.py scaffolding under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
 	$(shell which rm) $(MAKESTER__PYTHON_PROJECT_ROOT)/__main__.py
 
-py-proj-cli-rm:
-	$(MAKE) _py-cli-init-rm _py-cli-main-rm
+py-proj-cli-rm: _py-cli-init-rm _py-cli-main-rm
+
+# Heredoc for the logging_config.py.
+#
+define _logging_config_heredoc
+cat <<'EOF' > $1/logging_config.py
+"""Logging configuration."""
+
+from __future__ import annotations
+
+import logging
+import logging.config
+import os
+from typing import TYPE_CHECKING
+
+import structlog
+
+if TYPE_CHECKING:
+    import structlog.stdlib
+
+
+def suppress_logging():
+    """Provides an overriding (to level `CRITICAL`) suppression mechanism
+    for all loggers which takes precedence over the logger`s own level.
+
+    This function can be useful when the need arises to temporarily throttle logging output down
+    across the whole application.
+
+    Technically, this function will disable all logging calls below severity level
+    `CRITICAL`.
+
+    """
+    logging.disable(logging.ERROR)
+
+
+timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")
+pre_chain = [
+    # Add the log level and a timestamp to the event_dict if the log entry
+    # is not from structlog.
+    structlog.stdlib.add_log_level,
+    # Add extra attributes of LogRecord objects to the event dictionary
+    # so that values passed in the extra parameter of log methods pass
+    # through to log output.
+    structlog.stdlib.ExtraAdder(),
+    timestamper,
+]
+
+
+def extract_from_record(
+    _: structlog.stdlib._FixedFindCallerLogger, __: str, event_dict: dict
+) -> dict:
+    """Extract thread and process names and add them to the event dict."""
+    record = event_dict["_record"]
+    event_dict["thread"] = record.threadName
+
+    return event_dict
+
+
+logging.config.dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "plain": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.dev.ConsoleRenderer(colors=False),
+                ],
+                "foreign_pre_chain": pre_chain,
+            },
+            "colored": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processors": [
+                    extract_from_record,
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.dev.ConsoleRenderer(colors=True),
+                ],
+                "foreign_pre_chain": pre_chain,
+            },
+        },
+        "handlers": {
+            "default": {
+                "level": os.environ.get("LOG_LEVEL", "INFO").upper(),
+                "class": "logging.StreamHandler",
+                "formatter": "plain",
+            },
+        },
+        "loggers": {
+            "": {
+                "handlers": ["default"],
+                "level": os.environ.get("LOG_LEVEL", "INFO").upper(),
+                "propagate": True,
+            },
+        },
+    }
+)
+structlog.configure(
+    processors=[
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        timestamper,
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+
+log = structlog.get_logger("webapp")
+EOF
+endef
+
+export _logging_config_script = $(call _logging_config_heredoc,$(MAKESTER__PYTHON_PROJECT_ROOT))
+
+py-proj-logging-config:
+	$(info ### Writing logging configuration under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	$(shell which mkdir) -pv $(MAKESTER__PYTHON_PROJECT_ROOT)
+	@eval "$$_logging_config_script"
+
+py-proj-logging-config-rm:
+	$(info ### Deleting logging configuration under "$(MAKESTER__PYTHON_PROJECT_ROOT)" ...)
+	$(shell which rm) $(MAKESTER__PYTHON_PROJECT_ROOT)/logging_config.py
 
 py-proj-create: py-proj-toml-create
 	$(info ### Creating a Python project directory structure under $(MAKESTER__PYTHON_PROJECT_ROOT))
@@ -244,12 +364,13 @@ py-proj-create: py-proj-toml-create
 	@$(shell which mkdir) -pv $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)
 	@$(shell which cp) $(MAKESTER__RESOURCES_DIR)/blank_directory.gitignore $(MAKESTER__PROJECT_DIR)/tests/$(MAKESTER__PACKAGE_NAME)/.gitignore
 
-py-proj-primer: makester-repo-ceremony py-proj-create py-proj-cli docs-bootstrap gitversion-release
+py-proj-primer: makester-repo-ceremony py-proj-create py-proj-logging-config py-proj-cli docs-bootstrap gitversion-release
 
 _py-proj-help:
 	printf -- "-%.0s" {1..10}; printf "\n"
 	$(call help-line,py-proj-cli,Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\")
 	$(call help-line,py-proj-cli-rm,Add new CLI scaffolding for \"$(MAKESTER__PACKAGE_NAME)\")
 	$(call help-line,py-proj-create,Create a minimal Python project directory structure scaffolding)
+	$(call help-line,py-proj-logging-config,Create project logging configuration)
 	$(call help-line,py-proj-makefile,Create a project Makefile)
 	$(call help-line,py-proj-toml-create,Add new pyproject.toml configuration to \"$(MAKESTER__PYPROJECT_TOML)\")

@@ -41,6 +41,7 @@ dev = [
     "pytest-cov",
     "pytest-sugar",
     "ruff",
+    "structlog",
     "twine",
     "typer",
 ]

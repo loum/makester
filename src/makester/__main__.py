@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass
 
 import typer
-from logga import log, suppress_logging
+from .logging_config import log, suppress_logging
 
 import makester.templater
 import makester.waitster

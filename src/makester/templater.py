@@ -8,7 +8,8 @@ import tempfile
 from typing import Dict, Optional
 
 import jinja2
-from logga import log
+
+from .logging_config import log
 
 
 def get_environment_values(token: Optional[str] = None) -> dict:

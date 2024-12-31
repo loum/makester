@@ -3,17 +3,13 @@
 """
 import typer
 
+from .logging_config import log
+
 
 app = typer.Typer(add_completion=False, help="CLI tool")
 
 
 @app.command()
-
-
-def main() -> None:
-    """Script entry point."""
-    app()
-
-
-if __name__ == "__main__":
-    main()
+def supa_idea() -> None:
+    """Command placeholder."""
+    log.info("Looks like you invoked the supa_idea command 🤓")
