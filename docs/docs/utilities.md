@@ -2,12 +2,7 @@
 
 ## Getting started
 
-The Makester utilities are Python scripts that available to your project when you create
-the Makester environment with:
-
-```sh
-make -C $HOME/.makester py-install
-```
+The Makester utilities provide reuseable tooling across all of your projects.
 
 ## `makester` usage
 
@@ -69,12 +64,12 @@ nc -l 19999
 Poll the port:
 
 ```sh
-venv/bin/makester backoff localhost 19999 --detail "Just a port check ..."
+venv/bin/makester backoff localhost 19999 --detail "- Just a port check ..."
 ```
 
 ```sh title="Backoff polling port 19999 for service readiness."
-2022-12-13 07:55:20,037:makester:INFO: Checking host:port localhost:19999 Just a port check ... ...
-2022-12-13 07:55:21,042:makester:INFO: Port 19999 ready
+2024-12-30 22:42:06 [info     ] Checking host:port localhost:19999 - Just a port check ... ...
+2024-12-30 22:42:07 [info     ] Port 19999 ready
 ```
 
 ## `makester templater`

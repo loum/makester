@@ -48,7 +48,7 @@ export PATH := $(shell echo $$PATH:$(MAKESTER__BIN))
 
 # Prepare the makester working directory. Place all makester convenience capability here.
 # In MAKESTER__STANDALONE mode, each project should have a separate working directory.
-MAKESTER__WORK_DIR ?= $(PWD)/.makester
+MAKESTER__WORK_DIR ?= $(MAKESTER__HOME).makester
 makester-work-dir:
 	$(info ### Creating Makester working directory "$(MAKESTER__WORK_DIR)")
 	$(shell which mkdir) -pv $(MAKESTER__WORK_DIR)

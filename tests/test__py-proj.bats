@@ -16,9 +16,9 @@ setup() {
 teardown_file() {
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-proj-toml-rm
     MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-proj-cli-rm
+    MAKESTER__PYTHON_PROJECT_ROOT=$MAKESTER__PROJECT_DIR make py-proj-logging-config-rm
     rmdir "$MAKESTER__PROJECT_DIR"
 }
-
 
 # Python project variables.
 #
@@ -100,3 +100,15 @@ eval \"\\\$_pyproject_toml_script\"
 
     assert_success
 }
+
+# bats test_tags=target,py-proj-cli
+@test "Python logging config" {
+    MAKESTER__PYTHON_PROJECT_ROOT="$MAKESTER__PROJECT_DIR" \
+ run make -f makefiles/makester.mk py-proj-logging-config
+    diff "$MAKESTER__PROJECT_DIR/logging_config.py" tests/files/out/py/default_logging_config.py
+
+    assert_output "### Writing logging configuration under \"$MAKESTER__PROJECT_DIR\" ..."
+
+    assert_success
+}
+

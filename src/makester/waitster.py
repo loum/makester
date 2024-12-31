@@ -4,7 +4,7 @@
 import telnetlib
 
 import backoff
-from logga import log
+from .logging_config import log
 
 
 @backoff.on_exception(

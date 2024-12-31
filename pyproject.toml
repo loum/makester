@@ -32,7 +32,6 @@ dependencies = [
     "backoff",
     "black",
     "build",
-    "logga",
     "mdformat",
     "mdformat-admon",
     "mkdocs-material",
@@ -41,6 +40,7 @@ dependencies = [
     "mypy",
     "pipdeptree",
     "ruff",
+    "structlog",
     "typer[all]",
 ]
 dynamic = ["version"]
