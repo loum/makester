@@ -131,6 +131,8 @@ upgrade_makester() {
   && git fetch -v --prune \
   && git checkout "$BRANCH"
 
+  make init
+
   # Exit upgrade directory.
   cd -
 }

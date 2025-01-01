@@ -65,12 +65,12 @@ nc -l 19999
 Poll the port:
 
 ```sh
-makester backoff localhost 19999 --detail "- Just a port check ..."
+makester backoff localhost 19999 --detail "- Just a port check"
 ```
 
 ```sh title="Backoff polling port 19999 for service readiness."
-2024-12-30 22:42:06 [info     ] Checking host:port localhost:19999 - Just a port check ... ...
-2024-12-30 22:42:07 [info     ] Port 19999 ready
+Checking host:port localhost:19999 - Just a port check ...
+Server is accepting connection requests 🚀
 ```
 
 ## `makester templater`

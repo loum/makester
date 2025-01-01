@@ -1,10 +1,24 @@
 """Wait until dependent service is ready."""
 
-import telnetlib
+import asyncio
 
 import backoff
 
-from .logging_config import log
+
+async def wait_host_port(host: str, port: int) -> None:
+    """Attempt a connection request of port on a host.
+
+    Use the async library to attempt to open a connection
+
+    Parameters
+    ----------
+        host: The IP address or hostname.
+        port: Port number.
+
+    """
+    _, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout=2)
+    writer.close()
+    await writer.wait_closed()
 
 
 @backoff.on_exception(
@@ -19,9 +33,9 @@ def port_backoff(host: str, port: int, detail: str) -> None:
     if detail is not None:
         msg += f" {detail}"
 
-    log.info("%s ...", msg)
+    try:
+        asyncio.run(wait_host_port(host, int(port)))
+    finally:
+        print(f"{msg} ...")
 
-    with telnetlib.Telnet(host, int(port)) as _tn:
-        _tn.set_debuglevel(5)
-        _tn.read_until(b" ", 1)
-        log.info("Port %s ready", port)
+    print("Server is accepting connection requests 🚀")
