@@ -59,11 +59,6 @@ _gitversion-versions-rm:
 	$(info ### Removing $(MAKESTER__WORK_DIR)/versioning)
 	$(shell rm $(MAKESTER__WORK_DIR)/versioning 2>/dev/null)
 
-# Symbol to be deprecated in Makester 0.3.0
-release-version: _release-version-warn gitversion-release
-_release-version-warn:
-	$(call deprecated,release-version,0.3.0,gitversion-release)
-
 _GITVERSION_FILTER := sed -e 's/=.*$$// p' $(MAKESTER__WORK_DIR)/versioning | jq .$(MAKESTER__GITVERSION_VARIABLE) | tr -d '"'
 
 _gitversion-release-msg:

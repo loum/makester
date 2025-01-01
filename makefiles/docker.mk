@@ -21,22 +21,11 @@ MAKESTER__IMAGE_TARGET_TAG ?= $(HASH)
 
 MAKESTER__RUN_COMMAND ?= $(MAKESTER__DOCKER) run --rm --name $(MAKESTER__CONTAINER_NAME) $(MAKESTER__SERVICE_NAME):$(HASH)
 
-# 20221027: Introduced target grouping for "image" related items.
+# Target grouping for "image" related items.
 #
-# Symbol to be deprecated in Makester 0.3.0
-search-image: _search-image-warn image-search
-_search-image-warn:
-	$(call deprecated,search-image,0.3.0,image-search)
-
-is image-search si:
+is image-search:
 	-$(MAKESTER__DOCKER) images "$(MAKESTER__SERVICE_NAME)*"
 
-# Symbol to be deprecated in Makester 0.3.0
-build-image: _build-image-warn image-build
-_build-image-warn:
-	$(call deprecated,build-image,0.3.0,image-build)
-
-#
 # Best guess-timate at the type of platform to build the container image against.
 #
 ifndef MAKESTER__DOCKER_PLATFORM
@@ -47,11 +36,9 @@ ifndef MAKESTER__DOCKER_PLATFORM
   endif
 endif
 
-#
 # Deploy local registry server for container images.
 #
 MAKESTER__LOCAL_REGISTRY_RUNNING ?= $(shell $(MAKESTER__DOCKER) ps | grep makester-registry | rev | cut -d' ' -f 1 | rev)
-#$(info ### MAKESTER__LOCAL_REGISTRY_RUNNING $(MAKESTER__LOCAL_REGISTRY_RUNNING))
 
 MAKESTER__LOCAL_REGISTRY_IMAGE ?= registry:2
 MAKESTER__LOCAL_REGISTRY_PORT ?= 15000
@@ -110,7 +97,7 @@ MAKESTER__BUILD_CONTEXT ?= build
 MAKESTER__BUILD_PATH ?= .
 MAKESTER__BUILD_COMMAND ?= -t $(MAKESTER__SERVICE_NAME):$(MAKESTER__IMAGE_TARGET_TAG) $(MAKESTER__BUILD_PATH)
 
-ib image-build bi:
+ib image-build:
 	$(MAKESTER__DOCKER) $(MAKESTER__BUILD_CONTEXT) $(MAKESTER__BUILD_COMMAND)
 
 ibx image-buildx: MAKESTER__BUILD_CONTEXT := buildx build --platform $(MAKESTER__DOCKER_PLATFORM) --$(MAKESTER__DOCKER_DRIVER_OUTPUT)
@@ -119,16 +106,11 @@ ibx image-buildx: image-build
 irm image-rm rmi rm-image:
 	$(MAKESTER__DOCKER) rmi $(MAKESTER__IMAGE_TAG_ALIAS)
 
-# Symbol to be deprecated in Makester 0.3.0
-tag-image: _tag-image-warn image-tag
-_tag-image-warn:
-	$(call deprecated,tag-image,0.3.0,image-tag)
-
 define _image-tag-id
 $(shell $(MAKESTER__DOCKER) images --filter=reference=$(MAKESTER__SERVICE_NAME) --format "{{.ID}}" | head -1)
 endef
 
-image-tag tag:
+image-tag:
 	-$(MAKESTER__DOCKER) tag $(call _image-tag-id) $(MAKESTER__IMAGE_TAG_ALIAS)
 
 _image-tag-msg:
@@ -137,19 +119,19 @@ _image-tag-rm-msg:
 	$(info ### Removing tag "$(MAKESTER__IMAGE_TARGET_TAG)" from container image "$(MAKESTER__SERVICE_NAME)")
 
 image-tag-latest tag-latest: MAKESTER__IMAGE_TARGET_TAG = latest
-image-tag-latest tag-latest: _image-tag-msg tag
+image-tag-latest tag-latest: _image-tag-msg image-tag
 
 image-tag-latest-rm tag-rm-latest: MAKESTER__IMAGE_TARGET_TAG = latest
 image-tag-latest-rm tag-rm-latest: _image-tag-rm-msg image-rm
 
 image-tag-version tag-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
-image-tag-version tag-version: _image-tag-msg tag
+image-tag-version tag-version: _image-tag-msg image-tag
 
 image-tag-version-rm tag-rm-version: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)-$(MAKESTER__RELEASE_NUMBER)
 image-tag-version-rm tag-rm-version: _image-tag-rm-msg image-rm
 
 image-tag-main tag-main: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)
-image-tag-main tag-main: _image-tag-msg tag
+image-tag-main tag-main: _image-tag-msg image-tag
 
 image-tag-main-rm tag-rm-main: MAKESTER__IMAGE_TARGET_TAG = $(MAKESTER__VERSION)
 image-tag-main-rm tag-rm-main: _image-tag-rm-msg image-rm
@@ -171,60 +153,25 @@ image-push:
 image-rm-dangling rm-dangling-images:
 	-$(shell $(MAKESTER__DOCKER) rmi $(shell $(MAKESTER__DOCKER) images -f "dangling=true" -q))
 
-# 20221027: Introduced target grouping for "container" related items.
+# Target grouping for "container" related items.
 #
-# Symbol to be deprecated in Makester 0.3.0
-run: _run-warn container-run
-_run-warn:
-	$(call deprecated,run,0.3.0,container-run)
-
 container-run:
 	-$(MAKESTER__RUN_COMMAND)
-
-# Symbol to be deprecated in Makester 0.3.0
-stop: _stop-warn container-stop
-_stop-warn:
-	$(call deprecated,stop,0.3.0,container-stop)
 
 container-stop:
 	-$(MAKESTER__DOCKER) stop $(MAKESTER__CONTAINER_NAME)
 
-# Symbol to be deprecated in Makester 0.3.0
-root: _root-warn container-root
-_root-warn:
-	$(call deprecated,root,0.3.0,container-root)
-
 container-root:
 	-$(MAKESTER__DOCKER) exec -ti -u 0 $(MAKESTER__CONTAINER_NAME) sh || true
-
-# Symbol to be deprecated in Makester 0.3.0
-sh: _sh-warn container-sh
-_sh-warn:
-	$(call deprecated,sh,0.3.0,container-sh)
 
 container-sh:
 	-$(MAKESTER__DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) sh || true
 
-# Symbol to be deprecated in Makester 0.3.0
-bash: _bash-warn container-bash
-_bash-warn:
-	$(call deprecated,bash,0.3.0,container-bash)
-
 container-bash:
 	-$(MAKESTER__DOCKER) exec -ti $(MAKESTER__CONTAINER_NAME) bash || true
 
-# Symbol to be deprecated in Makester 0.3.0
-logs: _logs-warn container-logs
-_logs-warn:
-	$(call deprecated,logs,0.3.0,container-logs)
-
 container-logs:
 	-$(MAKESTER__DOCKER) logs --follow $(MAKESTER__CONTAINER_NAME)
-
-# Symbol to be deprecated in Makester 0.3.0
-status: _status-warn container-status
-_status-warn:
-	$(call deprecated,status,0.3.0,container-status)
 
 MAKESTER__RUNNING_CONTAINER ?= $(shell $(MAKESTER__DOCKER) ps | grep $(MAKESTER__CONTAINER_NAME) | rev | cut -d' ' -f 1 | rev)
 

@@ -7,8 +7,8 @@ declarative, GitOps continuous delivery tool for Kubernetes.
 
 ## Getting started
 
-If you are operating Makester in [minimal mode](../getting-started.md#minimal-mode), then
-append `microk8s` and `argocd` to `MAKESTER__INCLUDES` to enable the Makester Argo CD subsystem.
+If managing `Makefile` includes manually, you must append `microk8s` and `argocd` to `MAKESTER__INCLUDES` to
+enable the Makester Argo CD subsystem.
 
 Argo CD needs to be deployed into a Kubernetes cluster. As such, Start by checking the MicroK8s status:
 

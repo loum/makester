@@ -23,22 +23,12 @@ else
   MAKESTER__PYTHON ?= $(MAKESTER__PROJECT_DIR)/venv/bin/python
 endif
 
-# Symbol to be deprecated in Makester 0.3.0
-clear-env: _clear-env-warn py-venv-clear
-_clear-env-warn:
-	$(call deprecated,clear-env,0.3.0,py-venv-clear)
-
 _VENV_DIR_EXISTS ?= $(shell [ -e "$(MAKESTER__PROJECT_DIR)/venv" ] && echo 1 || echo 0)
 py-venv-clear:
 ifeq ($(_VENV_DIR_EXISTS), 1)
 	$(info ### Deleting virtual environment $(MAKESTER__PROJECT_DIR)/venv ...)
 	$(shell which rm) -fr $(MAKESTER__PROJECT_DIR)/venv
 endif
-
-# Symbol to be deprecated in Makester 0.3.0
-init-env: _init-env-warn py-venv-init
-_init-env-warn:
-	$(call deprecated,init-env,0.3.0,py-venv-init)
 
 py-venv-init: wheel-dir py-venv-create
 
@@ -79,11 +69,6 @@ py-package-clean:
 py-package: py-package-clean
 	$(info ### Building package ...)
 	$(MAKESTER__PYTHON) $(SETUP_PY) bdist_wheel --dist-dir $(MAKESTER__WHEEL) --verbose
-
-# Symbol to be deprecated in Makester 0.3.0
-py-versions: _py-versions-warn py-venv-vars
-_py-versions-warn:
-	$(call deprecated,py-versions,0.3.0,py-venv-vars)
 
 py-venv-vars:
 	printf -- "-%.0s" {1..10}; printf "\n"

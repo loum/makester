@@ -6,32 +6,19 @@
 tool that lets you build, change, and version infrastructure safely and efficiently.
 
 !!! warning
-    **Caveat emptor**: The intro was ripped from the official Terraform page. Makester is by no way endorsing
+    **Caveat emptor**: The intro was taken from the official Terraform page. Makester is by no way endorsing
     [Terraform](https://developer.hashicorp.com/terraform){target="\_blank"} as a preferred IaC. There are probably
     better ways to handle infrastructure deployments. Consider this only as a basic Terraform primer. For example,
     to stand up a managed Kubernetes cluster where you can then leverage GitOps. The less DevOps in your project,
     the better ...
-
-    It is wise to take a pragmatic approach to DevOps as it is an evolving discipline. I have seen projects put too
-    much faith in the DevOps process which ultimately leads to rigid systems that are prone to failure and resistance
-    to change. In a fast-moving technological landscape aim to build flexible systems that evolve with emerging
-    trends, and are not to the detriment of the product. Furthermore, DevOps is not a panacea for bad system design ...
-
-    If you are embarking on your first DevOps project with Terraform, get ready for version skew,
-    incompatibilities, conflicts, provider decay, the list goes on. As you start working on
-    more Terraform projects you will notice that the only consistency when it comes to project
-    layouts is that they will all be different. That is where the major consultancy firms will burn
-    you with convoluted pre-baked deployments that they on-sell to unsuspecting clients who are blindsighted by the
-    quick-win fallacy of the OpEx revolution. As the consultancies are the only ones that can operate and manage
-    the ensuing mess, you're stuck with that garbage until you come to your senses.
 
 ## Getting started
 
 Ensure [Terraform](https://developer.hashicorp.com/terraform/install){target="\_blank"} is available in
 your path [(we recommend installing tfenv)](https://github.com/tfutils/tfenv){target="\_blank"}.
 
-If you are operating Makester in [minimal mode](../getting-started.md#minimal-mode), then
-append `terraform` to `MAKESTER__INCLUDES` to enable the Makester Terraform subsystem.
+If managing `Makefile` includes manually, you must append `terraform` to `MAKESTER__INCLUDES` to
+enable the Makester Terraform subsystem.
 
 ## Command reference
 

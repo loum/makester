@@ -18,8 +18,8 @@ that is ideal for localised testing, experimentation and for shaking out product
 
 ## Getting started
 
-If you are operating Makester in [minimal mode](../../getting-started.md#minimal-mode), then
-append `microk8s` to `MAKESTER__INCLUDES` to enable the Makester MicroK8s subsystem.
+If managing `Makefile` includes manually, you must append `microk8s` to `MAKESTER__INCLUDES` to enable
+the Makester MicroK8s subsystem.
 
 Start by checking the MicroK8s status:
 
