@@ -27,7 +27,6 @@ def version_callback(value: bool) -> None:
 
 @dataclass
 class Common:
-
     """Common arguments at the command level."""
 
     quiet: bool
