@@ -1,6 +1,5 @@
-"""Template environment variables.
+"""Template environment variables."""
 
-"""
 import json
 import os
 import shutil
@@ -13,11 +12,10 @@ from .logging_config import log
 
 
 def get_environment_values(token: Optional[str] = None) -> dict:
-    """Returns a dictionary structure of all environment values.
+    """Generate a dictionary structure of all environment values.
 
     The optional `token` argument filters environment variables to only those that
     start with `token`.
-
     """
     if not token:
         log.info("Filtering disabled. All environment variables will be mapped")
@@ -33,9 +31,7 @@ def get_environment_values(token: Optional[str] = None) -> dict:
 
 
 def get_json_values(path_to_json: str) -> Dict:
-    """Parse JSON file `path_to_json` into a Python dictionary.
-
-    """
+    """Parse JSON file `path_to_json` into a Python dictionary."""
     log.info('Sourcing JSON values from "%s"', path_to_json)
 
     json_mapping = {}
@@ -51,8 +47,7 @@ def get_json_values(path_to_json: str) -> Dict:
 def build_from_template(
     env_map: Dict, template_file_path: str, write_output: bool = False
 ) -> None:
-    """Take `template_file_path` and template against variables
-    defined by `env_map`.
+    """Take `template_file_path` and template against variables defined by `env_map`.
 
     `template_file_path` needs to end with a `.j2` extension as the generated
     content will be output to the `template_file_path` less the `.j2`.
@@ -68,7 +63,6 @@ def build_from_template(
         export CUSTOM=some_value
 
     The template will render `some_value`. Otherwise, `default`.
-
     """
 
     def env_override(value: str, key: str) -> str:

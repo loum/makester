@@ -20,9 +20,11 @@ main() {
     exit
   fi
 
-  printf "Uninstalling Makester from: %s\n" "$MAKESTER"
   if [ -d "$MAKESTER" ]; then
+    printf "... uninstalling Makester from: %s\n" "$MAKESTER"
     rm -rf "$MAKESTER"
+    printf "... deleting %s\n" "$HOME/.local/bin/makester"
+    rm "$HOME"/.local/bin/makester
   fi
 
   printf "Done. Thanks for trying out Makester."

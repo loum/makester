@@ -1,14 +1,15 @@
-"""Makester CLI.
+"""Makester CLI."""
 
-"""
 import json
 from dataclasses import dataclass
+from pathlib import Path
 
 import typer
-from .logging_config import log, suppress_logging
 
 import makester.templater
 import makester.waitster
+
+from .logging_config import log, suppress_logging
 
 app = typer.Typer(
     add_completion=False,
@@ -16,11 +17,21 @@ app = typer.Typer(
 )
 
 
+def version_callback(value: bool) -> None:
+    """Makester version."""
+    if value:
+        with open(Path(__file__).resolve().parent.joinpath("VERSION")) as _fh:
+            print(f"Makester CLI version: {_fh.read().strip()}")
+            raise typer.Exit()
+
+
 @dataclass
 class Common:
+
     """Common arguments at the command level."""
 
     quiet: bool
+    version: bool
 
 
 @app.command()
@@ -83,9 +94,12 @@ def common(
     quiet: bool = typer.Option(
         False, "--quiet", help='Disable logs to screen (to log level "ERROR")'
     ),
+    version: bool = typer.Option(
+        False, "--version", help="Makester CLI version", callback=version_callback
+    ),
 ) -> None:
     """Define the common arguments."""
-    ctx.obj = Common(quiet)
+    ctx.obj = Common(quiet, version)
 
-    if ctx.obj.quiet:
+    if ctx.obj:
         suppress_logging()

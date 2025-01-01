@@ -119,6 +119,9 @@ setup_makester() {
       exit 1
   fi
 
+  make init
+  ln -s $PWD/venv/bin/makester $HOME/.local/bin
+
   # Exit installation directory
   cd -
 }
