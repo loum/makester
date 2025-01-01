@@ -118,35 +118,3 @@ teardown_file() {
 
     assert_success
 }
-
-# Symbol deprecation.
-#
-# bats test_tags=deprecated
-@test "Warning for deprecated symbol target py-versions" {
-    run make -f makefiles/makester.mk py-versions
-
-    assert_output --partial '### "py-versions" will be deprecated in Makester: 0.3.0
-### Replace "py-versions" with "py-venv-vars"'
-
-    assert_success
-}
-
-# bats test_tags=deprecated
-@test "Warning for deprecated symbol target clear-env" {
-    run make -f makefiles/makester.mk clear-env --dry-run
-
-    assert_output --partial '### "clear-env" will be deprecated in Makester: 0.3.0
-### Replace "clear-env" with "py-venv-clear"'
-
-    assert_success
-}
-
-# bats test_tags=deprecated
-@test "Warning for deprecated symbol target init-env" {
-    run make -f makefiles/makester.mk init-env --dry-run
-
-    assert_output --partial '### "init-env" will be deprecated in Makester: 0.3.0
-### Replace "init-env" with "py-venv-init"'
-
-    assert_success
-}

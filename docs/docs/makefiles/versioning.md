@@ -37,9 +37,6 @@ make gitversion
 ### Generate dynamic version
 
 !!! tag "[Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4)"
-    The `gitversion-release` target was renamed `gitversion-release`  from `makefiles/python-venv.mk`
-    in [Makester v0.1.4](https://github.com/loum/makester/releases/tag/0.1.4). `gitversion-release`
-    will be deprecated in [Makester v0.3.0](https://github.com/loum/makester/releases/tag/0.3.0)
 
 The output is filtered against the GitVersion variable defined by `MAKESTER__GITVERSION_VARIABLE`
 (defaults to `AssemblySemFileVer`). For example:

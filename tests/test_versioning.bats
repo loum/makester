@@ -180,19 +180,3 @@ include makester/makefiles/makester.mk'
 
     assert_success
 }
-
-# Symbol deprecation.
-#
-# bats test_tags=deprecated,debug
-@test "Warning for deprecated symbol target release-version" {
-    MAKESTER__GITVERSION_CONFIG=sample/GitVersion.yml run make -f makefiles/makester.mk release-version
-
-    assert_output --regexp "### \"release-version\" will be deprecated in Makester: 0.3.0
-### Replace \"release-version\" with \"gitversion-release\"
-### Filtering GitVersion variable: AssemblySemFileVer
-### Removing $MAKESTER__WORK_DIR/versioning
-### Creating Makester working directory \"$MAKESTER__WORK_DIR\"
-### MAKESTER__RELEASE_VERSION: [0-9]+\.[0-9]+\.[0-9]+[ab]{0,1}[0-9]{0,3}"
-
-    assert_success
-}
