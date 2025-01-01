@@ -13,15 +13,13 @@ if TYPE_CHECKING:
     import structlog.stdlib
 
 
-def suppress_logging():
-    """Provides an overriding (to level `CRITICAL`) suppression mechanism
-    for all loggers which takes precedence over the logger`s own level.
+def suppress_logging() -> None:
+    """Log level override (to level `CRITICAL`) suppression mechanism.
 
     This function can be useful when the need arises to temporarily throttle logging output down
     across the whole application.
 
-    Technically, this function will disable all logging calls below severity level
-    `CRITICAL`.
+    Technically, this function will disable all logging calls below severity level `CRITICAL`.
 
     """
     logging.disable(logging.ERROR)

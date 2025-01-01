@@ -52,6 +52,9 @@ version_file = "src/makester/VERSION"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+makester = ["VERSION"]
+
 [project.scripts]
 makester = "makester.__main__:app"
 
@@ -111,8 +114,9 @@ select = [
     "D",
 ]
 ignore = [
-    # DoNotAssignLambda
-    "E731",
+    "D211",  # no-blank-line-before-class
+    "D213",  # multi-line-summary-second-line
+    "E731",  # DoNotAssignLambda
 ]
 
 [tool.ruff.format]

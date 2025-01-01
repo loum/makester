@@ -1,9 +1,9 @@
-"""Wait until dependent service is ready.
+"""Wait until dependent service is ready."""
 
-"""
 import telnetlib
 
 import backoff
+
 from .logging_config import log
 
 

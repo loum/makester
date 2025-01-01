@@ -4,13 +4,14 @@
 
 The Makester utilities provide reuseable tooling across all of your projects.
 
+!!! note
+    Makester follows the [Cross-Desktop Group](https://specifications.freedesktop.org/basedir-spec/latest/#variables){target="\_blank"}
+    specification by installing the `makester` utility into `$HOME/.local/bin`.
+
 ## `makester` usage
 
-```sh
-venv/bin/makester
-```
-
 ```sh title="makester usage message."
+└> makester
 Usage: makester [OPTIONS] COMMAND [ARGS]...
 
  Makester CLI tool
@@ -33,7 +34,7 @@ Usage: makester [OPTIONS] COMMAND [ARGS]...
 Wait until dependent service is ready:
 
 ```sh
-venv/bin/makester backoff --help
+makester backoff --help
 ```
 
 ```sh title="makester backoff usage message."
@@ -64,7 +65,7 @@ nc -l 19999
 Poll the port:
 
 ```sh
-venv/bin/makester backoff localhost 19999 --detail "- Just a port check ..."
+makester backoff localhost 19999 --detail "- Just a port check ..."
 ```
 
 ```sh title="Backoff polling port 19999 for service readiness."
@@ -80,7 +81,7 @@ venv/bin/makester backoff localhost 19999 --detail "- Just a port check ..."
 Template against environment variables or optional JSON values (`--mapping` switch):
 
 ```sh
-venv/bin/makester templater --help
+makester templater --help
 ```
 
 ```sh title="makester templater usage message."
@@ -141,7 +142,7 @@ EOF
 Template!
 
 ```sh
-CUSTOM=bananas venv/bin/makester --quiet templater my_template.j2
+CUSTOM=bananas makester --quiet templater my_template.j2
 ```
 
 ```sh title="makester templater example output."
