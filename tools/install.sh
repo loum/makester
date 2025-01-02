@@ -109,7 +109,7 @@ setup_makester() {
   && git config makester.remote origin \
   && git config makester.branch "$BRANCH" \
   && git remote add origin "$REMOTE" \
-  && git fetch --depth=1 origin \
+  && git fetch origin \
   && git checkout "$BRANCH"
 
   if [ ! -d "$MAKESTER" ]; then
