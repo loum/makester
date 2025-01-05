@@ -4,8 +4,8 @@
 
 Use the Makester primer tool in upgrade mode:
 
-```
-resources/scripts/primer.sh -u
+```sh Makester upgrade
+sh $HOME/.makester/tools/install.sh --upgrade
 ```
 
 Prior to [Makester v0.2.6](https://github.com/loum/makester/releases/tag/0.2.6) you will first need
