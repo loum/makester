@@ -195,6 +195,23 @@ define _deprecated-err
 	$(if $4,$(error ###),)
 endef
 
+# Standardise the way "which" works across shells (not reliant on pipefail).
+#
+# Params:
+#   1. Executable name to test.
+#   2. The return value.
+define get-exe-path
+  $(2) := $$(shell PATH=$(PATH); command -v $1 || echo not found)
+endef
+
+just-a-test:
+	$(eval $(call get-exe-path,banana,return_value))
+ifeq ($(return_value),not found)
+	echo not found
+else
+	echo $(return_value)
+endif
+
 # Check that a dependent executable is available. Exit with an error otherwise.
 #
 # Params:
@@ -202,11 +219,16 @@ endef
 #   2. Install tip or message to print.
 #   3. (optional) Add "warn/option" symbol to not exit. Symbol can be anything.
 check-exe = $(strip $(foreach 1,$1,$(call _check-exe,$1,$(strip $(value 2)),$(strip $(value 3)))))
-_check-exe = $(if $(shell PATH=$(PATH); which $1 2>/dev/null),$(shell PATH=$(PATH); which $1),$(call _check-exe-err,$1,$(if $2,$2),$(if $3,$3)))
+
+define _check-exe
+  $(eval $(call get-exe-path,$1,return_value))
+  $(if $(filter $(return_value),not found), $(call _check-exe-err,$1,$(if $2,$2),$(if $3,$3)), $(return_value))
+endef
+
 define _check-exe-err
-	$(if $3,,$(info ### "$1" not found))
-	$(if $3,,$(info ### Install notes: $2))
-	$(if $3,,$(error ###))
+  $(if $3,,$(info ### "$1" not found))
+  $(if $3,,$(info ### Install notes: $2))
+  $(if $3,,$(error ###))
 endef
 
 ifndef MAKESTER__ARCH
