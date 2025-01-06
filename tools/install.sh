@@ -120,7 +120,8 @@ setup_makester() {
   fi
 
   make init
-  ln -s $PWD/venv/bin/makester $HOME/.local/bin
+  mkdir -p "$HOME"/.local/bin
+  ln -s "$MAKESTER"/venv/bin/makester "$HOME"/.local/bin
 
   # Exit installation directory
   cd -
@@ -144,8 +145,9 @@ print_success() {
   printf ' _ __ ___   __ _| | _____  ___| |_ ___ _ __\n'
   printf "| '_ \` _ \ / _\` | |/ / _ \/ __| __/ _ \ '__|\n"
   printf '| | | | | | (_| |   <  __/\__ \ ||  __/ |\n'
-  printf '|_| |_| |_|\__,_|_|\_\___||___/\__\___|_|....is now installed!\n'
+  printf '|_| |_| |_|\__,_|_|\_\___||___/\__\___|_|\b'
   printf '\n'
+  printf '\n... is now installed!\n'
 }
 
 main() {
