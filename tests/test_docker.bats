@@ -346,7 +346,8 @@ docker run --rm -d\\
     MAKESTER__DOCKER=docker run make -f makefiles/makester.mk image-buildx-builder --dry-run
 
     assert_output '### Creating BuildKit builder "multiarch" (if required) ...
-docker buildx create --driver-opt network=host --name multiarch --use'
+docker buildx inspect multiarch ||\
+ docker buildx create --driver-opt "network=host" --name multiarch --use'
 
     assert_success
 }
@@ -356,7 +357,8 @@ docker buildx create --driver-opt network=host --name multiarch --use'
  run make -f makefiles/makester.mk image-buildx-builder --dry-run
 
     assert_output '### Creating BuildKit builder "supa-builder" (if required) ...
-docker buildx create --driver-opt network=host --name supa-builder --use'
+docker buildx inspect supa-builder ||\
+ docker buildx create --driver-opt "network=host" --name supa-builder --use'
 
     assert_success
 }

@@ -62,9 +62,11 @@ else
 endif
 
 MAKESTER__BUILDKIT_BUILDER_NAME ?= multiarch
+MAKESTER__BUILDKIT_DRIVER_OPT ?= --driver-opt "network=host"
 image-buildx-builder:
 	$(info ### Creating BuildKit builder "$(MAKESTER__BUILDKIT_BUILDER_NAME)" (if required) ...)
-	-$(MAKESTER__DOCKER) buildx create --driver-opt network=host --name $(MAKESTER__BUILDKIT_BUILDER_NAME) --use
+	$(MAKESTER__DOCKER) buildx inspect $(MAKESTER__BUILDKIT_BUILDER_NAME) ||\
+ $(MAKESTER__DOCKER) buildx create $(MAKESTER__BUILDKIT_DRIVER_OPT) --name $(MAKESTER__BUILDKIT_BUILDER_NAME) --use
 
 image-registry-start: _image-registry-start _image-registry-backoff
 
