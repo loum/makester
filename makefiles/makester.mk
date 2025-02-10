@@ -283,6 +283,9 @@ endef
 
 vars:
 	$(call makester-vars-header)
+	printf "\nEnvironment statics:\n"
+	$(call help-line,MAKESTER__UNAME:,$(MAKESTER__UNAME))
+	$(call help-line,MAKESTER__ARCH:,$(MAKESTER__ARCH))
 	printf "\nOverride variables at the top of your Makefile before the includes:\n"
 	$(call help-line,MAKESTER__STANDALONE:,$(MAKESTER__STANDALONE))
 	$(call help-line,MAKESTER__HOME:,$(MAKESTER__HOME))
